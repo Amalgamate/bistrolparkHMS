@@ -1,0 +1,56 @@
+/* Medical background with crosses pattern */
+.medical-background {
+  background-color: #E6F3F7;
+  background-image: radial-gradient(#A5C4D4 1px, transparent 1px);
+  background-size: 20px 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.medical-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(to right, transparent 9px, #A5C4D4 9px, #A5C4D4 11px, transparent 11px),
+    linear-gradient(to bottom, transparent 9px, #A5C4D4 9px, #A5C4D4 11px, transparent 11px);
+  background-size: 20px 20px;
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Dashboard content should be above the background pattern */
+.dashboard-content {
+  position: relative;
+  z-index: 2;
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Login page specific background */
+.login-background {
+  background-color: #E6F3F7;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image:
+    linear-gradient(to right, transparent 19px, #A5C4D4 19px, #A5C4D4 21px, transparent 21px),
+    linear-gradient(to bottom, transparent 19px, #A5C4D4 19px, #A5C4D4 21px, transparent 21px);
+  background-size: 40px 40px;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 1;
+}
