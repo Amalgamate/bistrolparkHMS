@@ -2,48 +2,57 @@ import React from 'react';
 import { MetricCard } from './MetricCard';
 import { Users, UserCheck, Calendar, Building } from 'lucide-react';
 
-export const MetricsOverview: React.FC = () => {
+export const MetricsOverview: React.FC = React.memo(() => {
+  // Memoize the icons to prevent unnecessary re-renders
+  const buildingIcon = React.useMemo(() => <Building className="w-5 h-5 text-blue-800" />, []);
+  const doctorIcon = React.useMemo(() => <UserCheck className="w-5 h-5 text-blue-800" />, []);
+  const patientIcon = React.useMemo(() => <Users className="w-5 h-5 text-blue-800" />, []);
+  const appointmentIcon = React.useMemo(() => <Calendar className="w-5 h-5 text-blue-800" />, []);
+
+  // Memoize the breakdown data
+  const bedsBreakdown = React.useMemo(() => [
+    { label: 'Executive Room', value: '-' },
+    { label: 'Premium Room', value: '-' },
+    { label: 'Basic Room', value: '-' },
+  ], []);
+
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <MetricCard
         title="Total Beds"
-        value="60"
-        icon={<Building className="w-6 h-6 text-[#2B4F60]" />}
+        value="-"
+        icon={buildingIcon}
         status="Available"
-        breakdown={[
-          { label: 'Executive Room', value: '12' },
-          { label: 'Premium Room', value: '30' },
-          { label: 'Basic Room', value: '18' },
-        ]}
+        statusColor="text-blue-700 font-semibold"
+        breakdown={bedsBreakdown}
       />
-      
+
       <MetricCard
         title="Doctors"
-        value="46"
-        icon={<UserCheck className="w-6 h-6 text-[#2B4F60]" />}
+        value="-"
+        icon={doctorIcon}
         status="Available"
-        secondaryValue="4"
+        statusColor="text-blue-700 font-semibold"
+        secondaryValue="-"
         secondaryStatus="Leave"
         description="Shows the current number of available doctors."
       />
-      
+
       <MetricCard
         title="Patients"
-        value="212"
-        icon={<Users className="w-6 h-6 text-[#2B4F60]" />}
-        status="↑ 12%"
-        statusColor="text-green-500"
+        value="-"
+        icon={patientIcon}
+        status="-"
         description="Displays live updates of patient numbers."
       />
-      
+
       <MetricCard
         title="Appointment"
-        value="50"
-        icon={<Calendar className="w-6 h-6 text-[#2B4F60]" />}
-        status="↓ 11%"
-        statusColor="text-[#FF7F7F]"
+        value="-"
+        icon={appointmentIcon}
+        status="-"
         description="Ensures accurate and current total patient appointment at all times."
       />
     </div>
   );
-};
+});

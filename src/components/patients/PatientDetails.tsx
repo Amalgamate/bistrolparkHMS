@@ -3,12 +3,20 @@ import {
   User, Phone, Mail, MapPin, Calendar, Clock, Heart,
   Activity, AlertCircle, FileText, Edit, Printer,
   Download, Share2, ChevronRight, Plus, X, Thermometer,
-  Scale, Ruler
+  Scale, Ruler, CreditCard, DollarSign, Shield,
+  Upload, File, ImageIcon
 } from 'lucide-react';
 import { usePatient } from '../../context/PatientContext';
 import { useToast } from '../../context/ToastContext';
 import { VitalsForm } from './VitalsForm';
 import { VitalsHistory } from './VitalsHistory';
+import { PaymentHistory } from './PaymentHistory';
+import { InsuranceInfo } from './InsuranceInfo';
+import DocumentUpload from '../documents/DocumentUpload';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+import { format } from 'date-fns';
+import { generatePatientPDF } from '../../utils/pdfUtils';
 import '../../styles/theme.css';
 
 // Mock data for visits, lab results, and prescriptions
@@ -49,7 +57,14 @@ const MOCK_LAB_RESULTS = [
     name: 'Complete Blood Count (CBC)',
     status: 'Completed',
     result: 'Normal',
-    notes: 'All values within normal range'
+    notes: 'All values within normal range',
+    details: {
+      'WBC': '7.2 x 10^9/L',
+      'RBC': '4.8 x 10^12/L',
+      'Hemoglobin': '14.2 g/dL',
+      'Hematocrit': '42%',
+      'Platelets': '250 x 10^9/L'
+    }
   },
   {
     id: 202,
@@ -57,7 +72,13 @@ const MOCK_LAB_RESULTS = [
     name: 'Lipid Panel',
     status: 'Completed',
     result: 'Abnormal',
-    notes: 'LDL cholesterol elevated at 145 mg/dL (reference range: <100 mg/dL)'
+    notes: 'LDL cholesterol elevated at 145 mg/dL (reference range: <100 mg/dL)',
+    details: {
+      'Total Cholesterol': '220 mg/dL',
+      'LDL Cholesterol': '145 mg/dL',
+      'HDL Cholesterol': '45 mg/dL',
+      'Triglycerides': '150 mg/dL'
+    }
   },
   {
     id: 203,
@@ -65,7 +86,12 @@ const MOCK_LAB_RESULTS = [
     name: 'Chest X-ray',
     status: 'Completed',
     result: 'Abnormal',
-    notes: 'Findings consistent with acute bronchitis. No evidence of pneumonia.'
+    notes: 'Findings consistent with acute bronchitis. No evidence of pneumonia.',
+    details: {
+      'Technique': 'PA and lateral views',
+      'Findings': 'Increased bronchial markings bilaterally. No consolidation or effusion.',
+      'Impression': 'Findings consistent with acute bronchitis. No evidence of pneumonia.'
+    }
   }
 ];
 
@@ -78,7 +104,9 @@ const MOCK_PRESCRIPTIONS = [
     frequency: 'Once daily',
     duration: '90 days',
     prescribedBy: 'Dr. Sarah Johnson',
-    refills: 3
+    refills: 3,
+    instructions: 'Take in the morning with or without food. Avoid potassium supplements.',
+    sideEffects: 'May cause dizziness, cough, or headache. Report swelling of face, lips, or tongue immediately.'
   },
   {
     id: 302,
@@ -88,7 +116,9 @@ const MOCK_PRESCRIPTIONS = [
     frequency: 'Once daily',
     duration: '5 days',
     prescribedBy: 'Dr. Michael Chen',
-    refills: 0
+    refills: 0,
+    instructions: 'Take with a full glass of water. May be taken with or without food.',
+    sideEffects: 'May cause nausea, diarrhea, or abdominal pain. Complete the full course even if feeling better.'
   },
   {
     id: 303,
@@ -98,9 +128,66 @@ const MOCK_PRESCRIPTIONS = [
     frequency: 'Three times daily',
     duration: '7 days',
     prescribedBy: 'Dr. Michael Chen',
-    refills: 0
+    refills: 0,
+    instructions: 'Swallow capsules whole. Do not chew or dissolve in mouth.',
+    sideEffects: 'May cause drowsiness, headache, or dizziness. Avoid driving if affected.'
   }
 ];
+
+// Mock medical history data
+const MOCK_MEDICAL_HISTORY = {
+  surgeries: [
+    {
+      id: 401,
+      date: '2020-05-12',
+      procedure: 'Appendectomy',
+      surgeon: 'Dr. James Wilson',
+      hospital: 'Nairobi Hospital',
+      notes: 'Laparoscopic procedure. No complications.'
+    }
+  ],
+  hospitalizations: [
+    {
+      id: 501,
+      admissionDate: '2020-05-10',
+      dischargeDate: '2020-05-15',
+      reason: 'Acute appendicitis',
+      hospital: 'Nairobi Hospital',
+      attendingPhysician: 'Dr. James Wilson',
+      notes: 'Patient presented with acute abdominal pain. Diagnosed with appendicitis and underwent appendectomy.'
+    }
+  ],
+  familyHistory: [
+    {
+      condition: 'Hypertension',
+      relation: 'Father',
+      notes: 'Diagnosed at age 45'
+    },
+    {
+      condition: 'Type 2 Diabetes',
+      relation: 'Maternal Grandmother',
+      notes: 'Diagnosed at age 60'
+    }
+  ],
+  immunizations: [
+    {
+      id: 601,
+      date: '2023-10-15',
+      vaccine: 'Influenza (Flu)',
+      administrator: 'Nurse Jane Doe',
+      location: 'Bristol Park Hospital - Fedha Branch',
+      notes: 'Annual flu vaccine'
+    },
+    {
+      id: 602,
+      date: '2018-03-22',
+      vaccine: 'Tetanus, Diphtheria, Pertussis (Tdap)',
+      administrator: 'Dr. Michael Chen',
+      location: 'Kenyatta National Hospital',
+      notes: 'Booster dose'
+    }
+  ]
+};
 
 interface PatientDetailsProps {
   patientId: number;
@@ -119,6 +206,7 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [showVitalsForm, setShowVitalsForm] = useState(false);
+  const [showDocumentUpload, setShowDocumentUpload] = useState(false);
   const { getPatient } = usePatient();
   const { showToast } = useToast();
   const patient = getPatient(patientId);
@@ -145,7 +233,8 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
     ...patient,
     visits: MOCK_VISITS,
     labResults: MOCK_LAB_RESULTS,
-    prescriptions: MOCK_PRESCRIPTIONS
+    prescriptions: MOCK_PRESCRIPTIONS,
+    medicalHistory: MOCK_MEDICAL_HISTORY
   };
 
   // Calculate age from date of birth
@@ -166,6 +255,22 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  // Export patient data to PDF
+  const exportToPDF = () => {
+    try {
+      // Generate the PDF using our utility function
+      const doc = generatePatientPDF(patientWithMockData, true, true, true);
+
+      // Save the PDF
+      doc.save(`bristol_park_patient_${patientWithMockData.id}_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+
+      showToast('success', 'Patient record exported to PDF successfully');
+    } catch (error) {
+      console.error('Export to PDF failed:', error);
+      showToast('error', 'Failed to export to PDF');
+    }
   };
 
   return (
@@ -220,13 +325,22 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
           </div>
 
           <div className="flex gap-3">
-            <button className="btn btn-sm bg-secondary text-primary">
+            <button
+              className="btn btn-sm bg-secondary text-primary"
+              onClick={() => {
+                window.print();
+                showToast('success', 'Print dialog opened');
+              }}
+            >
               <Printer className="w-4 h-4 mr-1" />
               Print
             </button>
-            <button className="btn btn-sm bg-secondary text-primary">
+            <button
+              className="btn btn-sm bg-secondary text-primary"
+              onClick={exportToPDF}
+            >
               <Download className="w-4 h-4 mr-1" />
-              Export
+              Export PDF
             </button>
             <button className="btn btn-sm bg-secondary text-primary">
               <Share2 className="w-4 h-4 mr-1" />
@@ -253,11 +367,25 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
           Vitals
         </button>
         <button
+          className={`tab ${activeTab === 'medical-history' ? 'active' : ''}`}
+          onClick={() => setActiveTab('medical-history')}
+        >
+          <FileText className="w-4 h-4 mr-2" />
+          Medical History
+        </button>
+        <button
           className={`tab ${activeTab === 'visits' ? 'active' : ''}`}
           onClick={() => setActiveTab('visits')}
         >
           <Calendar className="w-4 h-4 mr-2" />
           Visits
+        </button>
+        <button
+          className={`tab ${activeTab === 'accounts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('accounts')}
+        >
+          <CreditCard className="w-4 h-4 mr-2" />
+          Accounts
         </button>
         <button
           className={`tab ${activeTab === 'lab' ? 'active' : ''}`}
@@ -480,22 +608,37 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
             <div className="card">
               <div className="card-header flex items-center justify-between">
                 <h3 className="text-lg font-semibold text-primary">Insurance Information</h3>
-                <button
-                  className="btn-icon btn-sm bg-secondary"
-                  onClick={() => onEdit(patient.id)}
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    className="btn-sm bg-primary text-white"
+                    onClick={() => setActiveTab('accounts')}
+                  >
+                    <Shield className="w-4 h-4 mr-1" />
+                    View Details
+                  </button>
+                  <button
+                    className="btn-icon btn-sm bg-secondary"
+                    onClick={() => onEdit(patient.id)}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
               <div className="card-body space-y-4">
-                <div>
-                  <p className="text-sm text-muted">Provider</p>
-                  <p className="font-medium">{patientWithMockData.insurance?.provider || 'Not provided'}</p>
-                </div>
-
-                <div>
-                  <p className="text-sm text-muted">Policy Number</p>
-                  <p className="font-medium">{patientWithMockData.insurance?.policyNumber || 'Not provided'}</p>
+                <div className="flex items-center">
+                  {patientWithMockData.insurance?.provider ? (
+                    <>
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                        <Shield className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{patientWithMockData.insurance.provider}</p>
+                        <p className="text-sm text-muted">Policy: {patientWithMockData.insurance.policyNumber}</p>
+                      </div>
+                    </>
+                  ) : (
+                    <p className="text-muted">No insurance information provided</p>
+                  )}
                 </div>
 
                 <div>
@@ -715,24 +858,326 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
           </div>
         )}
 
+        {/* Accounts Tab */}
+        {activeTab === 'accounts' && (
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-semibold text-primary">Patient Accounts</h3>
+              <div className="flex gap-2">
+                <button className="btn btn-outline btn-sm">
+                  <Printer className="w-4 h-4 mr-1" />
+                  Print Statement
+                </button>
+                <button className="btn btn-primary btn-sm">
+                  <Plus className="w-4 h-4 mr-1" />
+                  New Payment
+                </button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Account Summary */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-md shadow-sm p-4 mb-6">
+                  <h4 className="text-md font-semibold text-primary mb-4">Account Summary</h4>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center pb-2 border-b">
+                      <span className="text-sm text-gray-600">Total Charges</span>
+                      <span className="font-semibold">KES 45,000</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-2 border-b">
+                      <span className="text-sm text-gray-600">Insurance Payments</span>
+                      <span className="font-semibold text-green-600">KES 32,000</span>
+                    </div>
+                    <div className="flex justify-between items-center pb-2 border-b">
+                      <span className="text-sm text-gray-600">Patient Payments</span>
+                      <span className="font-semibold text-green-600">KES 8,000</span>
+                    </div>
+                    <div className="flex justify-between items-center pt-2">
+                      <span className="text-md font-medium">Current Balance</span>
+                      <span className="text-lg font-bold text-red-600">KES 5,000</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Insurance Information */}
+                <InsuranceInfo insurance={patientWithMockData.insurance} />
+              </div>
+
+              {/* Payment History */}
+              <div className="lg:col-span-2">
+                <PaymentHistory payments={patientWithMockData.payments} />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Medical History Tab */}
+        {activeTab === 'medical-history' && (
+          <div className="space-y-6">
+            {/* Surgeries */}
+            <div className="card">
+              <div className="card-header flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-primary">Surgical History</h3>
+                <button className="btn btn-primary btn-sm">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Surgery
+                </button>
+              </div>
+              <div className="card-body">
+                {patientWithMockData.medicalHistory?.surgeries?.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Procedure</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Surgeon</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {patientWithMockData.medicalHistory.surgeries.map((surgery) => (
+                          <tr key={surgery.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(surgery.date)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{surgery.procedure}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{surgery.surgeon}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{surgery.hospital}</td>
+                            <td className="px-6 py-4 text-sm">{surgery.notes}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500">No surgical history recorded</div>
+                )}
+              </div>
+            </div>
+
+            {/* Hospitalizations */}
+            <div className="card">
+              <div className="card-header flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-primary">Hospitalization History</h3>
+                <button className="btn btn-primary btn-sm">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Hospitalization
+                </button>
+              </div>
+              <div className="card-body">
+                {patientWithMockData.medicalHistory?.hospitalizations?.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Admission Date</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Discharge Date</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Attending Physician</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {patientWithMockData.medicalHistory.hospitalizations.map((hospitalization) => (
+                          <tr key={hospitalization.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(hospitalization.admissionDate)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(hospitalization.dischargeDate)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{hospitalization.reason}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{hospitalization.hospital}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{hospitalization.attendingPhysician}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500">No hospitalization history recorded</div>
+                )}
+              </div>
+            </div>
+
+            {/* Family History */}
+            <div className="card">
+              <div className="card-header flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-primary">Family Medical History</h3>
+                <button className="btn btn-primary btn-sm">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Family History
+                </button>
+              </div>
+              <div className="card-body">
+                {patientWithMockData.medicalHistory?.familyHistory?.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Condition</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Relation</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {patientWithMockData.medicalHistory.familyHistory.map((history, index) => (
+                          <tr key={index}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{history.condition}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{history.relation}</td>
+                            <td className="px-6 py-4 text-sm">{history.notes}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500">No family medical history recorded</div>
+                )}
+              </div>
+            </div>
+
+            {/* Immunizations */}
+            <div className="card">
+              <div className="card-header flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-primary">Immunization History</h3>
+                <button className="btn btn-primary btn-sm">
+                  <Plus className="w-4 h-4 mr-1" />
+                  Add Immunization
+                </button>
+              </div>
+              <div className="card-body">
+                {patientWithMockData.medicalHistory?.immunizations?.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vaccine</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Administrator</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+                          <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {patientWithMockData.medicalHistory.immunizations.map((immunization) => (
+                          <tr key={immunization.id}>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{formatDate(immunization.date)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{immunization.vaccine}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{immunization.administrator}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm">{immunization.location}</td>
+                            <td className="px-6 py-4 text-sm">{immunization.notes}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-gray-500">No immunization history recorded</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Documents Tab */}
         {activeTab === 'documents' && (
           <div>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-primary">Patient Documents</h3>
-              <button className="btn btn-primary btn-sm">
+              <button
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowDocumentUpload(true)}
+              >
                 <Plus className="w-4 h-4 mr-1" />
                 Upload Document
               </button>
             </div>
 
-            <div className="text-center py-8">
-              <div className="text-lg font-medium text-muted mb-2">No documents found</div>
-              <p className="text-muted">Upload patient documents such as consent forms, ID proofs, or medical records</p>
-              <button className="btn btn-primary mt-4">
-                <Plus className="w-4 h-4 mr-2" />
-                Upload New Document
-              </button>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Example document cards - these would be populated from real data */}
+              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-start mb-3">
+                  <FileIcon className="w-10 h-10 text-red-500 mr-3" />
+                  <div>
+                    <h4 className="font-medium text-gray-900">Medical History Form</h4>
+                    <p className="text-xs text-gray-500">PDF • 1.5 MB</p>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 mb-3">
+                  Uploaded on {new Date().toLocaleDateString()}
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button className="text-blue-600 hover:text-blue-800">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button className="text-green-600 hover:text-green-800">
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-start mb-3">
+                  <ImageIcon className="w-10 h-10 text-blue-500 mr-3" />
+                  <div>
+                    <h4 className="font-medium text-gray-900">X-Ray Results</h4>
+                    <p className="text-xs text-gray-500">JPG • 3.2 MB</p>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 mb-3">
+                  Uploaded on {new Date().toLocaleDateString()}
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button className="text-blue-600 hover:text-blue-800">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button className="text-green-600 hover:text-green-800">
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                <div className="flex items-start mb-3">
+                  <FileIcon className="w-10 h-10 text-red-500 mr-3" />
+                  <div>
+                    <h4 className="font-medium text-gray-900">Consent Form</h4>
+                    <p className="text-xs text-gray-500">PDF • 0.8 MB</p>
+                  </div>
+                </div>
+                <div className="text-xs text-gray-500 mb-3">
+                  Uploaded on {new Date().toLocaleDateString()}
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button className="text-blue-600 hover:text-blue-800">
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button className="text-green-600 hover:text-green-800">
+                    <Download className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-4 flex justify-center">
+              <a href="/document-center" className="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                View all documents in Document Center
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* Document Upload Modal */}
+        {showDocumentUpload && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-md shadow-lg w-full max-w-2xl max-h-[90vh] overflow-auto">
+              <DocumentUpload
+                patientId={patientId.toString()}
+                patientName={`${patientWithMockData.firstName} ${patientWithMockData.lastName}`}
+                onClose={() => setShowDocumentUpload(false)}
+                onUpload={(document) => {
+                  setShowDocumentUpload(false);
+                  showToast('success', 'Document uploaded successfully');
+                }}
+              />
             </div>
           </div>
         )}

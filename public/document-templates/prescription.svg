@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="800" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="600" height="800" fill="#ffffff"/>
+  
+  <!-- Header -->
+  <rect width="600" height="80" fill="#2B3990"/>
+  
+  <!-- Logo Placeholder -->
+  <circle cx="50" cy="40" r="30" fill="#ffffff"/>
+  
+  <!-- Header Text -->
+  <text x="100" y="40" font-family="Arial" font-size="20" fill="#ffffff" font-weight="bold">BRISTOL PARK HOSPITAL</text>
+  <text x="100" y="60" font-family="Arial" font-size="14" fill="#ffffff">Prescription</text>
+  
+  <!-- Document Title -->
+  <rect x="0" y="100" width="600" height="40" fill="#f0f0f0"/>
+  <text x="20" y="125" font-family="Arial" font-size="18" fill="#2B3990" font-weight="bold">PRESCRIPTION</text>
+  <text x="500" y="125" font-family="Arial" font-size="14" fill="#A61F1F" font-weight="bold">RX-12345</text>
+  
+  <!-- Doctor & Patient Information -->
+  <text x="20" y="170" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Doctor & Patient Information</text>
+  <line x1="20" y1="175" x2="580" y2="175" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Two Column Layout -->
+  <text x="20" y="200" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Prescribing Doctor:</text>
+  <text x="20" y="220" font-family="Arial" font-size="12" fill="#333333">Dr. Sarah Johnson</text>
+  <text x="20" y="240" font-family="Arial" font-size="12" fill="#333333">License No: MED-12345</text>
+  <text x="20" y="260" font-family="Arial" font-size="12" fill="#333333">Specialty: Internal Medicine</text>
+  <text x="20" y="280" font-family="Arial" font-size="12" fill="#333333">Bristol Park Hospital - Fedha Branch</text>
+  
+  <text x="350" y="200" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Patient:</text>
+  <text x="350" y="220" font-family="Arial" font-size="12" fill="#333333">John Doe</text>
+  <text x="350" y="240" font-family="Arial" font-size="12" fill="#333333">Patient ID: P12345</text>
+  <text x="350" y="260" font-family="Arial" font-size="12" fill="#333333">Date of Birth: 01/15/1980</text>
+  <text x="350" y="280" font-family="Arial" font-size="12" fill="#333333">Date Prescribed: 05/01/2023</text>
+  
+  <!-- Prescription Details -->
+  <text x="20" y="320" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Prescription Details</text>
+  <line x1="20" y1="325" x2="580" y2="325" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Rx Symbol -->
+  <text x="20" y="350" font-family="Arial" font-size="24" fill="#A61F1F" font-weight="bold">Rx</text>
+  
+  <!-- Medication 1 -->
+  <rect x="20" y="360" width="560" height="100" fill="#f9f9f9" stroke="#dddddd"/>
+  <text x="40" y="380" font-family="Arial" font-size="14" fill="#333333" font-weight="bold">1. Lisinopril 10mg Tablets</text>
+  <text x="40" y="400" font-family="Arial" font-size="12" fill="#333333">Sig: Take one tablet by mouth once daily for hypertension</text>
+  <text x="40" y="420" font-family="Arial" font-size="12" fill="#333333">Disp: 30 tablets</text>
+  <text x="40" y="440" font-family="Arial" font-size="12" fill="#333333">Refills: 3</text>
+  
+  <!-- Medication 2 -->
+  <rect x="20" y="470" width="560" height="100" fill="#ffffff" stroke="#dddddd"/>
+  <text x="40" y="490" font-family="Arial" font-size="14" fill="#333333" font-weight="bold">2. Metformin 500mg Tablets</text>
+  <text x="40" y="510" font-family="Arial" font-size="12" fill="#333333">Sig: Take one tablet by mouth twice daily with meals for diabetes</text>
+  <text x="40" y="530" font-family="Arial" font-size="12" fill="#333333">Disp: 60 tablets</text>
+  <text x="40" y="550" font-family="Arial" font-size="12" fill="#333333">Refills: 3</text>
+  
+  <!-- Special Instructions -->
+  <text x="20" y="600" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Special Instructions</text>
+  <line x1="20" y1="605" x2="580" y2="605" stroke="#2B3990" stroke-width="2"/>
+  
+  <rect x="20" y="620" width="560" height="80" fill="#f9f9f9" stroke="#dddddd"/>
+  <text x="30" y="640" font-family="Arial" font-size="12" fill="#333333">• Take medications as prescribed</text>
+  <text x="30" y="660" font-family="Arial" font-size="12" fill="#333333">• Avoid alcohol while taking these medications</text>
+  <text x="30" y="680" font-family="Arial" font-size="12" fill="#333333">• Return for follow-up appointment in 1 month</text>
+  
+  <!-- Signature -->
+  <text x="20" y="720" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Doctor's Signature:</text>
+  <line x1="150" y1="720" x2="300" y2="720" stroke="#333333" stroke-width="1"/>
+  <text x="150" y="735" font-family="Arial" font-size="10" fill="#666666" font-style="italic">Dr. Sarah Johnson</text>
+  
+  <!-- Footer -->
+  <rect y="750" width="600" height="50" fill="#f0f0f0"/>
+  <line x1="0" y1="750" x2="600" y2="750" stroke="#A61F1F" stroke-width="3"/>
+  <text x="20" y="780" font-family="Arial" font-size="10" fill="#666666">Bristol Park Hospital - Excellence in Healthcare</text>
+  <text x="580" y="780" font-family="Arial" font-size="10" fill="#666666" text-anchor="end">Page 1 of 1</text>
+  
+  <!-- Serial Number -->
+  <text x="20" y="795" font-family="Arial" font-size="8" fill="#999999">FDH-RX-12345</text>
+</svg>

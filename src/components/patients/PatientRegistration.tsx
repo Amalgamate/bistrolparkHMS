@@ -6,55 +6,204 @@ import { format } from 'date-fns';
 import {
   Save, X, User, Phone, Mail, Calendar, MapPin,
   Heart, Activity, AlertCircle, FileText, Users,
-  ChevronRight, ChevronLeft
+  ChevronRight, ChevronLeft, Shield
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
+import { useInsurance } from '../../context/InsuranceContext';
 import '../../styles/theme.css';
 
+// Helper function to validate Kenyan phone numbers
+const isValidKenyanPhone = (phone: string) => {
+  // Kenyan phone numbers can be in formats like:
+  // +254 7XX XXX XXX, 07XX XXX XXX, 254 7XX XXX XXX
+  const kenyanPhoneRegex = /^(?:\+254|254|0)7\d{8}$/;
+  // Remove spaces, dashes, and parentheses for validation
+  const cleanedPhone = phone.replace(/[\s\-()]/g, '');
+  return kenyanPhoneRegex.test(cleanedPhone);
+};
+
+// Helper function to validate Kenyan National ID
+const isValidKenyanID = (id: string) => {
+  // Kenyan IDs are typically 8 digits, but can be 7-9 digits
+  const kenyanIDRegex = /^\d{7,9}$/;
+  return kenyanIDRegex.test(id);
+};
+
+// Helper function to validate date of birth (must be in the past and not more than 120 years ago)
+const isValidDateOfBirth = (dob: string) => {
+  const dobDate = new Date(dob);
+  const today = new Date();
+  const minDate = new Date();
+  minDate.setFullYear(today.getFullYear() - 120); // 120 years ago
+
+  return dobDate < today && dobDate > minDate;
+};
+
 const patientSchema = z.object({
+  // File Numbers
+  outPatientFileNumber: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  oldReferenceNumber: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  inPatientFileNumber: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
   // Personal Information
-  firstName: z.string().min(2, 'First name must be at least 2 characters'),
-  lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  dateOfBirth: z.string().min(1, 'Date of birth is required'),
-  gender: z.enum(['male', 'female', 'other']),
-  nationalId: z.string().optional(),
+  firstName: z.string()
+    .min(2, 'First name must be at least 2 characters')
+    .max(50, 'First name cannot exceed 50 characters')
+    .regex(/^[a-zA-Z\s'-]+$/, 'First name can only contain letters, spaces, hyphens, and apostrophes'),
+
+  middleName: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  lastName: z.string()
+    .min(2, 'Last name must be at least 2 characters')
+    .max(50, 'Last name cannot exceed 50 characters')
+    .regex(/^[a-zA-Z\s'-]+$/, 'Last name can only contain letters, spaces, hyphens, and apostrophes'),
+
+  // Date of Birth - Both as combined field and separate components
+  dateOfBirth: z.string()
+    .min(1, 'Date of birth is required')
+    .refine(isValidDateOfBirth, 'Date of birth must be in the past and not more than 120 years ago'),
+
+  birthDay: z.string().optional(),
+  birthMonth: z.string().optional(),
+  birthYear: z.string().optional(),
+
+  gender: z.enum(['male', 'female', 'other'], {
+    errorMap: () => ({ message: 'Please select a gender' })
+  }),
+
+  nationalId: z.string()
+    .optional()
+    .refine(val => !val || isValidKenyanID(val), 'Please enter a valid Kenyan National ID or Passport Number'),
+
   maritalStatus: z.enum(['single', 'married', 'divorced', 'widowed', 'other']).optional(),
 
   // Contact Information
-  email: z.string().email('Invalid email address'),
-  phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-  address: z.string().min(5, 'Address must be at least 5 characters'),
-  city: z.string().min(2, 'City must be at least 2 characters'),
-  state: z.string().min(2, 'State must be at least 2 characters'),
-  zipCode: z.string().min(5, 'Zip code must be at least 5 characters'),
+  email: z.string()
+    .email('Invalid email address')
+    .max(100, 'Email cannot exceed 100 characters'),
+
+  phone: z.string()
+    .min(10, 'Phone number must be at least 10 digits')
+    .max(15, 'Phone number cannot exceed 15 digits')
+    .refine(isValidKenyanPhone, 'Please enter a valid Kenyan phone number (e.g., 07XX XXX XXX or +254 7XX XXX XXX)'),
+
+  residence: z.string()
+    .min(5, 'Residence must be at least 5 characters')
+    .max(200, 'Residence cannot exceed 200 characters'),
+
+  address: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  city: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  state: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  zipCode: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
 
   // Medical Information
   bloodType: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', 'unknown']).optional(),
-  allergies: z.string().optional(),
-  currentMedications: z.string().optional(),
-  chronicConditions: z.string().optional(),
+
+  allergies: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  currentMedications: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  chronicConditions: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  // SHA (formerly NHIF) Information
+  shaNumber: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  // Payment Type
+  paymentType: z.enum(['cash', 'insurance', 'mpesa', 'card', 'credit', 'other']).optional(),
 
   // Referral Information
   referral: z.object({
     isReferred: z.boolean().optional(),
-    referringHospital: z.string().optional(),
-    referringDoctor: z.string().optional(),
-    referralReason: z.string().optional(),
-    referralDate: z.string().optional(),
+
+    referringHospital: z.string()
+      .optional()
+      .transform(val => val === '' ? undefined : val),
+
+    referringDoctor: z.string()
+      .optional()
+      .transform(val => val === '' ? undefined : val),
+
+    referralReason: z.string()
+      .optional()
+      .transform(val => val === '' ? undefined : val),
+
+    referralDate: z.string()
+      .optional()
+      .transform(val => val === '' ? undefined : val),
   }).optional(),
 
-  // Emergency Contact
+  // Next of Kin (Required)
+  nextOfKinName: z.string()
+    .min(2, 'Next of Kin name must be at least 2 characters')
+    .max(100, 'Next of Kin name cannot exceed 100 characters'),
+
+  nextOfKinPhone: z.string()
+    .min(10, 'Phone number must be at least 10 digits')
+    .max(15, 'Phone number cannot exceed 15 digits')
+    .refine(isValidKenyanPhone, 'Please enter a valid Kenyan phone number'),
+
+  // Emergency Contact (Optional, can be different from Next of Kin)
   emergencyContact: z.object({
-    name: z.string().min(2, 'Emergency contact name must be at least 2 characters'),
-    phone: z.string().min(10, 'Phone number must be at least 10 digits'),
-    relationship: z.string().min(2, 'Relationship must be at least 2 characters'),
-  }),
+    name: z.string()
+      .min(2, 'Emergency contact name must be at least 2 characters')
+      .max(100, 'Emergency contact name cannot exceed 100 characters'),
+
+    phone: z.string()
+      .min(10, 'Phone number must be at least 10 digits')
+      .max(15, 'Phone number cannot exceed 15 digits')
+      .refine(isValidKenyanPhone, 'Please enter a valid Kenyan phone number'),
+
+    relationship: z.string()
+      .min(2, 'Relationship must be at least 2 characters')
+      .max(50, 'Relationship cannot exceed 50 characters'),
+  }).optional(),
 
   // Insurance Information
-  insuranceProvider: z.string().optional(),
-  insuranceNumber: z.string().optional(),
-  insuranceGroupNumber: z.string().optional(),
-  kraPin: z.string().optional(),
+  insuranceProvider: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  insuranceNumber: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  insuranceGroupNumber: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val),
+
+  kraPin: z.string()
+    .optional()
+    .transform(val => val === '' ? undefined : val)
+    .refine(val => !val || /^[A-Z]\d{9}[A-Z]$/.test(val), 'Please enter a valid KRA PIN (format: A123456789B)'),
 });
 
 type PatientFormData = z.infer<typeof patientSchema>;
@@ -72,6 +221,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
   const [activeTab, setActiveTab] = useState('personal');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
+  const { getActiveInsuranceProviders } = useInsurance();
 
   // Form management
   const {
@@ -90,10 +240,10 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
     // Validate current tab before switching
     const fieldsToValidate: Record<string, string[]> = {
       'personal': ['firstName', 'lastName', 'dateOfBirth', 'gender', 'nationalId'],
-      'contact': ['email', 'phone', 'address', 'city', 'state', 'zipCode'],
-      'medical': [],
+      'contact': ['email', 'phone', 'residence'],
+      'medical': ['paymentType'],
       'referral': [],
-      'emergency': ['emergencyContact.name', 'emergencyContact.phone', 'emergencyContact.relationship']
+      'emergency': ['nextOfKinName', 'nextOfKinPhone']
     };
 
     // Only validate if moving away from a tab with required fields
@@ -111,9 +261,34 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
   const onSubmit = async (data: PatientFormData) => {
     try {
       setIsSubmitting(true);
-      console.log(data);
+
+      // Combine day, month, year fields if they're filled in but dateOfBirth is not
+      if ((!data.dateOfBirth || data.dateOfBirth === '') &&
+          data.birthDay && data.birthMonth && data.birthYear) {
+        try {
+          // Import the utility function dynamically to avoid circular dependencies
+          const { combineDateParts } = await import('../../utils/legacySystemUtils');
+          data.dateOfBirth = combineDateParts(data.birthDay, data.birthMonth, data.birthYear);
+        } catch (err) {
+          console.error('Error importing legacy utils:', err);
+        }
+      }
+
       // Here you would typically send the data to your backend
+      // For integration with the legacy system, you would use:
+      //
+      // try {
+      //   const { createPatient } = await import('../../hooks/useLegacyApi');
+      //   await createPatient(data);
+      // } catch (err) {
+      //   console.error('Error saving to legacy system:', err);
+      //   // Fall back to local save if legacy system is unavailable
+      //   onSave(data);
+      // }
+
+      // For now, just use the local save function
       onSave(data);
+
       showToast('success', 'Patient registered successfully!');
       reset();
     } catch (error) {
@@ -193,6 +368,44 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
             {/* Personal Information */}
             {activeTab === 'personal' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* File Numbers Section */}
+                <div className="form-group">
+                  <label className="form-label" htmlFor="outPatientFileNumber">Out-Patient File Number</label>
+                  <div className="relative">
+                    <input
+                      id="outPatientFileNumber"
+                      type="text"
+                      {...register('outPatientFileNumber')}
+                      className="form-control"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="inPatientFileNumber">In-Patient File Number</label>
+                  <div className="relative">
+                    <input
+                      id="inPatientFileNumber"
+                      type="text"
+                      {...register('inPatientFileNumber')}
+                      className="form-control"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="oldReferenceNumber">Old Reference Number</label>
+                  <div className="relative">
+                    <input
+                      id="oldReferenceNumber"
+                      type="text"
+                      {...register('oldReferenceNumber')}
+                      className="form-control"
+                    />
+                  </div>
+                </div>
+
+                {/* Name Fields */}
                 <div className="form-group">
                   <label className="form-label" htmlFor="firstName">First Name*</label>
                   <div className="relative">
@@ -207,6 +420,18 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
                   {errors.firstName && (
                     <p className="mt-1 text-sm text-red-600" role="alert">{errors.firstName.message}</p>
                   )}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="middleName">Middle Name</label>
+                  <div className="relative">
+                    <input
+                      id="middleName"
+                      type="text"
+                      {...register('middleName')}
+                      className="form-control"
+                    />
+                  </div>
                 </div>
 
                 <div className="form-group">
@@ -241,6 +466,50 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
                   {errors.dateOfBirth && (
                     <p className="mt-1 text-sm text-red-600" role="alert">{errors.dateOfBirth.message}</p>
                   )}
+                </div>
+
+                {/* Separate Day/Month/Year fields (alternative to the date picker) */}
+                <div className="form-group md:col-span-2">
+                  <label className="form-label">Date of Birth (Day/Month/Year)</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="text-xs text-gray-500" htmlFor="birthDay">Day</label>
+                      <input
+                        id="birthDay"
+                        type="number"
+                        min="1"
+                        max="31"
+                        {...register('birthDay')}
+                        className="form-control"
+                        placeholder="DD"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500" htmlFor="birthMonth">Month</label>
+                      <input
+                        id="birthMonth"
+                        type="number"
+                        min="1"
+                        max="12"
+                        {...register('birthMonth')}
+                        className="form-control"
+                        placeholder="MM"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs text-gray-500" htmlFor="birthYear">Year</label>
+                      <input
+                        id="birthYear"
+                        type="number"
+                        min="1900"
+                        max={new Date().getFullYear()}
+                        {...register('birthYear')}
+                        className="form-control"
+                        placeholder="YYYY"
+                      />
+                    </div>
+                  </div>
+                  <p className="mt-1 text-xs text-gray-500">Alternative to the date picker above. Fill either one.</p>
                 </div>
 
                 <div className="form-group">
@@ -335,20 +604,33 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
                 </div>
 
                 <div className="form-group md:col-span-2">
-                  <label className="form-label" htmlFor="address">Address*</label>
+                  <label className="form-label" htmlFor="residence">Residence*</label>
+                  <div className="relative">
+                    <textarea
+                      id="residence"
+                      {...register('residence')}
+                      rows={3}
+                      className="form-control pl-10"
+                      aria-invalid={errors.residence ? "true" : "false"}
+                    />
+                    <MapPin className="absolute left-3 top-3 text-gray-400 pointer-events-none w-5 h-5" />
+                  </div>
+                  {errors.residence && (
+                    <p className="mt-1 text-sm text-red-600" role="alert">{errors.residence.message}</p>
+                  )}
+                </div>
+
+                <div className="form-group md:col-span-2">
+                  <label className="form-label" htmlFor="address">Additional Address (Optional)</label>
                   <div className="relative">
                     <textarea
                       id="address"
                       {...register('address')}
-                      rows={3}
+                      rows={2}
                       className="form-control pl-10"
-                      aria-invalid={errors.address ? "true" : "false"}
                     />
                     <MapPin className="absolute left-3 top-3 text-gray-400 pointer-events-none w-5 h-5" />
                   </div>
-                  {errors.address && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">{errors.address.message}</p>
-                  )}
                 </div>
 
                 <div className="form-group">
@@ -415,6 +697,37 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
                     <option value="O+">O+</option>
                     <option value="O-">O-</option>
                     <option value="unknown">Unknown</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="shaNumber">SHA Number (formerly NHIF)</label>
+                  <div className="relative">
+                    <input
+                      id="shaNumber"
+                      type="text"
+                      {...register('shaNumber')}
+                      className="form-control pl-10"
+                      placeholder="Enter SHA/NHIF number"
+                    />
+                    <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="paymentType">Payment Type*</label>
+                  <select
+                    id="paymentType"
+                    {...register('paymentType')}
+                    className="form-select"
+                  >
+                    <option value="">Select Payment Type</option>
+                    <option value="cash">Cash</option>
+                    <option value="insurance">Insurance</option>
+                    <option value="mpesa">M-Pesa</option>
+                    <option value="card">Card</option>
+                    <option value="credit">Credit</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
 
@@ -526,42 +839,79 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
             {/* Emergency Contact */}
             {activeTab === 'emergency' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Next of Kin Section */}
+                <div className="form-group md:col-span-2">
+                  <h3 className="text-lg font-medium text-[#01016C] mb-3">Next of Kin Information*</h3>
+                </div>
+
                 <div className="form-group">
-                  <label className="form-label" htmlFor="emergencyName">Emergency Contact Name*</label>
+                  <label className="form-label" htmlFor="nextOfKinName">Next of Kin Name*</label>
+                  <div className="relative">
+                    <input
+                      id="nextOfKinName"
+                      type="text"
+                      {...register('nextOfKinName')}
+                      className="form-control pl-10"
+                      aria-invalid={errors.nextOfKinName ? "true" : "false"}
+                    />
+                    <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
+                  </div>
+                  {errors.nextOfKinName && (
+                    <p className="mt-1 text-sm text-red-600" role="alert">{errors.nextOfKinName.message}</p>
+                  )}
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="nextOfKinPhone">Next of Kin Phone*</label>
+                  <div className="relative">
+                    <input
+                      id="nextOfKinPhone"
+                      type="tel"
+                      {...register('nextOfKinPhone')}
+                      className="form-control pl-10"
+                      aria-invalid={errors.nextOfKinPhone ? "true" : "false"}
+                    />
+                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
+                  </div>
+                  {errors.nextOfKinPhone && (
+                    <p className="mt-1 text-sm text-red-600" role="alert">{errors.nextOfKinPhone.message}</p>
+                  )}
+                </div>
+
+                {/* Emergency Contact Section (Optional) */}
+                <div className="form-group md:col-span-2 mt-6">
+                  <h3 className="text-lg font-medium text-[#01016C] mb-3">Additional Emergency Contact (Optional)</h3>
+                  <p className="text-sm text-gray-500 mb-3">Only fill this if different from Next of Kin</p>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="emergencyName">Emergency Contact Name</label>
                   <div className="relative">
                     <input
                       id="emergencyName"
                       type="text"
                       {...register('emergencyContact.name')}
                       className="form-control pl-10"
-                      aria-invalid={errors.emergencyContact?.name ? "true" : "false"}
                     />
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
                   </div>
-                  {errors.emergencyContact?.name && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">{errors.emergencyContact.name.message}</p>
-                  )}
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" htmlFor="emergencyRelationship">Relationship to Patient*</label>
+                  <label className="form-label" htmlFor="emergencyRelationship">Relationship to Patient</label>
                   <div className="relative">
                     <input
                       id="emergencyRelationship"
                       type="text"
                       {...register('emergencyContact.relationship')}
                       className="form-control pl-10"
-                      aria-invalid={errors.emergencyContact?.relationship ? "true" : "false"}
                     />
                     <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
                   </div>
-                  {errors.emergencyContact?.relationship && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">{errors.emergencyContact.relationship.message}</p>
-                  )}
                 </div>
 
                 <div className="form-group md:col-span-2">
-                  <label className="form-label" htmlFor="emergencyPhone">Emergency Contact Phone*</label>
+                  <label className="form-label" htmlFor="emergencyPhone">Emergency Contact Phone</label>
                   <div className="relative">
                     <input
                       id="emergencyPhone"
@@ -569,35 +919,32 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
                       {...register('emergencyContact.phone')}
                       placeholder="(123) 456-7890"
                       className="form-control pl-10"
-                      aria-invalid={errors.emergencyContact?.phone ? "true" : "false"}
                     />
                     <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
                   </div>
-                  {errors.emergencyContact?.phone && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">{errors.emergencyContact.phone.message}</p>
-                  )}
                 </div>
 
                 <div className="form-group">
                   <label className="form-label" htmlFor="insuranceProvider">Insurance Provider</label>
-                  <select
-                    id="insuranceProvider"
-                    {...register('insuranceProvider')}
-                    className="form-select"
-                  >
-                    <option value="">Select Insurance Provider</option>
-                    <option value="NHIF">NHIF (National Hospital Insurance Fund)</option>
-                    <option value="AAR">AAR Insurance</option>
-                    <option value="Jubilee">Jubilee Insurance</option>
-                    <option value="Britam">Britam Insurance</option>
-                    <option value="CIC">CIC Insurance</option>
-                    <option value="Madison">Madison Insurance</option>
-                    <option value="Other">Other</option>
-                  </select>
+                  <div className="relative">
+                    <select
+                      id="insuranceProvider"
+                      {...register('insuranceProvider')}
+                      className="form-select pl-10"
+                    >
+                      <option value="">Select Insurance Provider</option>
+                      {getActiveInsuranceProviders().map(provider => (
+                        <option key={provider.id} value={provider.id}>
+                          {provider.name}
+                        </option>
+                      ))}
+                    </select>
+                    <Shield className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none w-5 h-5" />
+                  </div>
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label" htmlFor="insuranceNumber">NHIF/Policy Number</label>
+                  <label className="form-label" htmlFor="insuranceNumber">Policy Number</label>
                   <input
                     id="insuranceNumber"
                     type="text"
@@ -605,6 +952,34 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
                     className="form-control"
                     placeholder="e.g. NHIF12345678"
                   />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="insuranceGroupNumber">Group Number</label>
+                  <input
+                    id="insuranceGroupNumber"
+                    type="text"
+                    {...register('insuranceGroupNumber')}
+                    className="form-control"
+                    placeholder="e.g. GRP12345"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="insuranceCoverageType">Coverage Type</label>
+                  <select
+                    id="insuranceCoverageType"
+                    {...register('insuranceCoverageType')}
+                    className="form-select"
+                  >
+                    <option value="">Select Coverage Type</option>
+                    <option value="Inpatient">Inpatient</option>
+                    <option value="Outpatient">Outpatient</option>
+                    <option value="Maternity">Maternity</option>
+                    <option value="Dental">Dental</option>
+                    <option value="Optical">Optical</option>
+                    <option value="Comprehensive">Comprehensive</option>
+                  </select>
                 </div>
 
                 <div className="form-group">

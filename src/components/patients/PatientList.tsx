@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Search, Filter, Plus, Edit, Trash2, Eye, MoreHorizontal,
   FileText, Calendar, Clock, User, Phone, Mail, MapPin
 } from 'lucide-react';
 import { usePatient } from '../../context/PatientContext';
 import { useToast } from '../../context/ToastContext';
+import ResponsiveTable from '../common/ResponsiveTable';
+import { generatePastelColor, isLightColor } from '../../utils/colorUtils';
 import '../../styles/theme.css';
 
 interface PatientListProps {
@@ -116,202 +118,229 @@ export const PatientList: React.FC<PatientListProps> = ({
       </div>
 
       {viewMode === 'table' ? (
-        <div className="overflow-x-auto">
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Patient</th>
-                <th>Contact</th>
-                <th>Blood Group</th>
-                <th>Last Visit</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredPatients.map(patient => (
-                <tr key={patient.id}>
-                  <td>
-                    <div className="flex items-center gap-3">
-                      <div className="avatar avatar-md bg-secondary flex items-center justify-center text-primary font-semibold">
-                        {patient.firstName.charAt(0)}{patient.lastName.charAt(0)}
-                      </div>
-                      <div>
-                        <div className="font-semibold">{patient.firstName} {patient.lastName}</div>
-                        <div className="text-sm text-muted">
-                          {patient.gender}, {calculateAge(patient.dateOfBirth)} years
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex flex-col">
-                      <div className="flex items-center">
-                        <Phone className="w-4 h-4 mr-2 text-muted" />
-                        <span>{patient.phone}</span>
-                      </div>
-                      <div className="flex items-center mt-1">
-                        <Mail className="w-4 h-4 mr-2 text-muted" />
-                        <span>{patient.email}</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <span className="badge badge-secondary">{patient.bloodGroup}</span>
-                  </td>
-                  <td>
-                    <div className="flex items-center">
-                      <Calendar className="w-4 h-4 mr-2 text-muted" />
-                      <span>{formatDate(patient.lastVisit)}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`badge ${patient.status === 'Active' ? 'badge-success' : 'badge-warning'}`}>
-                      {patient.status}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="relative">
-                      <div className="flex items-center gap-2">
-                        <button
-                          className="btn-icon btn-sm bg-secondary"
-                          onClick={() => onViewPatient(patient.id)}
-                        >
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="btn-icon btn-sm bg-accent"
-                          onClick={() => onEditPatient(patient.id)}
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button
-                          className="btn-icon btn-sm bg-warning"
-                          onClick={() => toggleActionMenu(patient.id)}
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </button>
-                      </div>
+        <ResponsiveTable
+          columns={[
+            {
+              key: 'patient',
+              header: 'Patient',
+              priority: 1,
+              render: (value, patient) => {
+                // Generate a pastel color based on the patient's name
+                const avatarColor = generatePastelColor(`${patient.firstName} ${patient.lastName}`);
+                // Determine if text should be dark or light based on background color
+                const textColor = isLightColor(avatarColor) ? '#000000' : '#FFFFFF';
 
-                      {showActionMenu === patient.id && (
-                        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10 border border-gray-200">
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-primary hover:bg-secondary"
-                            onClick={() => {
-                              onViewPatient(patient.id);
-                              setShowActionMenu(null);
-                            }}
-                          >
-                            <Eye className="w-4 h-4 inline mr-2" />
-                            View Details
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-primary hover:bg-secondary"
-                            onClick={() => {
-                              onEditPatient(patient.id);
-                              setShowActionMenu(null);
-                            }}
-                          >
-                            <Edit className="w-4 h-4 inline mr-2" />
-                            Edit Patient
-                          </button>
-                          <button
-                            className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
-                            onClick={() => {
-                              if (window.confirm('Are you sure you want to delete this patient?')) {
-                                deletePatient(patient.id);
-                                onDeletePatient(patient.id);
-                                showToast('success', `Patient ${patient.firstName} ${patient.lastName} has been deleted`);
-                                setShowActionMenu(null);
-                              }
-                            }}
-                          >
-                            <Trash2 className="w-4 h-4 inline mr-2" />
-                            Delete Patient
-                          </button>
-                        </div>
-                      )}
+                return (
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center font-semibold"
+                      style={{ backgroundColor: avatarColor, color: textColor }}
+                    >
+                      {patient.firstName.charAt(0)}{patient.lastName.charAt(0)}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredPatients.map(patient => (
-            <div key={patient.id} className="card">
-              <div className="p-4 flex items-center justify-between border-b">
-                <div className="flex items-center gap-3">
-                  <div className="avatar avatar-md bg-secondary flex items-center justify-center text-primary font-semibold">
-                    {patient.firstName.charAt(0)}{patient.lastName.charAt(0)}
+                    <div>
+                      <div className="font-semibold">{patient.firstName} {patient.lastName}</div>
+                      <div className="text-sm text-muted">
+                        {patient.gender}, {calculateAge(patient.dateOfBirth)} years
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-semibold">{patient.firstName} {patient.lastName}</div>
-                    <div className="text-sm text-muted">
-                      {patient.gender}, {calculateAge(patient.dateOfBirth)} years
-                    </div>
+                );
+              }
+            },
+            {
+              key: 'contact',
+              header: 'Contact',
+              priority: 2,
+              render: (value, patient) => (
+                <div className="flex flex-col">
+                  <div className="flex items-center">
+                    <Phone className="w-4 h-4 mr-2 text-muted" />
+                    <span>{patient.phone}</span>
+                  </div>
+                  <div className="flex items-center mt-1">
+                    <Mail className="w-4 h-4 mr-2 text-muted" />
+                    <span>{patient.email}</span>
                   </div>
                 </div>
+              )
+            },
+            {
+              key: 'bloodGroup',
+              header: 'Blood Group',
+              hideOnMobile: true,
+              render: (value, patient) => (
+                <span className="badge badge-secondary">{patient.bloodGroup}</span>
+              )
+            },
+            {
+              key: 'lastVisit',
+              header: 'Last Visit',
+              priority: 3,
+              render: (value, patient) => (
+                <div className="flex items-center">
+                  <Calendar className="w-4 h-4 mr-2 text-muted" />
+                  <span>{formatDate(patient.lastVisit)}</span>
+                </div>
+              )
+            },
+            {
+              key: 'status',
+              header: 'Status',
+              priority: 4,
+              render: (value, patient) => (
                 <span className={`badge ${patient.status === 'Active' ? 'badge-success' : 'badge-warning'}`}>
                   {patient.status}
                 </span>
-              </div>
-
-              <div className="p-4 space-y-3">
-                <div className="flex items-center">
-                  <Phone className="w-4 h-4 mr-2 text-muted" />
-                  <span>{patient.phone}</span>
-                </div>
-                <div className="flex items-center">
-                  <Mail className="w-4 h-4 mr-2 text-muted" />
-                  <span>{patient.email}</span>
-                </div>
-                <div className="flex items-center">
-                  <MapPin className="w-4 h-4 mr-2 text-muted" />
-                  <span className="truncate">{patient.address}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <Calendar className="w-4 h-4 mr-2 text-muted" />
-                    <span>Last Visit: {formatDate(patient.lastVisit)}</span>
+              )
+            },
+            {
+              key: 'actions',
+              header: 'Actions',
+              priority: 5,
+              render: (value, patient) => (
+                <div className="relative">
+                  <div className="flex items-center gap-2">
+                    <button
+                      className="btn-icon btn-sm bg-secondary"
+                      onClick={() => onViewPatient(patient.id)}
+                    >
+                      <Eye className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="btn-icon btn-sm bg-accent"
+                      onClick={() => onEditPatient(patient.id)}
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      className="btn-icon btn-sm bg-warning"
+                      onClick={() => toggleActionMenu(patient.id)}
+                    >
+                      <MoreHorizontal className="w-4 h-4" />
+                    </button>
                   </div>
-                  <span className="badge badge-secondary">{patient.bloodGroup}</span>
+
+                  {showActionMenu === patient.id && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg py-1 z-10 border border-gray-200">
+                      <button
+                        className="block w-full text-left px-4 py-2 text-sm text-primary hover:bg-secondary"
+                        onClick={() => {
+                          onViewPatient(patient.id);
+                          setShowActionMenu(null);
+                        }}
+                      >
+                        <Eye className="w-4 h-4 inline mr-2" />
+                        View Details
+                      </button>
+                      <button
+                        className="block w-full text-left px-4 py-2 text-sm text-primary hover:bg-secondary"
+                        onClick={() => {
+                          onEditPatient(patient.id);
+                          setShowActionMenu(null);
+                        }}
+                      >
+                        <Edit className="w-4 h-4 inline mr-2" />
+                        Edit Patient
+                      </button>
+                      <button
+                        className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                        onClick={() => {
+                          if (window.confirm('Are you sure you want to delete this patient?')) {
+                            deletePatient(patient.id);
+                            onDeletePatient(patient.id);
+                            showToast('success', `Patient ${patient.firstName} ${patient.lastName} has been deleted`);
+                            setShowActionMenu(null);
+                          }
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4 inline mr-2" />
+                        Delete Patient
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            }
+          ]}
+          data={filteredPatients}
+          keyField="id"
+          emptyMessage="No patients found"
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPatients.map(patient => {
+            // Generate avatar color once per patient
+            const avatarColor = generatePastelColor(`${patient.firstName} ${patient.lastName}`);
+            const textColor = isLightColor(avatarColor) ? '#000000' : '#FFFFFF';
+
+            return (
+              <div key={patient.id} className="card">
+                <div className="p-4 flex items-center justify-between border-b">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center font-semibold"
+                      style={{ backgroundColor: avatarColor, color: textColor }}
+                    >
+                      {patient.firstName.charAt(0)}{patient.lastName.charAt(0)}
+                    </div>
+                    <div>
+                      <div className="font-semibold">{patient.firstName} {patient.lastName}</div>
+                      <div className="text-sm text-muted">
+                        {patient.gender}, {calculateAge(patient.dateOfBirth)} years
+                      </div>
+                    </div>
+                  </div>
+                  <span className={`badge ${patient.status === 'Active' ? 'badge-success' : 'badge-warning'}`}>
+                    {patient.status}
+                  </span>
+                </div>
+
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center">
+                    <Phone className="w-4 h-4 mr-2 text-muted" />
+                    <span>{patient.phone}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Mail className="w-4 h-4 mr-2 text-muted" />
+                    <span>{patient.email}</span>
+                  </div>
+                  <div className="flex items-center">
+                    <MapPin className="w-4 h-4 mr-2 text-muted" />
+                    <span className="truncate">{patient.address}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <Calendar className="w-4 h-4 mr-2 text-muted" />
+                      <span>Last Visit: {formatDate(patient.lastVisit)}</span>
+                    </div>
+                    <span className="badge badge-secondary">{patient.bloodGroup}</span>
+                  </div>
+                </div>
+
+                <div className="p-4 border-t flex justify-end space-x-2">
+                  <button
+                    onClick={() => onViewPatient(patient.id)}
+                    className="btn-icon btn-sm bg-secondary"
+                  >
+                    <Eye className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => onEditPatient(patient.id)}
+                    className="btn-icon btn-sm bg-accent"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeletePatient(patient.id)}
+                    className="btn-icon btn-sm bg-warning"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-
-              <div className="p-4 border-t flex justify-between">
-                <button
-                  className="btn btn-sm btn-outline"
-                  onClick={() => onViewPatient(patient.id)}
-                >
-                  <Eye className="w-4 h-4 mr-1" />
-                  View
-                </button>
-                <button
-                  className="btn btn-sm btn-accent"
-                  onClick={() => onEditPatient(patient.id)}
-                >
-                  <Edit className="w-4 h-4 mr-1" />
-                  Edit
-                </button>
-                <button
-                  className="btn btn-sm btn-warning"
-                  onClick={() => {
-                    if (window.confirm('Are you sure you want to delete this patient?')) {
-                      deletePatient(patient.id);
-                      onDeletePatient(patient.id);
-                      showToast('success', `Patient ${patient.firstName} ${patient.lastName} has been deleted`);
-                    }
-                  }}
-                >
-                  <Trash2 className="w-4 h-4 mr-1" />
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

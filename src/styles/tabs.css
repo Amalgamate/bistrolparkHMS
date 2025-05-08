@@ -1,0 +1,84 @@
+/* Custom styling for tabs */
+
+.dashboard-tabs {
+  --tab-height: 60px;
+}
+
+.dashboard-tab {
+  height: var(--tab-height);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.dashboard-tab:hover {
+  transform: translateY(-2px);
+}
+
+.dashboard-tab.active {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dashboard-tab.quick-access {
+  border-color: #2B3990;
+}
+
+.dashboard-tab.quick-access.active {
+  background-color: #fff;
+  color: #2B3990;
+}
+
+.dashboard-tab.hospital-reports {
+  border-color: #2B3990;
+}
+
+.dashboard-tab.hospital-reports.active {
+  background-color: #fff;
+  color: #2B3990;
+}
+
+.dashboard-tab.accounts-overview {
+  border-color: #2B3990;
+}
+
+.dashboard-tab.accounts-overview.active {
+  background-color: #fff;
+  color: #2B3990;
+}
+
+/* Tab indicator */
+.dashboard-tab::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.dashboard-tab.active::after {
+  background-color: #2B3990;
+}
+
+/* Tab content animation */
+.tab-content-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.tab-content-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.tab-content-exit {
+  opacity: 1;
+}
+
+.tab-content-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}

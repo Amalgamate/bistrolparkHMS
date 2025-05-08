@@ -5,10 +5,11 @@ interface Toast {
   id: string;
   type: ToastType;
   message: string;
+  title?: string;
 }
 
 interface ToastContextType {
-  showToast: (type: ToastType, message: string) => void;
+  showToast: (type: ToastType, message: string, title?: string) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -16,9 +17,9 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
-  const showToast = (type: ToastType, message: string) => {
+  const showToast = (type: ToastType, message: string, title?: string) => {
     const id = Date.now().toString();
-    setToasts(prev => [...prev, { id, type, message }]);
+    setToasts(prev => [...prev, { id, type, message, title }]);
   };
 
   const removeToast = (id: string) => {

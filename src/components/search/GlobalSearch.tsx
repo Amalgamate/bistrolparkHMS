@@ -111,10 +111,12 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onSelect, className 
   // Try to use PatientContext, but don't fail if it's not available
   let patients: any[] = [];
   try {
+    // Check if the PatientContext is available in the current component tree
     const patientContext = usePatient();
     patients = patientContext?.patients || [];
   } catch (error) {
-    console.log('PatientProvider not available, patient search disabled');
+    // This is expected in some parts of the app where PatientProvider is not available
+    // No need to log this as it's not an error
   }
 
   // Close search results when clicking outside
@@ -270,7 +272,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onSelect, className 
           value={searchTerm}
           onChange={handleSearchChange}
           onFocus={() => setShowResults(true)}
-          className="block w-full py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-1 focus:ring-[#0100F6] focus:border-[#0100F6]"
+          className="block w-full py-2 pl-10 pr-10 text-sm border border-gray-300 rounded-md bg-gray-50 focus:outline-none focus:ring-1 focus:ring-[#2B3990] focus:border-[#2B3990]"
           placeholder="Search patients, actions, modules..."
         />
         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
@@ -296,7 +298,7 @@ export const GlobalSearch: React.FC<GlobalSearchProps> = ({ onSelect, className 
         <div className="absolute z-50 w-full mt-1 bg-white rounded-md shadow-lg max-h-96 overflow-y-auto border border-gray-200">
           {isLoading ? (
             <div className="flex items-center justify-center p-4">
-              <div className="w-5 h-5 border-2 border-t-[#0100F6] border-r-[#0100F6] border-b-[#0100F6] border-l-transparent rounded-full animate-spin"></div>
+              <div className="w-5 h-5 border-2 border-t-[#2B3990] border-r-[#2B3990] border-b-[#2B3990] border-l-transparent rounded-full animate-spin"></div>
               <span className="ml-2 text-sm text-gray-500">Searching...</span>
             </div>
           ) : results.length > 0 ? (

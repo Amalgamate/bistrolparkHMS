@@ -1,14 +1,14 @@
 :root {
   /* Color Theme */
-  --color-primary: #0100F6;
-  --color-secondary: #A5C4D4;
-  --color-accent: #2B4F60;
-  --color-warning: #FF7F7F;
+  --color-primary: #2B3990;
+  --color-secondary: #ff9900;
+  --color-accent: #A61F1F;
+  --color-warning: #A61F1F;
   --color-success: #4CAF50;
   --color-background: #E6F3F7;
 
   /* Text Colors */
-  --text-primary: #2B4F60;
+  --text-primary: #2B3990;
   --text-secondary: #4A5568;
   --text-muted: #718096;
   --text-light: #F7FAFC;
@@ -40,7 +40,7 @@
 body {
   background-color: var(--color-background);
   color: var(--text-primary);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'NEXA', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 /* Button Styles */
@@ -311,13 +311,16 @@ body {
   color: #92400E;
 }
 
-/* Avatar Styles */
+/* Avatar Styles - Updated with blue colors */
 .avatar {
   border-radius: var(--border-radius-md);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: #E6F3F7; /* Very light blue background */
+  color: #2B3990; /* Bristol blue text color */
+  border: 2px solid #2B3990; /* Bristol blue border */
 }
 
 .avatar-sm {
@@ -447,33 +450,13 @@ body {
   background-color: var(--color-background);
 }
 
-/* Login Page Background */
+
 .login-background {
-  background-color: #0000F6;
-  background-image:
-    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"),
-    radial-gradient(circle at 30% 70%, rgba(245, 184, 0, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 70% 30%, rgba(245, 184, 0, 0.05) 0%, transparent 50%);
+  background-color: #F5B800; 
   position: relative;
   overflow: hidden;
 }
 
-.login-background::before {
-  content: "";
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-    to bottom right,
-    transparent 30%,
-    rgba(245, 184, 0, 0.03) 50%,
-    transparent 70%
-  );
-  animation: shimmer 10s linear infinite;
-  pointer-events: none;
-}
 
 @keyframes shimmer {
   0% {
@@ -639,3 +622,7 @@ body {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+
+
+

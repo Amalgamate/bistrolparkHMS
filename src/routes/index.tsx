@@ -1,24 +1,27 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from '../pages/Dashboard';
+import UnifiedDashboard from '../pages/UnifiedDashboard';
 import PatientFlow from '../pages/PatientFlow';
+import DocumentCenter from '../pages/DocumentCenter';
 import { PatientRegister } from '../pages/PatientRegister';
-import DesignSystem from '../pages/DesignSystem';
+import DesignSystem from '../pages/DesignSystem.jsx';
 import Settings from '../pages/Settings';
 import UserManagement from '../pages/UserManagement';
 import PermissionTest from '../pages/PermissionTest';
 import LoginCredentials from '../pages/LoginCredentials';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
-import { Layout } from '../components/layout/Layout';
+import { UnifiedLayout } from '../components/layout/UnifiedLayout';
+import { PatientProvider } from '../context/PatientContext';
+import { ToastProvider } from '../context/ToastContext';
+import { InsuranceProvider } from '../context/InsuranceContext';
 
 export const AppRoutes: React.FC = () => {
   return (
-    <Layout>
+    <UnifiedLayout>
       <Routes>
-        <Route path="/" element={<Dashboard />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/" element={<UnifiedDashboard />} />
+        <Route path="/dashboard" element={<UnifiedDashboard />} />
 
-        {/* Protected routes with permission checks */}
         <Route path="/patients/*" element={
           <ProtectedRoute requiredPermission="view_patients">
             <PatientFlow />
@@ -27,19 +30,38 @@ export const AppRoutes: React.FC = () => {
 
         <Route path="/patient-module" element={
           <ProtectedRoute requiredPermission="register_patient">
-            <PatientRegister />
+            <PatientProvider>
+              <ToastProvider>
+                <InsuranceProvider>
+                  <PatientRegister />
+                </InsuranceProvider>
+              </ToastProvider>
+            </PatientProvider>
           </ProtectedRoute>
         } />
 
         <Route path="/settings" element={
           <ProtectedRoute requiredPermission="upload_hospital_logo">
-            <Settings />
+            <ToastProvider>
+              <InsuranceProvider>
+                <Settings />
+              </InsuranceProvider>
+            </ToastProvider>
           </ProtectedRoute>
         } />
 
         <Route path="/users" element={
           <ProtectedRoute requiredPermission="register_user">
             <UserManagement />
+          </ProtectedRoute>
+        } />
+
+        {/* Document Center */}
+        <Route path="/document-center" element={
+          <ProtectedRoute requiredPermission="view_documents">
+            <ToastProvider>
+              <DocumentCenter />
+            </ToastProvider>
           </ProtectedRoute>
         } />
 
@@ -50,6 +72,6 @@ export const AppRoutes: React.FC = () => {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </Layout>
+    </UnifiedLayout>
   );
 };

@@ -3,22 +3,46 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 // Define the shape of a patient
 export interface Patient {
   id: number;
+  // File Numbers
+  outPatientFileNumber?: string;
+  oldReferenceNumber?: string;
+  inPatientFileNumber?: string;
+
+  // Personal Information
   firstName: string;
+  middleName?: string;
   lastName: string;
   dateOfBirth: string;
+  birthDay?: string;
+  birthMonth?: string;
+  birthYear?: string;
   gender: string;
   nationalId?: string; // National ID or Passport
+  maritalStatus?: string;
+
+  // Contact Information
   email: string;
   phone: string;
-  address: string;
-  city: string;
-  state: string;
-  zipCode: string;
+  residence: string; // Primary residence (required)
+  address?: string; // Additional address (optional)
+  city?: string;
+  state?: string;
+  zipCode?: string;
+
+  // Medical Information
   bloodGroup?: string;
   allergies?: string;
   chronicConditions?: string;
   currentMedications?: string;
-  emergencyContact: {
+  shaNumber?: string; // SHA (formerly NHIF) number
+  paymentType?: string;
+
+  // Next of Kin (required)
+  nextOfKinName: string;
+  nextOfKinPhone: string;
+
+  // Emergency Contact (optional, can be different from Next of Kin)
+  emergencyContact?: {
     name: string;
     relationship: string;
     phone: string;
@@ -28,7 +52,25 @@ export interface Patient {
     policyNumber: string;
     groupNumber: string;
     holderName: string;
+    coverageType?: string;
+    coverageLimit?: number;
+    expiryDate?: string;
   };
+
+  // Payment history
+  payments?: Array<{
+    id: number;
+    date: string;
+    amount: number;
+    paymentMethod: 'Cash' | 'Card' | 'Mobile Money' | 'Insurance' | 'Corporate';
+    paymentType: 'Consultation' | 'Medication' | 'Lab Test' | 'Procedure' | 'Admission' | 'Other';
+    reference: string;
+    status: 'Paid' | 'Pending' | 'Failed' | 'Refunded';
+    insuranceProvider?: string;
+    insuranceCoverage?: number;
+    patientResponsibility?: number;
+    description?: string;
+  }>;
   // Referral information
   referral?: {
     isReferred: boolean;
@@ -51,6 +93,8 @@ export interface Patient {
   }>;
   lastVisit?: string;
   status: 'Active' | 'Inactive';
+  isAdmitted?: boolean;
+  isCleared?: boolean;
 }
 
 // Define the context shape
@@ -69,32 +113,97 @@ const PatientContext = createContext<PatientContextType | undefined>(undefined);
 const INITIAL_PATIENTS: Patient[] = [
   {
     id: 1,
+    // File Numbers
+    outPatientFileNumber: 'OP-12345',
+    oldReferenceNumber: 'REF-98765',
+    inPatientFileNumber: 'IP-54321',
+
+    // Personal Information
     firstName: 'Wanjiku',
+    middleName: 'Njeri',
     lastName: 'Kamau',
     dateOfBirth: '1985-05-15',
+    birthDay: '15',
+    birthMonth: '5',
+    birthYear: '1985',
     gender: 'Female',
     nationalId: '22456789',
+    maritalStatus: 'married',
+
+    // Contact Information
     email: 'wanjiku.kamau@gmail.com',
     phone: '0722 123 456',
-    address: 'Fedha Estate, Block C, Apt 304',
+    residence: 'Fedha Estate, Nairobi',
+    address: 'Block C, Apt 304',
     city: 'Nairobi',
     state: 'Nairobi County',
     zipCode: '00100',
+
+    // Medical Information
     bloodGroup: 'O+',
     allergies: 'Penicillin, Peanuts',
     chronicConditions: 'Hypertension, Asthma',
     currentMedications: 'Lisinopril 10mg daily, Ventolin inhaler as needed',
+    shaNumber: 'SHA12345678',
+    paymentType: 'insurance',
+
+    // Next of Kin
+    nextOfKinName: 'James Kamau',
+    nextOfKinPhone: '0733 987 654',
+
+    // Emergency Contact
     emergencyContact: {
       name: 'James Kamau',
       relationship: 'Husband',
       phone: '0733 987 654'
     },
     insurance: {
-      provider: 'NHIF',
-      policyNumber: 'NHIF23456789',
+      provider: 'SHA',
+      policyNumber: 'SHA23456789',
       groupNumber: 'GRP987654',
-      holderName: 'Wanjiku Kamau'
+      holderName: 'Wanjiku Kamau',
+      coverageType: 'Premium',
+      coverageLimit: 1000000,
+      expiryDate: '2024-12-31'
     },
+    payments: [
+      {
+        id: 1001,
+        date: '2023-11-05',
+        amount: 15000,
+        paymentMethod: 'Insurance',
+        paymentType: 'Consultation',
+        reference: 'INV-2023-1001',
+        status: 'Paid',
+        insuranceProvider: 'SHA',
+        insuranceCoverage: 12000,
+        patientResponsibility: 3000,
+        description: 'Consultation with Dr. Sarah Johnson'
+      },
+      {
+        id: 1002,
+        date: '2023-10-15',
+        amount: 25000,
+        paymentMethod: 'Insurance',
+        paymentType: 'Lab Test',
+        reference: 'INV-2023-985',
+        status: 'Paid',
+        insuranceProvider: 'SHA',
+        insuranceCoverage: 20000,
+        patientResponsibility: 5000,
+        description: 'Complete Blood Count and Lipid Panel'
+      },
+      {
+        id: 1003,
+        date: '2023-09-22',
+        amount: 5000,
+        paymentMethod: 'Cash',
+        paymentType: 'Medication',
+        reference: 'INV-2023-876',
+        status: 'Paid',
+        description: 'Prescription medications'
+      }
+    ],
     referral: {
       isReferred: true,
       referringHospital: 'Kenyatta National Hospital',
@@ -127,7 +236,8 @@ const INITIAL_PATIENTS: Patient[] = [
       }
     ],
     lastVisit: '2023-11-05',
-    status: 'Active'
+    status: 'Active',
+    isAdmitted: true
   },
   {
     id: 2,
@@ -174,7 +284,8 @@ const INITIAL_PATIENTS: Patient[] = [
       }
     ],
     lastVisit: '2023-11-02',
-    status: 'Active'
+    status: 'Active',
+    isCleared: true
   },
   {
     id: 3,
@@ -202,8 +313,39 @@ const INITIAL_PATIENTS: Patient[] = [
       provider: 'Jubilee Insurance',
       policyNumber: 'JUB23456789',
       groupNumber: 'GRP345678',
-      holderName: 'Njeri Waweru'
+      holderName: 'Njeri Waweru',
+      coverageType: 'Corporate',
+      coverageLimit: 2000000,
+      expiryDate: '2024-08-31'
     },
+    payments: [
+      {
+        id: 3001,
+        date: '2023-10-20',
+        amount: 35000,
+        paymentMethod: 'Corporate',
+        paymentType: 'Procedure',
+        reference: 'INV-2023-950',
+        status: 'Paid',
+        insuranceProvider: 'Jubilee Insurance',
+        insuranceCoverage: 35000,
+        patientResponsibility: 0,
+        description: 'Annual physical examination and wellness check'
+      },
+      {
+        id: 3002,
+        date: '2023-09-15',
+        amount: 18000,
+        paymentMethod: 'Corporate',
+        paymentType: 'Lab Test',
+        reference: 'INV-2023-875',
+        status: 'Paid',
+        insuranceProvider: 'Jubilee Insurance',
+        insuranceCoverage: 18000,
+        patientResponsibility: 0,
+        description: 'Comprehensive blood work and hormone panel'
+      }
+    ],
     referral: {
       isReferred: false
     },
@@ -246,11 +388,39 @@ const INITIAL_PATIENTS: Patient[] = [
       phone: '0722 567 890'
     },
     insurance: {
-      provider: 'NHIF',
-      policyNumber: 'NHIF34567890',
+      provider: 'SHA',
+      policyNumber: 'SHA34567890',
       groupNumber: 'GRP456789',
-      holderName: 'Mwangi Kariuki'
+      holderName: 'Mwangi Kariuki',
+      coverageType: 'Standard',
+      coverageLimit: 500000,
+      expiryDate: '2024-10-15'
     },
+    payments: [
+      {
+        id: 2001,
+        date: '2023-11-10',
+        amount: 12000,
+        paymentMethod: 'Insurance',
+        paymentType: 'Consultation',
+        reference: 'INV-2023-1105',
+        status: 'Paid',
+        insuranceProvider: 'SHA',
+        insuranceCoverage: 10000,
+        patientResponsibility: 2000,
+        description: 'Consultation with Dr. Michael Chen'
+      },
+      {
+        id: 2002,
+        date: '2023-10-05',
+        amount: 8000,
+        paymentMethod: 'Mobile Money',
+        paymentType: 'Medication',
+        reference: 'INV-2023-1050',
+        status: 'Paid',
+        description: 'Prescription medications'
+      }
+    ],
     referral: {
       isReferred: false
     },
@@ -366,7 +536,7 @@ const INITIAL_PATIENTS: Patient[] = [
       }
     ],
     lastVisit: '2023-11-25',
-    status: 'Active'
+    status: 'Inactive'
   }
 ];
 

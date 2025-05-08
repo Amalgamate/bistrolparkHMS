@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="800" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="600" height="800" fill="#ffffff"/>
+  
+  <!-- Header -->
+  <rect width="600" height="80" fill="#2B3990"/>
+  
+  <!-- Logo Placeholder -->
+  <circle cx="50" cy="40" r="30" fill="#ffffff"/>
+  
+  <!-- Header Text -->
+  <text x="100" y="40" font-family="Arial" font-size="20" fill="#ffffff" font-weight="bold">BRISTOL PARK HOSPITAL</text>
+  <text x="100" y="60" font-family="Arial" font-size="14" fill="#ffffff">Patient Medical Record</text>
+  
+  <!-- Document Title -->
+  <rect x="0" y="100" width="600" height="40" fill="#f0f0f0"/>
+  <text x="20" y="125" font-family="Arial" font-size="18" fill="#2B3990" font-weight="bold">PATIENT MEDICAL RECORD</text>
+  
+  <!-- Patient Information Section -->
+  <text x="20" y="170" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Patient Information</text>
+  <line x1="20" y1="175" x2="580" y2="175" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Patient Info Fields -->
+  <text x="20" y="200" font-family="Arial" font-size="12" fill="#333333">Name: John Doe</text>
+  <text x="300" y="200" font-family="Arial" font-size="12" fill="#333333">Patient ID: P12345</text>
+  <text x="20" y="220" font-family="Arial" font-size="12" fill="#333333">Date of Birth: 01/15/1980</text>
+  <text x="300" y="220" font-family="Arial" font-size="12" fill="#333333">Gender: Male</text>
+  <text x="20" y="240" font-family="Arial" font-size="12" fill="#333333">Phone: +254 712 345 678</text>
+  <text x="300" y="240" font-family="Arial" font-size="12" fill="#333333">Email: john.doe@example.com</text>
+  
+  <!-- Medical History Section -->
+  <text x="20" y="280" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Medical History</text>
+  <line x1="20" y1="285" x2="580" y2="285" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Medical History Content -->
+  <rect x="20" y="300" width="560" height="100" fill="#f9f9f9" stroke="#dddddd"/>
+  <text x="30" y="320" font-family="Arial" font-size="12" fill="#333333">• Hypertension diagnosed in 2015</text>
+  <text x="30" y="340" font-family="Arial" font-size="12" fill="#333333">• Appendectomy in 2010</text>
+  <text x="30" y="360" font-family="Arial" font-size="12" fill="#333333">• Allergic to penicillin</text>
+  <text x="30" y="380" font-family="Arial" font-size="12" fill="#333333">• Family history of diabetes</text>
+  
+  <!-- Vital Signs Section -->
+  <text x="20" y="430" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Vital Signs</text>
+  <line x1="20" y1="435" x2="580" y2="435" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Vital Signs Table -->
+  <rect x="20" y="450" width="560" height="30" fill="#e6e6e6"/>
+  <text x="30" y="470" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Date</text>
+  <text x="150" y="470" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Blood Pressure</text>
+  <text x="270" y="470" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Heart Rate</text>
+  <text x="390" y="470" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Temperature</text>
+  <text x="510" y="470" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Weight</text>
+  
+  <!-- Vital Signs Data -->
+  <rect x="20" y="480" width="560" height="30" fill="#f9f9f9"/>
+  <text x="30" y="500" font-family="Arial" font-size="12" fill="#333333">05/01/2023</text>
+  <text x="150" y="500" font-family="Arial" font-size="12" fill="#333333">120/80 mmHg</text>
+  <text x="270" y="500" font-family="Arial" font-size="12" fill="#333333">72 bpm</text>
+  <text x="390" y="500" font-family="Arial" font-size="12" fill="#333333">36.8°C</text>
+  <text x="510" y="500" font-family="Arial" font-size="12" fill="#333333">75 kg</text>
+  
+  <rect x="20" y="510" width="560" height="30" fill="#ffffff"/>
+  <text x="30" y="530" font-family="Arial" font-size="12" fill="#333333">04/15/2023</text>
+  <text x="150" y="530" font-family="Arial" font-size="12" fill="#333333">118/78 mmHg</text>
+  <text x="270" y="530" font-family="Arial" font-size="12" fill="#333333">70 bpm</text>
+  <text x="390" y="530" font-family="Arial" font-size="12" fill="#333333">36.6°C</text>
+  <text x="510" y="530" font-family="Arial" font-size="12" fill="#333333">76 kg</text>
+  
+  <!-- Notes Section -->
+  <text x="20" y="580" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Doctor's Notes</text>
+  <line x1="20" y1="585" x2="580" y2="585" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Notes Content -->
+  <rect x="20" y="600" width="560" height="100" fill="#f9f9f9" stroke="#dddddd"/>
+  <text x="30" y="620" font-family="Arial" font-size="12" fill="#333333">Patient is responding well to current medication regimen for hypertension.</text>
+  <text x="30" y="640" font-family="Arial" font-size="12" fill="#333333">Advised to maintain low-sodium diet and regular exercise.</text>
+  <text x="30" y="660" font-family="Arial" font-size="12" fill="#333333">Follow-up appointment scheduled in 3 months.</text>
+  
+  <!-- Footer -->
+  <rect y="750" width="600" height="50" fill="#f0f0f0"/>
+  <line x1="0" y1="750" x2="600" y2="750" stroke="#A61F1F" stroke-width="3"/>
+  <text x="20" y="780" font-family="Arial" font-size="10" fill="#666666">Bristol Park Hospital - Excellence in Healthcare</text>
+  <text x="580" y="780" font-family="Arial" font-size="10" fill="#666666" text-anchor="end">Page 1 of 1</text>
+  
+  <!-- Serial Number -->
+  <text x="20" y="795" font-family="Arial" font-size="8" fill="#999999">FDH-DOC-12345</text>
+</svg>

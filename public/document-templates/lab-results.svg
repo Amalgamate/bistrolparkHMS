@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="800" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="600" height="800" fill="#ffffff"/>
+  
+  <!-- Header -->
+  <rect width="600" height="80" fill="#2B3990"/>
+  
+  <!-- Logo Placeholder -->
+  <circle cx="50" cy="40" r="30" fill="#ffffff"/>
+  
+  <!-- Header Text -->
+  <text x="100" y="40" font-family="Arial" font-size="20" fill="#ffffff" font-weight="bold">BRISTOL PARK HOSPITAL</text>
+  <text x="100" y="60" font-family="Arial" font-size="14" fill="#ffffff">Laboratory Results</text>
+  
+  <!-- Document Title -->
+  <rect x="0" y="100" width="600" height="40" fill="#f0f0f0"/>
+  <text x="20" y="125" font-family="Arial" font-size="18" fill="#2B3990" font-weight="bold">LABORATORY TEST RESULTS</text>
+  <text x="500" y="125" font-family="Arial" font-size="14" fill="#A61F1F" font-weight="bold">LAB-12345</text>
+  
+  <!-- Patient Information -->
+  <text x="20" y="170" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Patient Information</text>
+  <line x1="20" y1="175" x2="580" y2="175" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Two Column Layout -->
+  <text x="20" y="200" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Patient:</text>
+  <text x="20" y="220" font-family="Arial" font-size="12" fill="#333333">John Doe</text>
+  <text x="20" y="240" font-family="Arial" font-size="12" fill="#333333">Patient ID: P12345</text>
+  <text x="20" y="260" font-family="Arial" font-size="12" fill="#333333">Date of Birth: 01/15/1980</text>
+  <text x="20" y="280" font-family="Arial" font-size="12" fill="#333333">Gender: Male</text>
+  
+  <text x="350" y="200" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Test Information:</text>
+  <text x="350" y="220" font-family="Arial" font-size="12" fill="#333333">Collection Date: 05/01/2023</text>
+  <text x="350" y="240" font-family="Arial" font-size="12" fill="#333333">Report Date: 05/02/2023</text>
+  <text x="350" y="260" font-family="Arial" font-size="12" fill="#333333">Ordering Physician: Dr. Sarah Johnson</text>
+  <text x="350" y="280" font-family="Arial" font-size="12" fill="#333333">Branch: Fedha</text>
+  
+  <!-- Test Results Section -->
+  <text x="20" y="320" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Complete Blood Count (CBC)</text>
+  <line x1="20" y1="325" x2="580" y2="325" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- CBC Results Table Header -->
+  <rect x="20" y="340" width="560" height="30" fill="#e6e6e6"/>
+  <text x="30" y="360" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Test</text>
+  <text x="250" y="360" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Result</text>
+  <text x="350" y="360" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Units</text>
+  <text x="450" y="360" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Reference Range</text>
+  <text x="550" y="360" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Flag</text>
+  
+  <!-- CBC Results -->
+  <rect x="20" y="370" width="560" height="30" fill="#f9f9f9"/>
+  <text x="30" y="390" font-family="Arial" font-size="12" fill="#333333">WBC</text>
+  <text x="250" y="390" font-family="Arial" font-size="12" fill="#333333">7.2</text>
+  <text x="350" y="390" font-family="Arial" font-size="12" fill="#333333">10^3/µL</text>
+  <text x="450" y="390" font-family="Arial" font-size="12" fill="#333333">4.5-11.0</text>
+  <text x="550" y="390" font-family="Arial" font-size="12" fill="#333333"></text>
+  
+  <rect x="20" y="400" width="560" height="30" fill="#ffffff"/>
+  <text x="30" y="420" font-family="Arial" font-size="12" fill="#333333">RBC</text>
+  <text x="250" y="420" font-family="Arial" font-size="12" fill="#333333">4.8</text>
+  <text x="350" y="420" font-family="Arial" font-size="12" fill="#333333">10^6/µL</text>
+  <text x="450" y="420" font-family="Arial" font-size="12" fill="#333333">4.5-5.9</text>
+  <text x="550" y="420" font-family="Arial" font-size="12" fill="#333333"></text>
+  
+  <rect x="20" y="430" width="560" height="30" fill="#f9f9f9"/>
+  <text x="30" y="450" font-family="Arial" font-size="12" fill="#333333">Hemoglobin</text>
+  <text x="250" y="450" font-family="Arial" font-size="12" fill="#333333">14.2</text>
+  <text x="350" y="450" font-family="Arial" font-size="12" fill="#333333">g/dL</text>
+  <text x="450" y="450" font-family="Arial" font-size="12" fill="#333333">13.5-17.5</text>
+  <text x="550" y="450" font-family="Arial" font-size="12" fill="#333333"></text>
+  
+  <rect x="20" y="460" width="560" height="30" fill="#ffffff"/>
+  <text x="30" y="480" font-family="Arial" font-size="12" fill="#333333">Hematocrit</text>
+  <text x="250" y="480" font-family="Arial" font-size="12" fill="#333333">42.0</text>
+  <text x="350" y="480" font-family="Arial" font-size="12" fill="#333333">%</text>
+  <text x="450" y="480" font-family="Arial" font-size="12" fill="#333333">41.0-50.0</text>
+  <text x="550" y="480" font-family="Arial" font-size="12" fill="#333333"></text>
+  
+  <rect x="20" y="490" width="560" height="30" fill="#f9f9f9"/>
+  <text x="30" y="510" font-family="Arial" font-size="12" fill="#333333">Platelets</text>
+  <text x="250" y="510" font-family="Arial" font-size="12" fill="#333333">250</text>
+  <text x="350" y="510" font-family="Arial" font-size="12" fill="#333333">10^3/µL</text>
+  <text x="450" y="510" font-family="Arial" font-size="12" fill="#333333">150-450</text>
+  <text x="550" y="510" font-family="Arial" font-size="12" fill="#333333"></text>
+  
+  <!-- Chemistry Panel Section -->
+  <text x="20" y="550" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Chemistry Panel</text>
+  <line x1="20" y1="555" x2="580" y2="555" stroke="#2B3990" stroke-width="2"/>
+  
+  <!-- Chemistry Results Table Header -->
+  <rect x="20" y="570" width="560" height="30" fill="#e6e6e6"/>
+  <text x="30" y="590" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Test</text>
+  <text x="250" y="590" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Result</text>
+  <text x="350" y="590" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Units</text>
+  <text x="450" y="590" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Reference Range</text>
+  <text x="550" y="590" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Flag</text>
+  
+  <!-- Chemistry Results -->
+  <rect x="20" y="600" width="560" height="30" fill="#f9f9f9"/>
+  <text x="30" y="620" font-family="Arial" font-size="12" fill="#333333">Glucose</text>
+  <text x="250" y="620" font-family="Arial" font-size="12" fill="#333333">110</text>
+  <text x="350" y="620" font-family="Arial" font-size="12" fill="#333333">mg/dL</text>
+  <text x="450" y="620" font-family="Arial" font-size="12" fill="#333333">70-99</text>
+  <text x="550" y="620" font-family="Arial" font-size="12" fill="#A61F1F">H</text>
+  
+  <rect x="20" y="630" width="560" height="30" fill="#ffffff"/>
+  <text x="30" y="650" font-family="Arial" font-size="12" fill="#333333">Creatinine</text>
+  <text x="250" y="650" font-family="Arial" font-size="12" fill="#333333">0.9</text>
+  <text x="350" y="650" font-family="Arial" font-size="12" fill="#333333">mg/dL</text>
+  <text x="450" y="650" font-family="Arial" font-size="12" fill="#333333">0.7-1.3</text>
+  <text x="550" y="650" font-family="Arial" font-size="12" fill="#333333"></text>
+  
+  <rect x="20" y="660" width="560" height="30" fill="#f9f9f9"/>
+  <text x="30" y="680" font-family="Arial" font-size="12" fill="#333333">Cholesterol, Total</text>
+  <text x="250" y="680" font-family="Arial" font-size="12" fill="#333333">195</text>
+  <text x="350" y="680" font-family="Arial" font-size="12" fill="#333333">mg/dL</text>
+  <text x="450" y="680" font-family="Arial" font-size="12" fill="#333333">&lt;200</text>
+  <text x="550" y="680" font-family="Arial" font-size="12" fill="#333333"></text>
+  
+  <!-- Footer -->
+  <rect y="750" width="600" height="50" fill="#f0f0f0"/>
+  <line x1="0" y1="750" x2="600" y2="750" stroke="#A61F1F" stroke-width="3"/>
+  <text x="20" y="780" font-family="Arial" font-size="10" fill="#666666">Bristol Park Hospital - Excellence in Healthcare</text>
+  <text x="580" y="780" font-family="Arial" font-size="10" fill="#666666" text-anchor="end">Page 1 of 1</text>
+  
+  <!-- Serial Number -->
+  <text x="20" y="795" font-family="Arial" font-size="8" fill="#999999">FDH-LAB-12345</text>
+</svg>

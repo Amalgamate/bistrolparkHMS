@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Search, Bell, Menu, MessageSquare, LogOut, User, Settings,
-  Plus, Calendar, FileText, Users, HelpCircle, ChevronDown, Building
+  Bell, Menu, MessageSquare, LogOut, User, Settings,
+  Plus, Calendar, FileText, Users, HelpCircle, ChevronDown, Building,
+  RefreshCw
 } from 'lucide-react';
+import IntelligentBranchSwitcher from '../auth/IntelligentBranchSwitcher';
 import { useAuth } from '../../context/AuthContext';
 import { GlobalSearch } from '../search/GlobalSearch';
 import { useNavigate } from 'react-router-dom';
+import LoginAs from '../auth/LoginAs';
+import { refreshCache } from '../../utils/cacheUtils';
 
 interface HeaderProps {
   onMenuButtonClick: () => void;
@@ -41,17 +45,13 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
       <div className="flex items-center">
         <button
           type="button"
-          className="p-2 text-[#0100F6] rounded-md focus:outline-none hover:bg-gray-100 transition-all duration-150"
+          className="p-2 text-[#2B3990] rounded-md focus:outline-none hover:bg-gray-100 transition-all duration-150"
           onClick={onMenuButtonClick}
         >
           <Menu className="w-5 h-5" />
         </button>
-        <div className="flex flex-col ml-2 md:ml-0">
-          <h1 className="text-xl font-semibold text-[#0100F6]">Bistro Park Hospital</h1>
-          <div className="flex items-center text-xs text-gray-500">
-            <Building className="w-3 h-3 mr-1" />
-            <span>{user?.branch || 'Fedha'} Branch</span>
-          </div>
+        <div className="ml-2 md:ml-0">
+          <IntelligentBranchSwitcher />
         </div>
       </div>
 
@@ -84,6 +84,23 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
           <Bell className="w-5 h-5" />
           <span className="absolute top-0 right-0 block w-2 h-2 bg-red-500 rounded-full"></span>
         </button>
+
+        {/* Refresh Cache Button */}
+        <button
+          type="button"
+          className="p-1.5 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#F5B800] relative"
+          onClick={() => {
+            if (confirm('This will refresh the application cache and reload the page. Continue?')) {
+              refreshCache(true, true);
+            }
+          }}
+          title="Refresh Application Cache"
+        >
+          <RefreshCw className="w-5 h-5" />
+        </button>
+
+        {/* Login As Button - Only visible for admins */}
+        <LoginAs />
 
         {/* Quick Action Button */}
         <div className="relative" ref={quickActionRef}>
@@ -144,8 +161,15 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
                   <span className="text-xs text-gray-500">Online</span>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-lg bg-[#F5B800] flex items-center justify-center text-black font-bold">
-                {user?.name?.charAt(0) || 'A'}
+              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-[#F5B800]">
+                <img
+                  src="/user-avatar.svg"
+                  alt="User Avatar"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${user?.name || 'Admin User'}&background=F5B800&color=000`;
+                  }}
+                />
               </div>
               <ChevronDown className="w-4 h-4 ml-1 text-gray-500 hidden sm:block" />
             </button>
@@ -161,12 +185,19 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
                   {/* User Profile Header */}
                   <div className="px-5 py-4 bg-gray-50 border-b border-gray-100">
                     <div className="flex items-center">
-                      <div className="w-12 h-12 rounded-lg bg-[#F5B800] flex items-center justify-center text-black font-bold text-lg mr-3">
-                        {user?.name?.charAt(0) || 'A'}
+                      <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#F5B800] mr-3">
+                        <img
+                          src="/user-avatar.svg"
+                          alt="User Avatar"
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = `https://ui-avatars.com/api/?name=${user?.name || 'Admin User'}&background=F5B800&color=000`;
+                          }}
+                        />
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-gray-900">{user?.name || 'Admin User'}</p>
-                        <p className="text-xs text-gray-500">{user?.email || 'admin@bistropark.com'}</p>
+                        <p className="text-xs text-gray-500">{user?.email || 'admin@bristolparkhospital.com'}</p>
                         <div className="mt-1 flex items-center space-x-2">
                           <span className="text-xs font-medium px-2 py-1 bg-blue-100 text-blue-800 rounded-full">
                             {user?.role || 'Admin'}
@@ -176,8 +207,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
                     </div>
                     <div className="mt-3 flex items-center justify-between bg-white rounded-md p-2 border border-gray-100">
                       <div className="flex items-center">
-                        <Building className="w-4 h-4 text-[#0100F6] mr-2" />
-                        <span className="text-sm font-medium">{user?.branch || 'Fedha'} Branch</span>
+                        <Building className="w-4 h-4 text-[#2B3990] mr-2" />
+                        <span className="text-sm font-bold text-[#2B3990]">{user?.branch || 'FEDHA'}</span>
                       </div>
                       <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-800 rounded-full">Active</span>
                     </div>
@@ -185,6 +216,13 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
 
                   {/* Menu Items */}
                   <div className="py-2">
+                    <a
+                      href="/profile"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
+                    >
+                      <User className="h-4 w-4 mr-2 text-gray-500" />
+                      My Profile
+                    </a>
                     <a href="#" className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                       <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center mr-3">
                         <User className="w-4 h-4 text-blue-600" />
@@ -223,3 +261,4 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
     </header>
   );
 };
+

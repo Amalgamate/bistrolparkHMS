@@ -1,9 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { NewPatientRegistration } from '../components/patients/NewPatientRegistration';
-import { NewPatientAdmission } from '../components/patients/NewPatientAdmission';
-import { NewPatientTracking } from '../components/patients/NewPatientTracking';
-import { NewPatientHistory } from '../components/patients/NewPatientHistory';
 import { NewPatientReports } from '../components/patients/NewPatientReports';
 
 const NewPatientFlow: React.FC = () => {
@@ -57,30 +54,7 @@ const NewPatientFlow: React.FC = () => {
           >
             Patient Registration
           </button>
-          <button
-            onClick={() => navigate('/patients/history')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${isActive('/history')
-              ? 'border-[#1961FB] text-[#01016C]'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-          >
-            Medical History
-          </button>
-          <button
-            onClick={() => navigate('/patients/admission')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${isActive('/admission')
-              ? 'border-[#1961FB] text-[#01016C]'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-          >
-            Admission History
-          </button>
-          <button
-            onClick={() => navigate('/patients/tracking')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${isActive('/tracking')
-              ? 'border-[#1961FB] text-[#01016C]'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'}`}
-          >
-            Walk-in History
-          </button>
+
           <button
             onClick={() => navigate('/patients/reports')}
             className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${isActive('/reports')
@@ -95,9 +69,6 @@ const NewPatientFlow: React.FC = () => {
       <Routes>
         <Route path="/" element={<NewPatientRegistration />} />
         <Route path="/registration" element={<NewPatientRegistration />} />
-        <Route path="/history" element={<NewPatientHistory />} />
-        <Route path="/admission" element={<NewPatientAdmission />} />
-        <Route path="/tracking" element={<NewPatientTracking />} />
         <Route path="/reports" element={<NewPatientReports />} />
       </Routes>
     </div>

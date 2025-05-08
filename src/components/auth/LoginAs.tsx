@@ -76,7 +76,7 @@ const LoginAs: React.FC = () => {
 
     // Use the first allowed branch as default
     const defaultBranch = userToLoginAs.allowedBranches[0];
-    
+
     // Login as the selected user
     if (userToLoginAs && defaultBranch) {
       await login(userToLoginAs.email, userToLoginAs.password, defaultBranch);
@@ -88,7 +88,7 @@ const LoginAs: React.FC = () => {
   const filteredUsers = users.filter(u => {
     if (u.id === currentUser?.id) return false; // Don't show current user
     if (!u.active) return false; // Don't show inactive users
-    
+
     const searchLower = searchTerm.toLowerCase();
     return (
       u.name.toLowerCase().includes(searchLower) ||
@@ -119,7 +119,7 @@ const LoginAs: React.FC = () => {
               className="w-full p-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2B3990]"
             />
           </div>
-          
+
           <div className="max-h-96 overflow-y-auto">
             {filteredUsers.length === 0 ? (
               <div className="p-4 text-center text-gray-500">

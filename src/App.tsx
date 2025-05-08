@@ -1,16 +1,31 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
+import { useEffect } from 'react';
+import { BrowserRouter } from 'react-router-dom';
+import LocationBasedLogin from './pages/LocationBasedLogin';
 import { useAuth } from './context/AuthContext';
 import { AppRoutes } from './routes';
+import { checkAndUpdateVersion, forceReload } from './utils/cacheUtils';
 
-function App() {
+import React from 'react';
+
+const App: React.FC = () => {
   const { isAuthenticated } = useAuth();
 
-  // Redirect to dashboard after login
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof localStorage === 'undefined') return;
+
+    const versionChanged = checkAndUpdateVersion();
+
+    if (versionChanged && localStorage.getItem('app_initialized')) {
+      forceReload();
+    } else {
+      localStorage.setItem('app_initialized', 'true');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
     if (isAuthenticated) {
-      // Use window.location to ensure a full page reload to the dashboard
       if (window.location.pathname === '/') {
         window.location.href = '/dashboard';
       }
@@ -18,7 +33,7 @@ function App() {
   }, [isAuthenticated]);
 
   if (!isAuthenticated) {
-    return <Login />;
+    return <LocationBasedLogin />;
   }
 
   return (

@@ -6,15 +6,17 @@ export type ToastType = 'success' | 'error' | 'info' | 'warning';
 interface ToastProps {
   type: ToastType;
   message: string;
+  title?: string;
   duration?: number;
   onClose: () => void;
 }
 
-export const Toast: React.FC<ToastProps> = ({ 
-  type, 
-  message, 
-  duration = 5000, 
-  onClose 
+export const Toast: React.FC<ToastProps> = ({
+  type,
+  message,
+  title,
+  duration = 5000,
+  onClose
 }) => {
   const [isVisible, setIsVisible] = useState(true);
 
@@ -43,7 +45,7 @@ export const Toast: React.FC<ToastProps> = ({
   const getStyles = () => {
     const baseStyles = "fixed bottom-4 right-4 flex items-center p-4 rounded-md shadow-lg transform transition-all duration-300 max-w-md";
     const visibilityStyles = isVisible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0";
-    
+
     let typeStyles = "";
     switch (type) {
       case 'success':
@@ -59,7 +61,7 @@ export const Toast: React.FC<ToastProps> = ({
         typeStyles = "bg-blue-50 text-blue-800 border-l-4 border-blue-500";
         break;
     }
-    
+
     return `${baseStyles} ${typeStyles} ${visibilityStyles}`;
   };
 
@@ -69,9 +71,10 @@ export const Toast: React.FC<ToastProps> = ({
         {getIcon()}
       </div>
       <div className="flex-1 mr-2">
-        {message}
+        {title && <div className="font-medium">{title}</div>}
+        <div className={title ? "text-sm mt-1" : ""}>{message}</div>
       </div>
-      <button 
+      <button
         onClick={() => {
           setIsVisible(false);
           setTimeout(onClose, 300);
@@ -89,13 +92,14 @@ interface ToastContainerProps {
     id: string;
     type: ToastType;
     message: string;
+    title?: string;
   }>;
   removeToast: (id: string) => void;
 }
 
-export const ToastContainer: React.FC<ToastContainerProps> = ({ 
-  toasts, 
-  removeToast 
+export const ToastContainer: React.FC<ToastContainerProps> = ({
+  toasts,
+  removeToast
 }) => {
   return (
     <div className="fixed bottom-0 right-0 z-50 p-4 space-y-4">
@@ -104,6 +108,7 @@ export const ToastContainer: React.FC<ToastContainerProps> = ({
           key={toast.id}
           type={toast.type}
           message={toast.message}
+          title={toast.title}
           onClose={() => removeToast(toast.id)}
         />
       ))}

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="600" height="800" viewBox="0 0 600 800" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="600" height="800" fill="#ffffff"/>
+  
+  <!-- Header -->
+  <rect width="600" height="80" fill="#2B3990"/>
+  
+  <!-- Logo Placeholder -->
+  <circle cx="50" cy="40" r="30" fill="#ffffff"/>
+  
+  <!-- Header Text -->
+  <text x="100" y="40" font-family="Arial" font-size="20" fill="#ffffff" font-weight="bold">BRISTOL PARK HOSPITAL</text>
+  <text x="100" y="60" font-family="Arial" font-size="14" fill="#ffffff">Discharge Summary</text>
+  
+  <!-- Document Title -->
+  <rect x="0" y="100" width="600" height="40" fill="#f0f0f0"/>
+  <text x="20" y="125" font-family="Arial" font-size="18" fill="#2B3990" font-weight="bold">DISCHARGE SUMMARY</text>
+  <text x="500" y="125" font-family="Arial" font-size="14" fill="#A61F1F" font-weight="bold">DC-12345</text>
+  
+  <!-- Patient Information -->
+  <text x="20" y="170" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Patient Information</text>
+  <line x1="20" y1="175" x2="580" y2="175" stroke="#2B3990" stroke-width="2"/>
+  
+  <text x="20" y="200" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Name:</text>
+  <text x="120" y="200" font-family="Arial" font-size="12" fill="#333333">John Doe</text>
+  
+  <text x="350" y="200" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Patient ID:</text>
+  <text x="450" y="200" font-family="Arial" font-size="12" fill="#333333">P12345</text>
+  
+  <text x="20" y="220" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Date of Birth:</text>
+  <text x="120" y="220" font-family="Arial" font-size="12" fill="#333333">01/15/1980</text>
+  
+  <text x="350" y="220" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Gender:</text>
+  <text x="450" y="220" font-family="Arial" font-size="12" fill="#333333">Male</text>
+  
+  <!-- Admission Details -->
+  <text x="20" y="260" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Admission Details</text>
+  <line x1="20" y1="265" x2="580" y2="265" stroke="#2B3990" stroke-width="2"/>
+  
+  <text x="20" y="290" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Admission Date:</text>
+  <text x="150" y="290" font-family="Arial" font-size="12" fill="#333333">04/28/2023</text>
+  
+  <text x="350" y="290" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Discharge Date:</text>
+  <text x="450" y="290" font-family="Arial" font-size="12" fill="#333333">05/01/2023</text>
+  
+  <text x="20" y="310" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Admitting Diagnosis:</text>
+  <text x="150" y="310" font-family="Arial" font-size="12" fill="#333333">Pneumonia</text>
+  
+  <text x="350" y="310" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Discharge Diagnosis:</text>
+  <text x="450" y="310" font-family="Arial" font-size="12" fill="#333333">Resolved Pneumonia</text>
+  
+  <text x="20" y="330" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Attending Physician:</text>
+  <text x="150" y="330" font-family="Arial" font-size="12" fill="#333333">Dr. Sarah Johnson</text>
+  
+  <text x="350" y="330" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Department:</text>
+  <text x="450" y="330" font-family="Arial" font-size="12" fill="#333333">Internal Medicine</text>
+  
+  <!-- Hospital Course -->
+  <text x="20" y="370" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Hospital Course</text>
+  <line x1="20" y1="375" x2="580" y2="375" stroke="#2B3990" stroke-width="2"/>
+  
+  <rect x="20" y="390" width="560" height="80" fill="#f9f9f9" stroke="#dddddd"/>
+  <text x="30" y="410" font-family="Arial" font-size="12" fill="#333333">Patient was admitted with fever, productive cough, and shortness of breath. Chest X-ray</text>
+  <text x="30" y="430" font-family="Arial" font-size="12" fill="#333333">showed right lower lobe infiltrate consistent with pneumonia. Patient was started on IV</text>
+  <text x="30" y="450" font-family="Arial" font-size="12" fill="#333333">antibiotics and showed significant improvement. Oxygen saturation normalized and fever</text>
+  <text x="30" y="470" font-family="Arial" font-size="12" fill="#333333">resolved by day 3 of admission.</text>
+  
+  <!-- Discharge Medications -->
+  <text x="20" y="500" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Discharge Medications</text>
+  <line x1="20" y1="505" x2="580" y2="505" stroke="#2B3990" stroke-width="2"/>
+  
+  <rect x="20" y="520" width="560" height="80" fill="#f9f9f9" stroke="#dddddd"/>
+  <text x="30" y="540" font-family="Arial" font-size="12" fill="#333333">1. Amoxicillin 500mg - Take 1 capsule by mouth three times daily for 7 days</text>
+  <text x="30" y="560" font-family="Arial" font-size="12" fill="#333333">2. Acetaminophen 500mg - Take 1-2 tablets by mouth every 6 hours as needed for fever or pain</text>
+  <text x="30" y="580" font-family="Arial" font-size="12" fill="#333333">3. Continue all home medications as previously prescribed</text>
+  
+  <!-- Follow-up Instructions -->
+  <text x="20" y="630" font-family="Arial" font-size="16" fill="#2B3990" font-weight="bold">Follow-up Instructions</text>
+  <line x1="20" y1="635" x2="580" y2="635" stroke="#2B3990" stroke-width="2"/>
+  
+  <rect x="20" y="650" width="560" height="60" fill="#f9f9f9" stroke="#dddddd"/>
+  <text x="30" y="670" font-family="Arial" font-size="12" fill="#333333">1. Follow up with Dr. Sarah Johnson in 1 week (appointment scheduled for 05/08/2023 at 10:00 AM)</text>
+  <text x="30" y="690" font-family="Arial" font-size="12" fill="#333333">2. Return to emergency department if fever returns, shortness of breath worsens, or new symptoms develop</text>
+  
+  <!-- Signature -->
+  <text x="20" y="720" font-family="Arial" font-size="12" fill="#333333" font-weight="bold">Discharging Physician's Signature:</text>
+  <line x1="220" y1="720" x2="370" y2="720" stroke="#333333" stroke-width="1"/>
+  <text x="220" y="735" font-family="Arial" font-size="10" fill="#666666" font-style="italic">Dr. Sarah Johnson</text>
+  
+  <!-- Footer -->
+  <rect y="750" width="600" height="50" fill="#f0f0f0"/>
+  <line x1="0" y1="750" x2="600" y2="750" stroke="#A61F1F" stroke-width="3"/>
+  <text x="20" y="780" font-family="Arial" font-size="10" fill="#666666">Bristol Park Hospital - Excellence in Healthcare</text>
+  <text x="580" y="780" font-family="Arial" font-size="10" fill="#666666" text-anchor="end">Page 1 of 1</text>
+  
+  <!-- Serial Number -->
+  <text x="20" y="795" font-family="Arial" font-size="8" fill="#999999">FDH-DC-12345</text>
+</svg>
