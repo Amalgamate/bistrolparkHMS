@@ -1,0 +1,398 @@
+import { Admission, Room, Bed } from '../context/AdmissionContext';
+
+// Mock admitted patients data
+export const mockAdmittedPatients: Admission[] = [
+  {
+    id: 'ADM10001',
+    patientId: 'BP10023456',
+    patientName: 'David Kamau',
+    admissionDate: '2024-06-10',
+    admissionTime: '09:30',
+    roomId: 'RM101',
+    roomName: 'Executive Suite 101',
+    roomType: 'Executive',
+    diagnosis: 'Pneumonia',
+    doctorId: 'DOC001',
+    doctorName: 'Dr. Sarah Williams',
+    notes: 'Patient requires oxygen support and regular monitoring',
+    status: 'admitted',
+    billAmount: 25000,
+    billPaid: false,
+    insuranceCovered: true,
+    insuranceProvider: 'SHA',
+    insurancePolicyNumber: 'SHA12345678',
+    insuranceApprovalCode: 'AP12345'
+  },
+  {
+    id: 'ADM10002',
+    patientId: 'BP10023457',
+    patientName: 'Faith Wanjiku',
+    admissionDate: '2024-06-12',
+    admissionTime: '14:15',
+    roomId: 'RM201',
+    roomName: 'Premium Room 201',
+    roomType: 'Premium',
+    diagnosis: 'Post-surgical recovery (Appendectomy)',
+    doctorId: 'DOC002',
+    doctorName: 'Dr. Michael Chen',
+    notes: 'Patient recovering well, monitor wound site',
+    status: 'admitted',
+    billAmount: 18000,
+    billPaid: true,
+    insuranceCovered: true,
+    insuranceProvider: 'SHA',
+    insurancePolicyNumber: 'SHA23456789',
+    insuranceApprovalCode: 'AP23456'
+  },
+  {
+    id: 'ADM10003',
+    patientId: 'BP10023458',
+    patientName: 'Peter Omondi',
+    admissionDate: '2024-06-15',
+    admissionTime: '11:00',
+    roomId: 'RM301',
+    roomName: 'Basic Room 301',
+    roomType: 'Basic',
+    diagnosis: 'Malaria',
+    doctorId: 'DOC003',
+    doctorName: 'Dr. Amelia Rodriguez',
+    notes: 'Patient on IV antimalarials, monitor for fever',
+    status: 'admitted',
+    billAmount: 12000,
+    billPaid: false,
+    insuranceCovered: false
+  },
+  {
+    id: 'ADM10004',
+    patientId: 'BP10023459',
+    patientName: 'Esther Muthoni',
+    admissionDate: '2024-06-16',
+    admissionTime: '08:45',
+    roomId: 'RM401',
+    roomName: 'Ward A - Bed 1',
+    roomType: 'Ward',
+    bedNumber: 'Bed 1',
+    diagnosis: 'Typhoid Fever',
+    doctorId: 'DOC001',
+    doctorName: 'Dr. Sarah Williams',
+    notes: 'Patient on IV antibiotics, monitor fluid intake',
+    status: 'admitted',
+    billAmount: 8000,
+    billPaid: false,
+    insuranceCovered: true,
+    insuranceProvider: 'SHA',
+    insurancePolicyNumber: 'SHA34567890',
+    insuranceApprovalCode: 'AP34567'
+  },
+  {
+    id: 'ADM10005',
+    patientId: 'BP10023460',
+    patientName: 'John Njoroge',
+    admissionDate: '2024-06-17',
+    admissionTime: '16:30',
+    roomId: 'RM102',
+    roomName: 'Executive Suite 102',
+    roomType: 'Executive',
+    diagnosis: 'Diabetic Ketoacidosis',
+    doctorId: 'DOC004',
+    doctorName: 'Dr. David Thompson',
+    notes: 'Patient requires insulin therapy and close monitoring of blood glucose',
+    status: 'admitted',
+    billAmount: 30000,
+    billPaid: true,
+    insuranceCovered: true,
+    insuranceProvider: 'Jubilee',
+    insurancePolicyNumber: 'JUB12345678',
+    insuranceApprovalCode: 'AP45678'
+  }
+];
+
+// Mock discharged patients data
+export const mockDischargedPatients: Admission[] = [
+  {
+    id: 'ADM9001',
+    patientId: 'BP10023461',
+    patientName: 'Grace Achieng',
+    admissionDate: '2024-05-20',
+    admissionTime: '10:00',
+    roomId: 'RM202',
+    roomName: 'Premium Room 202',
+    roomType: 'Premium',
+    diagnosis: 'Acute Bronchitis',
+    doctorId: 'DOC002',
+    doctorName: 'Dr. Michael Chen',
+    notes: 'Patient responded well to antibiotics',
+    status: 'discharged',
+    dischargeDate: '2024-05-25',
+    dischargeTime: '11:30',
+    dischargeNotes: 'Discharged with oral antibiotics for 5 more days',
+    billAmount: 15000,
+    billPaid: true,
+    insuranceCovered: true,
+    insuranceProvider: 'SHA',
+    insurancePolicyNumber: 'SHA45678901',
+    insuranceApprovalCode: 'AP56789'
+  },
+  {
+    id: 'ADM9002',
+    patientId: 'BP10023462',
+    patientName: 'James Mwangi',
+    admissionDate: '2024-05-22',
+    admissionTime: '14:00',
+    roomId: 'RM302',
+    roomName: 'Basic Room 302',
+    roomType: 'Basic',
+    diagnosis: 'Gastroenteritis',
+    doctorId: 'DOC003',
+    doctorName: 'Dr. Amelia Rodriguez',
+    notes: 'Patient treated for dehydration',
+    status: 'discharged',
+    dischargeDate: '2024-05-24',
+    dischargeTime: '16:45',
+    dischargeNotes: 'Discharged with oral rehydration therapy',
+    billAmount: 8000,
+    billPaid: true,
+    insuranceCovered: false
+  },
+  {
+    id: 'ADM9003',
+    patientId: 'BP10023463',
+    patientName: 'Sarah Otieno',
+    admissionDate: '2024-05-25',
+    admissionTime: '09:15',
+    roomId: 'RM103',
+    roomName: 'Executive Suite 103',
+    roomType: 'Executive',
+    diagnosis: 'Hypertensive Crisis',
+    doctorId: 'DOC001',
+    doctorName: 'Dr. Sarah Williams',
+    notes: 'Patient stabilized with antihypertensives',
+    status: 'discharged',
+    dischargeDate: '2024-05-28',
+    dischargeTime: '10:00',
+    dischargeNotes: 'Discharged with adjusted medication regimen',
+    billAmount: 22000,
+    billPaid: true,
+    insuranceCovered: true,
+    insuranceProvider: 'Jubilee',
+    insurancePolicyNumber: 'JUB23456789',
+    insuranceApprovalCode: 'AP67890'
+  },
+  {
+    id: 'ADM9004',
+    patientId: 'BP10023464',
+    patientName: 'Daniel Kimani',
+    admissionDate: '2024-06-01',
+    admissionTime: '11:30',
+    roomId: 'RM402',
+    roomName: 'Ward A - Bed 2',
+    roomType: 'Ward',
+    bedNumber: 'Bed 2',
+    diagnosis: 'Cellulitis',
+    doctorId: 'DOC004',
+    doctorName: 'Dr. David Thompson',
+    notes: 'Patient treated with IV antibiotics',
+    status: 'discharged',
+    dischargeDate: '2024-06-05',
+    dischargeTime: '14:00',
+    dischargeNotes: 'Discharged with oral antibiotics and wound care instructions',
+    billAmount: 10000,
+    billPaid: false,
+    insuranceCovered: true,
+    insuranceProvider: 'SHA',
+    insurancePolicyNumber: 'SHA56789012',
+    insuranceApprovalCode: 'AP78901'
+  },
+  {
+    id: 'ADM9005',
+    patientId: 'BP10023465',
+    patientName: 'Mary Wambui',
+    admissionDate: '2024-06-02',
+    admissionTime: '15:45',
+    roomId: 'RM203',
+    roomName: 'Premium Room 203',
+    roomType: 'Premium',
+    diagnosis: 'Asthma Exacerbation',
+    doctorId: 'DOC002',
+    doctorName: 'Dr. Michael Chen',
+    notes: 'Patient treated with bronchodilators and steroids',
+    status: 'discharged',
+    dischargeDate: '2024-06-04',
+    dischargeTime: '13:30',
+    dischargeNotes: 'Discharged with inhaler therapy and follow-up appointment',
+    billAmount: 12000,
+    billPaid: true,
+    insuranceCovered: false
+  }
+];
+
+// Mock rooms data
+export const mockRooms: Room[] = [
+  {
+    id: 'RM101',
+    name: 'Executive Suite 101',
+    type: 'Executive',
+    status: 'Occupied',
+    floor: '1st Floor',
+    wing: 'East Wing',
+    dailyRate: 15000,
+    features: ['Private bathroom', 'TV', 'WiFi', 'Refrigerator', 'Sofa bed for visitors'],
+    patientId: 'BP10023456',
+    patientName: 'David Kamau',
+    admissionDate: '2024-06-10'
+  },
+  {
+    id: 'RM102',
+    name: 'Executive Suite 102',
+    type: 'Executive',
+    status: 'Occupied',
+    floor: '1st Floor',
+    wing: 'East Wing',
+    dailyRate: 15000,
+    features: ['Private bathroom', 'TV', 'WiFi', 'Refrigerator', 'Sofa bed for visitors'],
+    patientId: 'BP10023460',
+    patientName: 'John Njoroge',
+    admissionDate: '2024-06-17'
+  },
+  {
+    id: 'RM103',
+    name: 'Executive Suite 103',
+    type: 'Executive',
+    status: 'Available',
+    floor: '1st Floor',
+    wing: 'East Wing',
+    dailyRate: 15000,
+    features: ['Private bathroom', 'TV', 'WiFi', 'Refrigerator', 'Sofa bed for visitors']
+  },
+  {
+    id: 'RM201',
+    name: 'Premium Room 201',
+    type: 'Premium',
+    status: 'Occupied',
+    floor: '2nd Floor',
+    wing: 'North Wing',
+    dailyRate: 10000,
+    features: ['Private bathroom', 'TV', 'WiFi'],
+    patientId: 'BP10023457',
+    patientName: 'Faith Wanjiku',
+    admissionDate: '2024-06-12'
+  },
+  {
+    id: 'RM202',
+    name: 'Premium Room 202',
+    type: 'Premium',
+    status: 'Available',
+    floor: '2nd Floor',
+    wing: 'North Wing',
+    dailyRate: 10000,
+    features: ['Private bathroom', 'TV', 'WiFi']
+  },
+  {
+    id: 'RM203',
+    name: 'Premium Room 203',
+    type: 'Premium',
+    status: 'Available',
+    floor: '2nd Floor',
+    wing: 'North Wing',
+    dailyRate: 10000,
+    features: ['Private bathroom', 'TV', 'WiFi']
+  },
+  {
+    id: 'RM301',
+    name: 'Basic Room 301',
+    type: 'Basic',
+    status: 'Occupied',
+    floor: '3rd Floor',
+    wing: 'West Wing',
+    dailyRate: 5000,
+    features: ['Shared bathroom', 'TV'],
+    patientId: 'BP10023458',
+    patientName: 'Peter Omondi',
+    admissionDate: '2024-06-15'
+  },
+  {
+    id: 'RM302',
+    name: 'Basic Room 302',
+    type: 'Basic',
+    status: 'Available',
+    floor: '3rd Floor',
+    wing: 'West Wing',
+    dailyRate: 5000,
+    features: ['Shared bathroom', 'TV']
+  },
+  {
+    id: 'RM303',
+    name: 'Basic Room 303',
+    type: 'Basic',
+    status: 'Maintenance',
+    floor: '3rd Floor',
+    wing: 'West Wing',
+    dailyRate: 5000,
+    features: ['Shared bathroom', 'TV']
+  },
+  {
+    id: 'RM401',
+    name: 'Ward A',
+    type: 'Ward',
+    status: 'Occupied',
+    floor: '4th Floor',
+    wing: 'South Wing',
+    dailyRate: 2500,
+    beds: [
+      {
+        id: 'BED401-1',
+        number: 'Bed 1',
+        status: 'Occupied',
+        patientId: 'BP10023459',
+        patientName: 'Esther Muthoni',
+        admissionDate: '2024-06-16'
+      },
+      {
+        id: 'BED401-2',
+        number: 'Bed 2',
+        status: 'Available'
+      },
+      {
+        id: 'BED401-3',
+        number: 'Bed 3',
+        status: 'Available'
+      },
+      {
+        id: 'BED401-4',
+        number: 'Bed 4',
+        status: 'Available'
+      }
+    ]
+  },
+  {
+    id: 'RM402',
+    name: 'Ward B',
+    type: 'Ward',
+    status: 'Available',
+    floor: '4th Floor',
+    wing: 'South Wing',
+    dailyRate: 2500,
+    beds: [
+      {
+        id: 'BED402-1',
+        number: 'Bed 1',
+        status: 'Available'
+      },
+      {
+        id: 'BED402-2',
+        number: 'Bed 2',
+        status: 'Available'
+      },
+      {
+        id: 'BED402-3',
+        number: 'Bed 3',
+        status: 'Available'
+      },
+      {
+        id: 'BED402-4',
+        number: 'Bed 4',
+        status: 'Maintenance'
+      }
+    ]
+  }
+];

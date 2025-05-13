@@ -14,7 +14,6 @@ import { PaymentHistory } from './PaymentHistory';
 import { InsuranceInfo } from './InsuranceInfo';
 import DocumentUpload from '../documents/DocumentUpload';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 import { format } from 'date-fns';
 import { generatePatientPDF } from '../../utils/pdfUtils';
 import '../../styles/theme.css';
@@ -310,7 +309,7 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
               Edit
             </button>
             <button
-              className="btn-icon btn-sm bg-secondary text-primary"
+              className="btn-icon btn-sm bg-secondary text-white"
               onClick={onClose}
             >
               <X className="w-4 h-4" />
@@ -326,7 +325,7 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
 
           <div className="flex gap-3">
             <button
-              className="btn btn-sm bg-secondary text-primary"
+              className="btn btn-sm bg-secondary text-white"
               onClick={() => {
                 window.print();
                 showToast('success', 'Print dialog opened');
@@ -336,13 +335,13 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
               Print
             </button>
             <button
-              className="btn btn-sm bg-secondary text-primary"
+              className="btn btn-sm bg-secondary text-white"
               onClick={exportToPDF}
             >
               <Download className="w-4 h-4 mr-1" />
               Export PDF
             </button>
-            <button className="btn btn-sm bg-secondary text-primary">
+            <button className="btn btn-sm bg-secondary text-white">
               <Share2 className="w-4 h-4 mr-1" />
               Share
             </button>

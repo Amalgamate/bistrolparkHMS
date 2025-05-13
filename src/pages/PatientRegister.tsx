@@ -4,7 +4,6 @@ import { useToast, ToastProvider } from '../context/ToastContext';
 import { Search, Plus, Filter, User, Phone, Calendar, Clock, FileText, MoreHorizontal, Edit, Trash2, Eye, X, Download, ChevronDown } from 'lucide-react';
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
 import { generatePatientListPDF } from '../utils/pdfUtils';
 import '../styles/theme.css';
 

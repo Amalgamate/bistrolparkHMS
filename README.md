@@ -72,9 +72,9 @@ bristolparkhospital/
 └── README.md           # Project documentation
 ```
 
-## Legacy System Integration
+## Backend Migration
 
-This project includes integration with the legacy Java backend system. For detailed information on how to integrate with the legacy system, please refer to the [Legacy Integration Guide](./LEGACY_INTEGRATION.md).
+Instead of integrating with the legacy Java backend, we are migrating data to a new modern backend stack. For detailed information on the migration strategy and implementation, please refer to the [Backend Migration Guide](./BACKEND_MIGRATION.md).
 
 ## Available Scripts
 

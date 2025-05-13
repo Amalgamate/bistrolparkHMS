@@ -4,6 +4,7 @@ import LocationBasedLogin from './pages/LocationBasedLogin';
 import { useAuth } from './context/AuthContext';
 import { AppRoutes } from './routes';
 import { checkAndUpdateVersion, forceReload } from './utils/cacheUtils';
+import { RealTimeNotificationProvider } from './context/RealTimeNotificationContext';
 
 import React from 'react';
 
@@ -37,9 +38,11 @@ const App: React.FC = () => {
   }
 
   return (
-    <BrowserRouter>
-      <AppRoutes />
-    </BrowserRouter>
+    <RealTimeNotificationProvider>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </RealTimeNotificationProvider>
   );
 }
 

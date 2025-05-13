@@ -1,0 +1,73 @@
+/* Lab Module Tab Styles */
+
+.lab-tab {
+  position: relative;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Tab colors */
+.lab-tab-requests {
+  --tab-color: #2B3990; /* Primary blue */
+  --tab-color-rgb: 43, 57, 144;
+}
+
+.lab-tab-internal {
+  --tab-color: #4CAF50; /* Green */
+  --tab-color-rgb: 76, 175, 80;
+}
+
+.lab-tab-external {
+  --tab-color: #9C27B0; /* Purple */
+  --tab-color-rgb: 156, 39, 176;
+}
+
+.lab-tab-reports {
+  --tab-color: #FF9800; /* Orange */
+  --tab-color-rgb: 255, 152, 0;
+}
+
+.lab-tab-prices {
+  --tab-color: #F44336; /* Red */
+  --tab-color-rgb: 244, 67, 54;
+}
+
+.lab-tab-new {
+  --tab-color: #00BCD4; /* Cyan */
+  --tab-color-rgb: 0, 188, 212;
+}
+
+.lab-tab-walkin {
+  --tab-color: #673AB7; /* Deep Purple */
+  --tab-color-rgb: 103, 58, 183;
+}
+
+/* Active tab styles */
+.lab-tab[data-state="active"] {
+  color: var(--tab-color) !important;
+  font-weight: 600;
+}
+
+.lab-tab[data-state="active"]::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--tab-color);
+}
+
+/* Hover styles for inactive tabs */
+.lab-tab:not([data-state="active"]):hover {
+  color: var(--tab-color) !important;
+  background-color: rgba(var(--tab-color-rgb), 0.05);
+}
+
+/* Icon styles */
+.lab-tab[data-state="active"] svg {
+  color: var(--tab-color);
+}
+
+.lab-tab:not([data-state="active"]):hover svg {
+  color: var(--tab-color);
+}

@@ -375,16 +375,27 @@ const INITIAL_ROLES: Role[] = [
   {
     id: 'front-office',
     name: 'Front Office',
-    description: 'Reception staff with access to patient registration and appointments',
+    description: 'Reception staff with access to only Clinical, Patients, Appointments, and Admissions modules',
     permissions: [
-      'register_patient', 'view_patients', 'view_appointments',
-      'view_patient_charges', 'view_patients_seen_on_a_selected_period',
-      'view_waiting_patients_for_lab', 'view_waiting_patients_for_pharmacy',
-      'view_waiting_patients_for_radiology', 'upload_appointment_files',
-      'receipt_partial_payments', 'add_invoice_payment',
-      'view_waiting_patients', 'view_laboratory_price_list',
-      'view_radiology_price_list', 'view_medicine_price_list',
-      'view_services_price_list', 'delete_appointment'
+      // Patient Management (for Patients module)
+      'register_patient',
+      'view_patients',
+      'view_patient_charges',
+      'view_patients_seen_on_a_selected_period',
+
+      // Appointment Management (for Appointments module)
+      'view_appointments',
+      'upload_appointment_files',
+      'delete_appointment',
+
+      // Admissions Management (for Admissions module)
+      'view_admitted_patients',
+      'register_inpatient',
+      'view_inpatient_admission_profile',
+
+      // Clinical Module
+      'view_waiting_patients',
+      'record_vital_signs'
     ]
   },
   {
@@ -424,11 +435,68 @@ const INITIAL_ROLES: Role[] = [
     permissions: [
       'mortuary', 'view_patients'
     ]
+  },
+  {
+    id: 'lab-technician',
+    name: 'Lab Technician',
+    description: 'Laboratory staff with access to lab tests and results',
+    permissions: [
+      'view_patients', 'view_waiting_patients_for_lab',
+      'view_patient_visits_on_lab', 'view_external_patient_visits_on_lab',
+      'view_laboratory_price_list', 'edit_internal_lab_reports',
+      'view_patients_diagnoses', 'view_patient_notes',
+      'view_waiting_patients'
+    ]
   }
 ];
 
 // Initial users
 const INITIAL_USERS: User[] = [
+  // Test users for patient flow testing
+  {
+    id: 'front1',
+    name: 'Front Office User',
+    email: 'front@bristol.com',
+    jobId: 'front1',
+    role: 'front-office',
+    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela'],
+    password: 'password123',
+    active: true,
+    remoteAccessAllowed: true
+  },
+  {
+    id: 'nurse1',
+    name: 'Nurse User',
+    email: 'nurse@bristol.com',
+    jobId: 'nurse1',
+    role: 'nurse',
+    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela'],
+    password: 'password123',
+    active: true,
+    remoteAccessAllowed: true
+  },
+  {
+    id: 'doctor1',
+    name: 'Doctor User',
+    email: 'doctor@bristol.com',
+    jobId: 'doctor1',
+    role: 'doctor',
+    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela'],
+    password: 'password123',
+    active: true,
+    remoteAccessAllowed: true
+  },
+  {
+    id: 'lab1',
+    name: 'Lab Technician',
+    email: 'lab@bristol.com',
+    jobId: 'lab1',
+    role: 'lab-technician',
+    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela'],
+    password: 'password123',
+    active: true,
+    remoteAccessAllowed: true
+  },
   {
     id: '1',
     name: 'Super Admin',

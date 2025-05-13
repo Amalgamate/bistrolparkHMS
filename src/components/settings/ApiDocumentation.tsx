@@ -96,30 +96,28 @@ const ApiDocumentation: React.FC = () => {
         </div>
         <div className="p-6">
           <p className="text-gray-600 mb-4">
-            This documentation provides guidelines for backend developers to integrate the React frontend with the Java backend.
-            It includes information about API endpoints, authentication, and data formats.
+            This documentation provides guidelines for backend developers on the new Node.js/Express/PostgreSQL backend that will replace the legacy Java backend.
+            It includes information about API design, authentication system, and key modules for the Bristol Park Hospital system.
           </p>
-          
+
           <div className="bg-gray-50 p-4 rounded-md border border-gray-200 mb-4">
-            <h4 className="font-medium text-gray-800 mb-2">Key Integration Points:</h4>
+            <h4 className="font-medium text-gray-800 mb-2">New Backend Stack:</h4>
             <ul className="list-disc pl-5 space-y-1 text-gray-600">
-              <li>Authentication and user management</li>
-              <li>Patient registration and management</li>
-              <li>Document management and generation</li>
-              <li>Branch-specific data handling</li>
-              <li>Insurance provider integration (SHA)</li>
-              <li>Payment processing (M-Pesa)</li>
+              <li><strong>API Layer:</strong> Node.js, Express.js, TypeScript</li>
+              <li><strong>Database:</strong> PostgreSQL, Prisma/TypeORM, Redis</li>
+              <li><strong>Authentication:</strong> JWT, Passport.js, bcrypt</li>
+              <li><strong>Documentation:</strong> Swagger/OpenAPI, Postman</li>
             </ul>
           </div>
-          
+
           <div className="flex justify-center">
-            <iframe 
-              src="/docs/api-documentation.md" 
+            <iframe
+              src="/docs/api-documentation-new.md"
               className="w-full h-[500px] border border-gray-200 rounded-md"
               title="API Documentation"
             />
           </div>
-          
+
           <div className="mt-6 bg-blue-50 p-4 rounded-md border border-blue-200">
             <h4 className="font-medium text-blue-800 mb-2">Need Help?</h4>
             <p className="text-blue-700">

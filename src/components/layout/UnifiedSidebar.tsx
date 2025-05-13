@@ -74,10 +74,19 @@ const NavItem: React.FC<NavItemProps & { disabled?: boolean }> = ({
 }) => {
   const navigate = useNavigate();
 
-  // Define active modules - only Patients, Admission, and Settings modules are active
+  // Define active modules - only Patients, Admissions, Appointments, Clinical, Laboratory, and Settings modules are active
   const isActiveModule =
+    text === "Patients" ||
     text === "Patients Register" ||
-    text === "Admission" ||
+    text === "Admissions" ||
+    text === "Appointments" ||
+    text === "Clinical" ||
+    text === "Clinical/Nursing" ||
+    text === "Laboratory" ||
+    text === "Patient Queue" ||
+    text === "Appointment Management" ||
+    text === "Visit Records" ||
+    text === "Reports" ||
     text === "Branch Settings" ||
     text === "User Management" ||
     text === "General Settings" ||
@@ -135,10 +144,14 @@ const CollapsibleNavItem: React.FC<CollapsibleNavItemProps & { disabled?: boolea
 }) => {
   const [isOpen, setIsOpen] = useState(isActive || defaultOpen);
 
-  // Define active modules - only Patients, Admission, and Settings modules are active
+  // Define active modules - only Patients, Admissions, Appointments, Clinical, Laboratory, and Settings modules are active
   const isActiveModule =
     text === "Patients" ||
-    text === "Admission" ||
+    text === "Admissions" ||
+    text === "Appointments" ||
+    text === "Clinical" ||
+    text === "Clinical/Nursing" ||
+    text === "Laboratory" ||
     text === "Settings";
 
   // Apply disabled styling if the module is not active
@@ -240,10 +253,12 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps & { disabled?: boolea
       .join('');
   }, [abbreviation, title]);
 
-  // Define active modules - only Patients, Admission, and Settings modules are active
+  // Define active modules - only Patients, Admissions, Appointments, Clinical, and Settings modules are active
   const isActiveModule =
     title === "Patients" ||
-    title === "Admission" ||
+    title === "Admissions" ||
+    title === "Appointments" ||
+    title === "Clinical" ||
     title === "Settings" ||
     title === "Hospital Modules";
 
@@ -389,88 +404,49 @@ export const UnifiedSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, clas
             abbreviation="HM"
             defaultOpen={true}
           >
-            {/* Patients - Active */}
+            {/* Clinical/Nursing - Active (Moved to top) */}
             <PermissionNavSection requiredPermission="view_patients">
-              <CollapsibleNavItem
-                icon={<User className="w-4 h-4" />}
-                text="Patients"
-                isActive={currentPath.includes('/patients') || currentPath.includes('/patient-module')}
-                defaultOpen={currentPath.includes('/patients') || currentPath.includes('/patient-module')}
+              <NavItem
+                icon={<Activity className="w-4 h-4" />}
+                text="Clinical/Nursing"
+                to="/clinical"
+                isActive={currentPath.includes('/clinical')}
                 collapsed={collapsed}
-              >
-                <PermissionNavSection requiredPermission="register_patient">
-                  <NavItem
-                    icon={<User className="w-4 h-4" />}
-                    text="Patients Register"
-                    to="/patient-module"
-                    isActive={currentPath.includes('/patient-module')}
-                  />
-                </PermissionNavSection>
-              </CollapsibleNavItem>
+              />
             </PermissionNavSection>
 
-            {/* Admission - Active */}
-            <CollapsibleNavItem
-              icon={<Bed className="w-4 h-4" />}
-              text="Admission"
-              isActive={currentPath.includes('/admission')}
-              collapsed={collapsed}
-            >
+            {/* Patients - Active */}
+            <PermissionNavSection requiredPermission="view_patients">
+              <NavItem
+                icon={<User className="w-4 h-4" />}
+                text="Patients"
+                to="/patient-module"
+                isActive={currentPath.includes('/patients') || currentPath.includes('/patient-module')}
+                collapsed={collapsed}
+              />
+            </PermissionNavSection>
+
+            {/* Admissions - Active */}
+            <PermissionNavSection requiredPermission="view_admitted_patients">
               <NavItem
                 icon={<Bed className="w-4 h-4" />}
-                text="Inpatient"
-                to="/inpatient"
-                isActive={currentPath.includes('/inpatient')}
+                text="Admissions"
+                to="/admissions"
+                isActive={currentPath.includes('/admissions')}
+                collapsed={collapsed}
               />
-              <NavItem
-                icon={<CheckCircle className="w-4 h-4" />}
-                text="Discharge"
-                to="/discharge"
-                isActive={currentPath.includes('/discharge')}
-              />
-            </CollapsibleNavItem>
+            </PermissionNavSection>
 
-            {/* Clinical */}
-            <CollapsibleNavItem
-              icon={<Activity className="w-4 h-4" />}
-              text="Clinical"
-              collapsed={collapsed}
-            >
+            {/* Appointments - Active */}
+            <PermissionNavSection requiredPermission="view_appointments">
               <NavItem
-                icon={<Thermometer className="w-4 h-4" />}
-                text="Vitals"
-                to="/vitals"
-                isActive={currentPath.includes('/vitals')}
+                icon={<Calendar className="w-4 h-4" />}
+                text="Appointments"
+                to="/appointments/management"
+                isActive={currentPath.includes('/appointments')}
+                collapsed={collapsed}
               />
-              <NavItem
-                icon={<Clipboard className="w-4 h-4" />}
-                text="Consultations"
-                to="/consultations"
-                isActive={currentPath.includes('/consultations')}
-              />
-              <NavItem
-                icon={<Stethoscope className="w-4 h-4" />}
-                text="Doctors"
-                to="/doctors"
-                isActive={currentPath.includes('/doctors')}
-              />
-            </CollapsibleNavItem>
-
-            {/* Appointments */}
-            <NavItem
-              icon={<Calendar className="w-4 h-4" />}
-              text="Appointments"
-              to="/appointments"
-              isActive={currentPath.includes('/appointments')}
-            />
-
-            {/* Queue Management */}
-            <NavItem
-              icon={<Clock className="w-4 h-4" />}
-              text="Queue Management"
-              to="/queue"
-              isActive={currentPath.includes('/queue')}
-            />
+            </PermissionNavSection>
 
             {/* Pharmacy */}
             <NavItem
@@ -480,13 +456,16 @@ export const UnifiedSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, clas
               isActive={currentPath.includes('/pharmacy')}
             />
 
-            {/* Laboratory */}
-            <NavItem
-              icon={<Beaker className="w-4 h-4" />}
-              text="Laboratory"
-              to="/laboratory"
-              isActive={currentPath.includes('/laboratory')}
-            />
+            {/* Laboratory - Active */}
+            <PermissionNavSection requiredPermission="view_waiting_patients_for_lab">
+              <NavItem
+                icon={<Beaker className="w-4 h-4" />}
+                text="Laboratory"
+                to="/lab"
+                isActive={currentPath.includes('/lab')}
+                collapsed={collapsed}
+              />
+            </PermissionNavSection>
 
             {/* Radiology */}
             <NavItem

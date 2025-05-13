@@ -100,35 +100,43 @@ export const mockDoctors: Doctor[] = [
 export const mockAppointments: AppointmentData[] = [
   {
     id: '1',
-    patientName: 'Sabrina Carpenter',
+    patientName: 'David Kamau',
     doctorName: 'Dr. Sarah Williams',
-    date: '7 Jan 2024',
+    date: '15 Jun 2024',
     time: '09:00 AM',
     status: 'Scheduled'
   },
   {
     id: '2',
-    patientName: 'Andrea Tea',
+    patientName: 'Faith Wanjiku',
     doctorName: 'Dr. Michael Chen',
-    date: '7 Jan 2024',
+    date: '20 Jun 2024',
     time: '10:30 AM',
     status: 'Scheduled'
   },
   {
     id: '3',
-    patientName: 'Mark Johnson',
+    patientName: 'Peter Omondi',
     doctorName: 'Dr. David Thompson',
-    date: '6 Jan 2024',
+    date: '10 Jun 2024',
     time: '02:00 PM',
     status: 'Completed'
   },
   {
     id: '4',
-    patientName: 'Emily Parker',
+    patientName: 'Esther Muthoni',
     doctorName: 'Dr. Sarah Williams',
-    date: '6 Jan 2024',
+    date: '25 Jul 2024',
     time: '11:15 AM',
     status: 'Cancelled'
+  },
+  {
+    id: '5',
+    patientName: 'John Njoroge',
+    doctorName: 'Dr. John Mwangi',
+    date: '20 Jun 2024',
+    time: '01:45 PM',
+    status: 'Scheduled'
   }
 ];
 

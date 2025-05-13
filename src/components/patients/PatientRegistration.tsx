@@ -6,10 +6,11 @@ import { format } from 'date-fns';
 import {
   Save, X, User, Phone, Mail, Calendar, MapPin,
   Heart, Activity, AlertCircle, FileText, Users,
-  ChevronRight, ChevronLeft, Shield
+  ChevronRight, ChevronLeft, Shield, MessageCircle
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { useInsurance } from '../../context/InsuranceContext';
+import { notifyPatientRegistration } from '../../utils/smsUtils';
 import '../../styles/theme.css';
 
 // Helper function to validate Kenyan phone numbers
@@ -289,7 +290,17 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
       // For now, just use the local save function
       onSave(data);
 
-      showToast('success', 'Patient registered successfully!');
+      // Send SMS notification to the patient
+      const patientName = `${data.firstName} ${data.lastName}`;
+      const smsResult = await notifyPatientRegistration(patientName, data.phone);
+
+      if (smsResult.success) {
+        showToast('success', 'Patient registered successfully! SMS notification sent.');
+      } else {
+        showToast('success', 'Patient registered successfully! SMS notification could not be sent.');
+        console.error('SMS notification failed:', smsResult.error);
+      }
+
       reset();
     } catch (error) {
       showToast('error', 'An error occurred while saving patient data');

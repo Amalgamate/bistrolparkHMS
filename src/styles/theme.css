@@ -1,11 +1,12 @@
 :root {
   /* Color Theme */
   --color-primary: #2B3990;
-  --color-secondary: #ff9900;
+  --color-secondary: #008080; /* Changed to teal */
   --color-accent: #A61F1F;
   --color-warning: #A61F1F;
   --color-success: #4CAF50;
   --color-background: #E6F3F7;
+  --color-teal: #008080; /* Added teal color */
 
   /* Text Colors */
   --text-primary: #2B3990;
@@ -452,7 +453,7 @@ body {
 
 
 .login-background {
-  background-color: #F5B800; 
+  background-color: #F5B800;
   position: relative;
   overflow: hidden;
 }

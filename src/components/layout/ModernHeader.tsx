@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { GlobalSearch } from '../search/GlobalSearch';
 import { useNavigate } from 'react-router-dom';
 import { refreshCache } from '../../utils/cacheUtils';
+import NotificationCenter from '../notifications/NotificationCenter';
 import '../../styles/theme.css';
 
 interface ModernHeaderProps {
@@ -72,14 +73,8 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
           />
         </div>
 
-        {/* Notification Button */}
-        <button
-          type="button"
-          className="p-1.5 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#F5B800] relative"
-        >
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-0 right-0 block w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        {/* Notification Center */}
+        <NotificationCenter />
 
         {/* Refresh Cache Button */}
         <button
@@ -114,12 +109,18 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
                 <p className="text-xs text-gray-500 mt-1">Frequently used actions</p>
               </div>
               <div className="py-2">
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <button
+                  onClick={() => {
+                    navigate('/clinical');
+                    setQuickActionOpen(false);
+                  }}
+                  className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                >
                   <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center mr-3">
                     <Users className="w-4 h-4 text-blue-600" />
                   </div>
                   <span>New Patient</span>
-                </a>
+                </button>
                 <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                   <div className="w-8 h-8 rounded-md bg-green-50 flex items-center justify-center mr-3">
                     <Calendar className="w-4 h-4 text-green-600" />
