@@ -43,3 +43,11 @@ logs
 # System files
 .DS_Store
 Thumbs.db
+
+# Backend folders (not needed for frontend build)
+api/
+server/
+bristol-park-hmis/
+
+# Package lock (will be regenerated)
+package-lock.json
