@@ -3,11 +3,15 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# Install curl for health checks and python for native dependencies
+RUN apk add --no-cache curl python3 make g++
 
-# Install dependencies
-RUN npm ci
+# Copy package files
+COPY package.json ./
+
+# Clear npm cache and install dependencies
+RUN npm cache clean --force
+RUN npm install --verbose
 
 # Copy all files
 COPY . .
