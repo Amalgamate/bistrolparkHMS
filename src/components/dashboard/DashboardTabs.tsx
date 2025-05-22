@@ -15,7 +15,7 @@ const Tab: React.FC<TabProps> = ({ id, label, icon, isActive, onClick, customSty
     <div
       className={`
         dashboard-tab flex items-center justify-center gap-3 px-4 py-3
-        rounded-lg cursor-pointer transition-all duration-200 border border-gray-200
+        rounded-lg cursor-pointer transition-all duration-200 border border-gray-200        
         ${isActive ? 'active shadow-sm' : 'hover:bg-gray-50'}
         ${id === 'queues' ? 'queues-tab' : ''}
         ${id === 'quick-access' ? 'quick-access' : ''}
@@ -23,13 +23,13 @@ const Tab: React.FC<TabProps> = ({ id, label, icon, isActive, onClick, customSty
         ${id === 'financial-reports' ? 'accounts-overview' : ''}
         ${customStyle || ''}
         ${isActive && id === 'queues' ? 'bg-black text-white' :
-          isActive ? 'bg-white' : 'bg-gray-100'}
+          isActive ? 'bg-white' : 'bg-gray-100 '}
       `}
       onClick={() => onClick(id)}
     >
-      <span className={`${id === 'queues' ? 'text-white' : 'text-gray-500'}`}>{icon}</span>
+      <span className={`${id === 'queues' && isActive ? 'text-white' : 'text-gray-500'}`}>{icon}</span>
       <span className={`font-medium ${
-        id === 'queues' ? 'text-white' :
+        id === 'queues' && isActive ? 'text-white' :
         isActive ? 'text-gray-800' : 'text-gray-600'
       }`}>{label}</span>
     </div>
