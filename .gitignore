@@ -86,3 +86,12 @@ npm-shrinkwrap.json
 
 # Bristol Park Hospital specific
 # Add any project-specific files to ignore here
+
+# Database backups and large files
+*.backup
+backup.backup
+*.sql
+*.dump
+*.tar.gz
+*.zip
+*.7z
