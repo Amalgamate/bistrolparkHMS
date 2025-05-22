@@ -1,0 +1,21 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install netcat for database connection check
+RUN apk add --no-cache netcat-openbsd
+
+# Copy all files (including node_modules)
+COPY . .
+
+# Make the initialization script executable
+RUN chmod +x /init-db.sh
+
+# Expose port
+EXPOSE 3001
+
+# Use the initialization script as entrypoint
+ENTRYPOINT ["/init-db.sh"]
+
+# Start the server
+CMD ["npm", "start"]
