@@ -28,11 +28,11 @@ services:
       - PORT=3001
       - DB_HOST=db
       - DB_PORT=5432
-      - DB_NAME=${DB_NAME:-bristol_park_hmis}
-      - DB_USER=${DB_USER:-postgres}
-      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=bristol_park_hmis
+      - DB_USER=postgres
+      - DB_PASSWORD=BristolPark2024_SecureDB_Password
       - DB_SSL=false
-      - JWT_SECRET=${JWT_SECRET}
+      - JWT_SECRET=BristolParkHMIS2024_SecureJWT_Key_For_Production_Use_Only_32Plus_Characters_Long
       - JWT_EXPIRES_IN=24h
     networks:
       - bristol-park-network
@@ -45,7 +45,7 @@ services:
       - "5432:5432"
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=BristolPark2024_SecureDB_Password
       - POSTGRES_DB=bristol_park_hmis
     volumes:
       - postgres_data:/var/lib/postgresql/data
