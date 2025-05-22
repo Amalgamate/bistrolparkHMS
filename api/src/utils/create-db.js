@@ -18,14 +18,14 @@ const pool = new Pool({
 
 const createDatabase = async () => {
   const client = await pool.connect();
-  
+
   try {
     // Check if database exists
     const checkResult = await client.query(
       "SELECT 1 FROM pg_database WHERE datname = $1",
       [process.env.DB_NAME]
     );
-    
+
     if (checkResult.rows.length === 0) {
       // Database doesn't exist, create it
       console.log(`Creating database: ${process.env.DB_NAME}`);
@@ -41,6 +41,31 @@ const createDatabase = async () => {
   } finally {
     client.release();
     await pool.end();
+  }
+
+  // Now connect to the new database and create UUID extension
+  const appPool = new Pool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
+  });
+
+  const appClient = await appPool.connect();
+
+  try {
+    // Create UUID extension if it doesn't exist
+    console.log('Creating UUID extension...');
+    await appClient.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"');
+    console.log('UUID extension created successfully');
+  } catch (error) {
+    console.error('Error creating UUID extension:', error);
+    // Don't throw here as the database creation was successful
+  } finally {
+    appClient.release();
+    await appPool.end();
   }
 };
 
