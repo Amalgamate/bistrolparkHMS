@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Lock, User, AlertCircle, MapPin, Loader2 } from 'lucide-react';
+import { Lock, User, AlertCircle, MapPin, Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth, LoginResult } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 
@@ -26,6 +26,7 @@ const LocationBasedLogin: React.FC = () => {
   const [requiresBranchSelection, setRequiresBranchSelection] = useState(false);
   const [allowedBranches, setAllowedBranches] = useState<string[]>([]);
   const [locationStatus, setLocationStatus] = useState<'idle' | 'detecting' | 'detected' | 'error'>('idle');
+  const [showPassword, setShowPassword] = useState(false);
   const { login, selectBranch, isLoading } = useAuth();
   const { branches, getCurrentLocation } = useSettings();
 
@@ -222,13 +223,24 @@ const LocationBasedLogin: React.FC = () => {
                   <input
                     {...registerLogin('password')}
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
-                    className={`appearance-none rounded-md relative block w-full pl-10 pr-3 py-3 border ${
+                    className={`appearance-none rounded-md relative block w-full pl-10 pr-10 py-3 border ${
                       loginErrors.password ? 'border-red-300' : 'border-gray-300'
                     } placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-[#2B3990] focus:border-[#2B3990] sm:text-sm`}
                     placeholder="Password"
                   />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 hover:text-[#2B3990] focus:outline-none"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-5 w-5" aria-hidden="true" />
+                    ) : (
+                      <Eye className="h-5 w-5" aria-hidden="true" />
+                    )}
+                  </button>
                 </div>
                 {loginErrors.password && (
                   <p className="mt-1 text-sm text-red-600">{loginErrors.password.message}</p>
@@ -367,7 +379,10 @@ const LocationBasedLogin: React.FC = () => {
         <div className="mt-4 text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{' '}
-            <a href="#" className="font-medium text-[#2B3990] hover:text-blue-800">
+            <a
+              href="mailto:system@bristolparkhospital.com?subject=Account%20Request&body=Hello%20Administrator,%0A%0AI%20would%20like%20to%20request%20an%20account%20for%20the%20Bristol%20Park%20Hospital%20Management%20System.%0A%0AName:%20%0APosition:%20%0ADepartment:%20%0AEmail:%20%0APhone:%20%0A%0AThank%20you."
+              className="font-medium text-[#2B3990] hover:text-blue-800"
+            >
               Contact administrator
             </a>
           </p>

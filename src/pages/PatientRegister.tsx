@@ -8,8 +8,8 @@ import { generatePatientListPDF } from '../utils/pdfUtils';
 import '../styles/theme.css';
 
 // Lazy load components for better performance
-const PatientRegistration = lazy(() => import('../components/patients/PatientRegistration').then(module => ({ default: module.PatientRegistration })));
-const PatientDetails = lazy(() => import('../components/patients/PatientDetails').then(module => ({ default: module.PatientDetails })));
+const PatientRegistration = lazy(() => import('../components/patients/EnhancedPatientRegistration'));
+const PatientDetails = lazy(() => import('../components/patients/PatientDetails'));
 const VirtualizedPatientList = lazy(() => import('../components/patients/VirtualizedPatientList'));
 
 // Define filter options
@@ -48,14 +48,30 @@ export const PatientRegister: React.FC = () => {
 
   // Calculate age from date of birth
   const calculateAge = React.useCallback((dateOfBirth: string) => {
-    const today = new Date();
-    const birthDate = new Date(dateOfBirth);
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
+    if (!dateOfBirth) {
+      return 0;
     }
-    return age;
+
+    try {
+      const today = new Date();
+      const birthDate = new Date(dateOfBirth);
+
+      // Check if date is valid
+      if (isNaN(birthDate.getTime())) {
+        console.warn('Invalid date of birth:', dateOfBirth);
+        return 0;
+      }
+
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age;
+    } catch (error) {
+      console.error('Error calculating age:', error);
+      return 0;
+    }
   }, []);
 
   // Apply status filter
@@ -98,7 +114,40 @@ export const PatientRegister: React.FC = () => {
 
   // Filter patients based on search term, status, and date range
   const filteredPatients = React.useMemo(() => {
-    return patients.filter(patient => {
+    console.log('Filtering patients:', patients);
+
+    // Check if patients is an array
+    if (!Array.isArray(patients)) {
+      console.error('Patients is not an array:', patients);
+      return [];
+    }
+
+    // Map patient properties based on API response format
+    const processedPatients = patients.map(patient => {
+      // Log the first patient to see its structure
+      if (patients.indexOf(patient) === 0) {
+        console.log('First patient structure:', patient);
+      }
+
+      // Handle different property naming conventions
+      return {
+        id: patient.id,
+        firstName: patient.firstName || patient.first_name || '',
+        lastName: patient.lastName || patient.last_name || '',
+        phone: patient.phone || patient.contact_number || '',
+        email: patient.email || '',
+        nationalId: patient.nationalId || patient.national_id || patient.id_number || '',
+        dateOfBirth: patient.dateOfBirth || patient.date_of_birth || '',
+        gender: patient.gender || '',
+        status: patient.status || 'Active',
+        lastVisit: patient.lastVisit || patient.last_visit || '',
+        bloodGroup: patient.bloodGroup || patient.blood_type || patient.blood_group || '',
+        isAdmitted: patient.isAdmitted || false,
+        isCleared: patient.isCleared || false,
+      };
+    });
+
+    return processedPatients.filter(patient => {
       // First apply status filter
       if (!applyStatusFilter(patient)) return false;
 
@@ -112,7 +161,7 @@ export const PatientRegister: React.FC = () => {
       const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
       const idMatch = patient.id.toString().includes(term);
       const nameMatch = fullName.includes(term);
-      const phoneMatch = patient.phone.toLowerCase().includes(term);
+      const phoneMatch = patient.phone && patient.phone.toLowerCase().includes(term);
       const nationalIdMatch = patient.nationalId?.toLowerCase().includes(term) || false;
 
       return idMatch || nameMatch || phoneMatch || nationalIdMatch;
@@ -243,7 +292,7 @@ export const PatientRegister: React.FC = () => {
   }, [filteredPatients, statusFilter, dateRangeFilter, searchTerm, showToast]);
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <div className="flex flex-col h-full">
       <div className="flex-1 overflow-auto">
         {/* Page Header */}
         <div className="flex justify-between items-center bg-white p-4 rounded-md shadow-sm mb-4">

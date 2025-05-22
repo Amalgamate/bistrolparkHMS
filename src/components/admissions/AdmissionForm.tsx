@@ -42,7 +42,7 @@ import { useAdmission } from '../../context/AdmissionContext';
 import { useToast } from '../../context/ToastContext';
 import { useNotification } from '../../context/NotificationContext';
 import { format } from 'date-fns';
-import { mockAdmittedPatients } from '../../data/mockAdmissionsData';
+import apiClient from '../../services/apiClient';
 
 // Define the form schema
 const admissionSchema = z.object({
@@ -71,17 +71,8 @@ interface AdmissionFormProps {
   patient?: any;
 }
 
-// Mock data for doctors
-const mockDoctors = [
-  { id: 'DOC001', name: 'Dr. Sarah Williams', specialty: 'Cardiology' },
-  { id: 'DOC002', name: 'Dr. Michael Chen', specialty: 'Neurology' },
-  { id: 'DOC003', name: 'Dr. Amelia Rodriguez', specialty: 'Pediatrics' },
-  { id: 'DOC004', name: 'Dr. David Thompson', specialty: 'Orthopedics' },
-  { id: 'DOC005', name: 'Dr. John Mwangi', specialty: 'Internal Medicine' },
-];
-
-// Mock data for insurance providers
-const mockInsuranceProviders = [
+// Insurance providers
+const insuranceProviders = [
   { id: 'INS001', name: 'SHA' },
   { id: 'INS002', name: 'Jubilee' },
   { id: 'INS003', name: 'AAR' },
@@ -103,6 +94,8 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({
   const [selectedPatient, setSelectedPatient] = useState<any>(patient || null);
   const [availableRooms, setAvailableRooms] = useState<any[]>([]);
   const [showInsuranceFields, setShowInsuranceFields] = useState(false);
+  const [doctors, setDoctors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Initialize form
   const form = useForm<AdmissionFormData>({
@@ -151,23 +144,63 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({
     }
   }, [selectedPatient, form]);
 
+  // Fetch doctors from API
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/users?role=doctor');
+        if (response.data && Array.isArray(response.data)) {
+          const formattedDoctors = response.data.map(doctor => ({
+            id: doctor.id,
+            name: `Dr. ${doctor.first_name} ${doctor.last_name}`,
+            specialty: doctor.specialty || 'General'
+          }));
+          setDoctors(formattedDoctors);
+        }
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+        showToast('error', 'Failed to load doctors');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, [showToast]);
+
   // Handle patient search
-  const handleSearch = () => {
-    // In a real app, this would be an API call
-    const results = mockAdmittedPatients
-      .filter(p =>
-        p.patientId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.patientName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      .map(p => ({
-        id: p.patientId,
-        name: p.patientName
-      }));
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      showToast('warning', 'Please enter a search term');
+      return;
+    }
 
-    setSearchResults(results);
+    try {
+      setLoading(true);
+      const response = await apiClient.get(`/patients?search=${encodeURIComponent(searchQuery)}`);
 
-    if (results.length === 0) {
-      showToast('warning', 'No patients found matching your search');
+      if (response.data && Array.isArray(response.data)) {
+        const results = response.data.map(p => ({
+          id: p.id || p.mrn,
+          name: `${p.first_name} ${p.last_name}`
+        }));
+
+        setSearchResults(results);
+
+        if (results.length === 0) {
+          showToast('warning', 'No patients found matching your search');
+        }
+      } else {
+        setSearchResults([]);
+        showToast('warning', 'No patients found');
+      }
+    } catch (error) {
+      console.error('Error searching for patients:', error);
+      showToast('error', 'Failed to search for patients');
+      setSearchResults([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -190,7 +223,7 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({
 
   // Handle doctor selection
   const handleDoctorChange = (doctorId: string) => {
-    const doctor = mockDoctors.find(d => d.id === doctorId);
+    const doctor = doctors.find(d => d.id === doctorId);
     if (doctor) {
       form.setValue('doctorName', doctor.name);
     }
@@ -472,11 +505,21 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {mockDoctors.map(doctor => (
-                            <SelectItem key={doctor.id} value={doctor.id}>
-                              {doctor.name} ({doctor.specialty})
-                            </SelectItem>
-                          ))}
+                          {loading ? (
+                            <div className="flex items-center justify-center p-4">
+                              <span className="text-sm text-gray-500">Loading doctors...</span>
+                            </div>
+                          ) : doctors.length > 0 ? (
+                            doctors.map(doctor => (
+                              <SelectItem key={doctor.id} value={doctor.id}>
+                                {doctor.name} ({doctor.specialty})
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <div className="flex items-center justify-center p-4">
+                              <span className="text-sm text-gray-500">No doctors found</span>
+                            </div>
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -523,7 +566,7 @@ const AdmissionForm: React.FC<AdmissionFormProps> = ({
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              {mockInsuranceProviders.map(provider => (
+                              {insuranceProviders.map(provider => (
                                 <SelectItem key={provider.id} value={provider.name}>
                                   {provider.name}
                                 </SelectItem>

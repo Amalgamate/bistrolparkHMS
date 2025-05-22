@@ -1,15 +1,15 @@
 import React, { useState, Suspense, lazy } from 'react';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from '../ui/card';
 import { Button } from '../ui/button';
-import { 
-  UserPlus, 
-  Ticket, 
+import {
+  UserPlus,
+  Ticket,
   CheckCircle2,
   AlertTriangle
 } from 'lucide-react';
@@ -18,9 +18,8 @@ import { useClinical, Priority } from '../../context/ClinicalContext';
 import { useToast } from '../../context/ToastContext';
 
 // Lazy load the patient registration component from the patient module
-const PatientRegistrationForm = lazy(() => 
-  import('../../components/patients/PatientRegistration')
-    .then(module => ({ default: module.PatientRegistration }))
+const PatientRegistrationForm = lazy(() =>
+  import('../../components/patients/EnhancedPatientRegistration')
 );
 
 interface IntegratedPatientRegistrationProps {
@@ -44,23 +43,23 @@ const IntegratedPatientRegistration: React.FC<IntegratedPatientRegistrationProps
       // Extract patient information
       const fullName = `${patientData.firstName} ${patientData.lastName}`;
       const patientPriority = patientData.priority || 'normal';
-      
+
       // Register patient in the clinical queue
       const queueEntry = registerPatient(
-        patientData.id || `BP${Math.floor(10000000 + Math.random() * 90000000)}`, 
-        fullName, 
+        patientData.id || `BP${Math.floor(10000000 + Math.random() * 90000000)}`,
+        fullName,
         patientPriority as Priority
       );
-      
+
       // Store patient information
       setPatientId(patientData.id);
       setPatientName(fullName);
       setPriority(patientPriority);
-      
+
       // Set success state and token number
       setRegistrationSuccess(true);
       setTokenNumber(queueEntry.tokenNumber);
-      
+
       // Show success message
       showToast('success', `Patient ${fullName} registered successfully and added to queue`);
     } catch (error) {
@@ -68,7 +67,7 @@ const IntegratedPatientRegistration: React.FC<IntegratedPatientRegistrationProps
       showToast('error', 'Failed to add patient to clinical queue');
     }
   };
-  
+
   // Reset success state
   const handleReset = () => {
     setRegistrationSuccess(false);
@@ -77,7 +76,7 @@ const IntegratedPatientRegistration: React.FC<IntegratedPatientRegistrationProps
     setPatientName('');
     setPriority('normal');
   };
-  
+
   return (
     <div className="space-y-4">
       <Card>
@@ -99,7 +98,7 @@ const IntegratedPatientRegistration: React.FC<IntegratedPatientRegistrationProps
               <p className="text-gray-600 mb-6">
                 Patient <span className="font-semibold">{patientName}</span> has been registered and added to the queue.
               </p>
-              
+
               <div className="bg-blue-50 p-6 rounded-lg inline-block mb-6">
                 <div className="text-center">
                   <div className="text-sm text-gray-600 mb-1">Token Number</div>
@@ -110,7 +109,7 @@ const IntegratedPatientRegistration: React.FC<IntegratedPatientRegistrationProps
                   <div className="text-sm text-gray-600">Please direct the patient to the waiting area.</div>
                 </div>
               </div>
-              
+
               <div className="flex justify-center gap-4">
                 <Button variant="outline" onClick={handleReset}>
                   <UserPlus className="h-4 w-4 mr-2" />

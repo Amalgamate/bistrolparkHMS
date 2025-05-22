@@ -196,7 +196,7 @@ interface PatientDetailsProps {
   onAdmitPatient?: (patientId: number) => void;
 }
 
-export const PatientDetails: React.FC<PatientDetailsProps> = ({
+const PatientDetails: React.FC<PatientDetailsProps> = ({
   patientId,
   onClose,
   onEdit,
@@ -1184,3 +1184,5 @@ export const PatientDetails: React.FC<PatientDetailsProps> = ({
     </div>
   );
 };
+
+export default PatientDetails;

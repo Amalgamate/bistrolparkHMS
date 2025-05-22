@@ -1,25 +1,115 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, User, Calendar, Clock, FileText, Activity, Pill, Clipboard, Download, Printer, ChevronDown, ChevronUp } from 'lucide-react';
+import apiClient from '../../services/apiClient';
+
+// Define interfaces for API data
+interface MedicalRecord {
+  id: string;
+  type: string;
+  title: string;
+  date: string;
+  time: string;
+  doctor: string;
+  description: string;
+  diagnosis?: string;
+  treatment?: string;
+  medications?: string[];
+  notes?: string;
+}
+
+interface Patient {
+  id: string;
+  first_name?: string;
+  last_name?: string;
+  name?: string;
+  age?: number;
+  gender?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  bloodType?: string;
+  blood_type?: string;
+  allergies?: string;
+  medicalRecords?: MedicalRecord[];
+}
 
 export const NewPatientHistory: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [expandedRecords, setExpandedRecords] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
   // Handle search
-  const handleSearch = () => {
-    // In a real application, this would be an API call
-    const foundPatient = mockPatients.find(
-      p => p.id === searchQuery ||
-           p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-
-    if (foundPatient) {
-      setSelectedPatient(foundPatient);
-    } else {
-      setSelectedPatient(null);
-      alert('Patient not found. Please check the ID or name and try again.');
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      alert('Please enter a patient ID or name to search');
+      return;
     }
+
+    try {
+      setLoading(true);
+      const response = await apiClient.get(`/patients?search=${encodeURIComponent(searchQuery)}`);
+
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        const patient = response.data[0];
+
+        // Format the patient data
+        const formattedPatient: Patient = {
+          id: patient.id || patient.mrn,
+          name: `${patient.first_name} ${patient.last_name}`,
+          first_name: patient.first_name,
+          last_name: patient.last_name,
+          age: patient.age || calculateAge(patient.date_of_birth),
+          gender: patient.gender,
+          phone: patient.phone,
+          email: patient.email,
+          address: patient.address,
+          bloodType: patient.blood_type,
+          allergies: patient.allergies,
+          // Add mock medical records for now
+          medicalRecords: [
+            {
+              id: 'MR001',
+              type: 'consultation',
+              title: 'Initial Consultation',
+              date: new Date().toISOString().split('T')[0],
+              time: new Date().toTimeString().split(' ')[0].substring(0, 5),
+              doctor: 'Dr. John Mwangi',
+              description: 'Initial patient consultation.',
+              diagnosis: 'Pending',
+              notes: 'Patient records being migrated to the new system.'
+            }
+          ]
+        };
+
+        setSelectedPatient(formattedPatient);
+      } else {
+        setSelectedPatient(null);
+        alert('Patient not found. Please check the ID or name and try again.');
+      }
+    } catch (error) {
+      console.error('Error searching for patient:', error);
+      alert('An error occurred while searching for the patient. Please try again later.');
+      setSelectedPatient(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper function to calculate age from date of birth
+  const calculateAge = (dateOfBirth: string): number => {
+    if (!dateOfBirth) return 0;
+
+    const dob = new Date(dateOfBirth);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+
+    return age;
   };
 
   // Toggle record expansion
@@ -270,133 +360,7 @@ const getRecordTypeIcon = (type: string) => {
   }
 };
 
-// Mock data
-interface MedicalRecord {
-  id: string;
-  type: string;
-  title: string;
-  date: string;
-  time: string;
-  doctor: string;
-  description: string;
-  diagnosis?: string;
-  treatment?: string;
-  medications?: string[];
-  notes?: string;
-}
-
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  phone: string;
-  email: string;
-  address: string;
-  bloodType: string;
-  allergies?: string;
-  medicalRecords: MedicalRecord[];
-}
-
-const mockPatients: Patient[] = [
-  {
-    id: 'BP10023456',
-    name: 'David Kamau',
-    age: 45,
-    gender: 'Male',
-    phone: '0712 345 678',
-    email: 'david.kamau@example.com',
-    address: 'Kileleshwa Estate, Nairobi',
-    bloodType: 'O+',
-    allergies: 'Penicillin',
-    medicalRecords: [
-      {
-        id: 'MR001',
-        type: 'consultation',
-        title: 'Annual Physical Examination',
-        date: '2024-05-15',
-        time: '09:30 AM',
-        doctor: 'Dr. John Mwangi',
-        description: 'Patient came in for annual physical examination.',
-        diagnosis: 'Hypertension (mild)',
-        treatment: 'Lifestyle modifications recommended. Follow-up in 3 months.',
-        medications: ['Lisinopril 10mg daily'],
-        notes: 'Patient advised to reduce sodium intake and increase physical activity.'
-      },
-      {
-        id: 'MR002',
-        type: 'lab',
-        title: 'Blood Work Panel',
-        date: '2024-05-15',
-        time: '10:45 AM',
-        doctor: 'Dr. Grace Akinyi',
-        description: 'Complete blood count, lipid panel, and metabolic panel.',
-        notes: 'Results show slightly elevated cholesterol levels. All other values within normal range.'
-      },
-      {
-        id: 'MR003',
-        type: 'consultation',
-        title: 'Follow-up Appointment',
-        date: '2024-02-20',
-        time: '02:15 PM',
-        doctor: 'Dr. John Mwangi',
-        description: 'Follow-up for hypertension management.',
-        diagnosis: 'Hypertension (controlled)',
-        treatment: 'Continue current medication regimen.',
-        medications: ['Lisinopril 10mg daily'],
-        notes: 'Blood pressure readings improved. Patient reports compliance with medication and lifestyle changes.'
-      }
-    ]
-  },
-  {
-    id: 'BP10023457',
-    name: 'Faith Wanjiku',
-    age: 32,
-    gender: 'Female',
-    phone: '0723 456 789',
-    email: 'faith.wanjiku@example.com',
-    address: 'South B Estate, Nairobi',
-    bloodType: 'A-',
-    medicalRecords: [
-      {
-        id: 'MR004',
-        type: 'emergency',
-        title: 'Emergency Room Visit',
-        date: '2024-04-10',
-        time: '11:20 PM',
-        doctor: 'Dr. Daniel Otieno',
-        description: 'Patient presented with severe abdominal pain.',
-        diagnosis: 'Acute appendicitis',
-        treatment: 'Emergency appendectomy performed.',
-        medications: ['Cefazolin 1g IV', 'Morphine 4mg IV PRN for pain'],
-        notes: 'Surgery successful. Patient admitted for post-operative care.'
-      },
-      {
-        id: 'MR005',
-        type: 'admission',
-        title: 'Inpatient Admission',
-        date: '2024-04-10',
-        time: '11:55 PM',
-        doctor: 'Dr. Daniel Otieno',
-        description: 'Post-appendectomy admission for monitoring and recovery.',
-        treatment: 'IV antibiotics, pain management, and wound care.',
-        medications: ['Cefazolin 1g IV q8h', 'Hydrocodone/Acetaminophen 5/325mg PO q6h PRN for pain'],
-        notes: 'Patient recovering well. Anticipated discharge in 2-3 days.'
-      },
-      {
-        id: 'MR006',
-        type: 'procedure',
-        title: 'Surgical Follow-up',
-        date: '2024-04-17',
-        time: '10:00 AM',
-        doctor: 'Dr. Samuel Kipchoge',
-        description: 'Post-operative follow-up appointment.',
-        treatment: 'Wound check and suture removal.',
-        notes: 'Incision healing well. No signs of infection. Patient cleared to resume normal activities in 1 week.'
-      }
-    ]
-  }
-];
+// End of component
 
 function AlertTriangle(props: any) {
   return (

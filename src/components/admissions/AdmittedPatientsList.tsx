@@ -1,26 +1,27 @@
 import React, { useState } from 'react';
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
 } from '../ui/table';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
-import { 
-  Eye, 
-  FileText, 
-  UserMinus, 
+import {
+  Eye,
+  FileText,
+  UserMinus,
   MoreHorizontal,
   Calendar,
   Clock,
   Bed,
   User,
-  Stethoscope
+  Stethoscope,
+  LucideIcon
 } from 'lucide-react';
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -28,6 +29,8 @@ import {
 } from '../ui/dropdown-menu';
 import { Admission } from '../../context/AdmissionContext';
 import { format } from 'date-fns';
+import { ColoredIcon } from '../ui/colored-icon';
+import { ColorVariant } from '../ui/colored-icon-button';
 
 interface AdmittedPatientsListProps {
   patients: Admission[];
@@ -81,13 +84,13 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
           {patients.length} {patients.length === 1 ? 'patient' : 'patients'} currently admitted
         </p>
       </div>
-      
+
       <div className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead className="w-[50px]">#</TableHead>
-              <TableHead 
+              <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort('patientName')}
               >
@@ -96,7 +99,7 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                   <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </TableHead>
-              <TableHead 
+              <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort('admissionDate')}
               >
@@ -106,7 +109,7 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                 )}
               </TableHead>
               <TableHead>Room</TableHead>
-              <TableHead 
+              <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort('diagnosis')}
               >
@@ -115,7 +118,7 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                   <span className="ml-1">{sortDirection === 'asc' ? '↑' : '↓'}</span>
                 )}
               </TableHead>
-              <TableHead 
+              <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort('doctorName')}
               >
@@ -139,9 +142,9 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
             ) : (
               sortedPatients.map((patient, index) => {
                 const daysAdmitted = calculateDaysAdmitted(patient.admissionDate);
-                
+
                 return (
-                  <TableRow 
+                  <TableRow
                     key={patient.id}
                     className="hover:bg-gray-50 cursor-pointer"
                     onClick={() => onView(patient)}
@@ -149,8 +152,8 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                     <TableCell className="font-medium">{index + 1}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center mr-2">
-                          <User className="h-4 w-4 text-blue-700" />
+                        <div className="mr-2">
+                          <ColoredIcon icon={User} color="blue" size="sm" variant="outline" />
                         </div>
                         <div>
                           <div className="font-medium">{patient.patientName}</div>
@@ -161,18 +164,18 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                     <TableCell>
                       <div className="flex flex-col">
                         <div className="flex items-center">
-                          <Calendar className="h-3 w-3 mr-1 text-gray-500" />
+                          <ColoredIcon icon={Calendar} color="indigo" size="xs" variant="text" className="mr-1" />
                           <span>{formatDate(patient.admissionDate)}</span>
                         </div>
                         <div className="flex items-center text-xs text-gray-500 mt-1">
-                          <Clock className="h-3 w-3 mr-1" />
+                          <ColoredIcon icon={Clock} color="gray" size="xs" variant="text" className="mr-1" />
                           <span>{patient.admissionTime}</span>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <Bed className="h-4 w-4 mr-1 text-gray-500" />
+                        <ColoredIcon icon={Bed} color="blue" size="xs" variant="text" className="mr-1" />
                         <div>
                           <div>{patient.roomName}</div>
                           <div className="text-xs text-gray-500">{patient.roomType}</div>
@@ -186,7 +189,7 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        <Stethoscope className="h-4 w-4 mr-1 text-gray-500" />
+                        <ColoredIcon icon={Stethoscope} color="purple" size="xs" variant="text" className="mr-1" />
                         <span>{patient.doctorName}</span>
                       </div>
                     </TableCell>
@@ -212,7 +215,7 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                             e.stopPropagation();
                             onView(patient);
                           }}>
-                            <Eye className="h-4 w-4 mr-2" />
+                            <ColoredIcon icon={Eye} color="blue" size="xs" variant="text" className="mr-2" />
                             View Details
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
@@ -220,14 +223,14 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
                             // Handle view medical records
                             console.log('View medical records for', patient.patientName);
                           }}>
-                            <FileText className="h-4 w-4 mr-2" />
+                            <ColoredIcon icon={FileText} color="indigo" size="xs" variant="text" className="mr-2" />
                             Medical Records
                           </DropdownMenuItem>
                           <DropdownMenuItem onClick={(e) => {
                             e.stopPropagation();
                             onDischarge(patient);
                           }}>
-                            <UserMinus className="h-4 w-4 mr-2" />
+                            <ColoredIcon icon={UserMinus} color="red" size="xs" variant="text" className="mr-2" />
                             Discharge Patient
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -240,7 +243,7 @@ const AdmittedPatientsList: React.FC<AdmittedPatientsListProps> = ({
           </TableBody>
         </Table>
       </div>
-      
+
       <div className="p-4 border-t border-gray-200 text-sm text-gray-500">
         Showing {patients.length} of {patients.length} admitted patients
       </div>

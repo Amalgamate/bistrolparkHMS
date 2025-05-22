@@ -7,6 +7,7 @@ import { BranchOverview } from '../components/dashboard/BranchOverview';
 import { SimpleModuleGrid } from '../components/dashboard/SimpleModuleGrid';
 import DashboardTabs from '../components/dashboard/DashboardTabs';
 import TabContent from '../components/dashboard/TabContent';
+import QueueSystem from '../components/dashboard/QueueSystem';
 import { useAuth } from '../context/AuthContext';
 import { Building2, BarChart, DollarSign, Grid, User, PieChart, Plus, Calendar, Heart, Clock } from 'lucide-react';
 import { APP_VERSION } from '../utils/cacheUtils';
@@ -17,7 +18,7 @@ const DASHBOARD_VERSION = APP_VERSION;
 const UnifiedDashboard: React.FC = () => {
   const { user } = useAuth();
   const branch = user?.branch || 'Fedha';
-  const [activeTab, setActiveTab] = useState('quick-access');
+  const [activeTab, setActiveTab] = useState('queues');
 
   // Load saved tab if available
   useEffect(() => {
@@ -36,8 +37,13 @@ const UnifiedDashboard: React.FC = () => {
   return (
     <div className="space-y-4 relative z-10">
       {/* Tabbed Dashboard Sections */}
-      <div className="bg-white rounded-lg p-4">
+      <div className={`${activeTab === 'queues' ? 'bg-black' : 'bg-white'} rounded-lg p-4`}>
         <DashboardTabs activeTab={activeTab} onChange={handleTabChange} />
+
+          {/* Queues Tab */}
+          <TabContent id="queues" activeTab={activeTab} className="space-y-6">
+            <QueueSystem />
+          </TabContent>
 
           {/* Quick Access Tab */}
           <TabContent id="quick-access" activeTab={activeTab} className="space-y-6">

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { PatientRegistration } from '../components/patients/PatientRegistration';
+import EnhancedPatientRegistration from '../components/patients/EnhancedPatientRegistration';
 import { PatientAdmission } from '../components/patients/PatientAdmission';
 import { PatientTracking } from '../components/patients/PatientTracking';
 
@@ -52,8 +52,8 @@ const PatientFlow: React.FC = () => {
       </div>
 
       <Routes>
-        <Route path="/" element={<PatientRegistration />} />
-        <Route path="/registration" element={<PatientRegistration />} />
+        <Route path="/" element={<EnhancedPatientRegistration />} />
+        <Route path="/registration" element={<EnhancedPatientRegistration />} />
         <Route path="/admission" element={<PatientAdmission />} />
         <Route path="/tracking" element={<PatientTracking />} />
       </Routes>

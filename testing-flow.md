@@ -11,10 +11,9 @@ This document outlines the complete patient flow testing process, from registrat
 4. **Lab Technician** - Firefox Private Browsing
 
 ### User Credentials:
-- **Front Office**: front@bristol.com / password123
-- **Nurse**: nurse@bristol.com / password123
-- **Doctor**: doctor@bristol.com / password123
-- **Lab Technician**: lab@bristol.com / password123
+- **Admin**: superadmin@bristolpark.com / admin12345
+- **Doctor**: doctor@bristolpark.com / doctor12345
+- **Test User**: test@test.com / test
 
 ## Testing Flow
 

@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { NewPatientRegistration } from '../components/patients/NewPatientRegistration';
+import EnhancedPatientRegistration from '../components/patients/EnhancedPatientRegistration';
 import { NewPatientReports } from '../components/patients/NewPatientReports';
 
 const NewPatientFlow: React.FC = () => {
@@ -67,8 +67,8 @@ const NewPatientFlow: React.FC = () => {
       </div>
 
       <Routes>
-        <Route path="/" element={<NewPatientRegistration />} />
-        <Route path="/registration" element={<NewPatientRegistration />} />
+        <Route path="/" element={<EnhancedPatientRegistration />} />
+        <Route path="/registration" element={<EnhancedPatientRegistration />} />
         <Route path="/reports" element={<NewPatientReports />} />
       </Routes>
     </div>

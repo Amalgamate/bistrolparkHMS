@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Frontend service (development mode)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:3001/api
+    depends_on:
+      - api
+    networks:
+      - bristol-park-network
+    restart: unless-stopped
+
+  # Backend API service (development mode)
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./api:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=bristol_park_hmis
+      - DB_USER=postgres
+      - DB_PASSWORD=password
+      - DB_SSL=false
+      - JWT_SECRET=your_jwt_secret_key
+      - JWT_EXPIRES_IN=24h
+    depends_on:
+      - db
+    networks:
+      - bristol-park-network
+    restart: unless-stopped
+    command: npm run dev
+
+  # Database service
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bristol_park_hmis
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - bristol-park-network
+    restart: unless-stopped
+
+networks:
+  bristol-park-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

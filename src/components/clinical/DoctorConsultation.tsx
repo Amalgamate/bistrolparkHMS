@@ -55,11 +55,14 @@ import {
   MoreHorizontal,
   CheckCircle2,
   Ticket,
-  Calendar
+  Calendar,
+  Trash2
 } from 'lucide-react';
-import { useClinical, QueueEntry, PatientStatus } from '../../context/ClinicalContext';
+import { useClinical, QueueEntry, PatientStatus, Medication } from '../../context/ClinicalContext';
 import { useToast } from '../../context/ToastContext';
+import { useRealTimeNotification } from '../../context/RealTimeNotificationContext';
 import { format, formatDistanceToNow } from 'date-fns';
+import MedicationForm from './MedicationForm';
 
 interface DoctorConsultationProps {
   patientId: string | null;
@@ -74,14 +77,19 @@ const DoctorConsultation: React.FC<DoctorConsultationProps> = ({
   onChangeView,
   onSelectPatient
 }) => {
-  const { queue, getQueueEntry, assignDoctor, updatePatientStatus } = useClinical();
+  const { queue, getQueueEntry, assignDoctor, updatePatientStatus, prescribeMedications } = useClinical();
   const { showToast } = useToast();
+  const { notifyPrescriptionReady } = useRealTimeNotification();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<QueueEntry | null>(null);
   const [chiefComplaints, setChiefComplaints] = useState('');
   const [diagnosis, setDiagnosis] = useState('');
   const [notes, setNotes] = useState('');
+  const [treatmentNotes, setTreatmentNotes] = useState('');
   const [activeTab, setActiveTab] = useState('symptoms');
+  const [medications, setMedications] = useState<Medication[]>([]);
+  const [isMedicationFormOpen, setIsMedicationFormOpen] = useState(false);
+  const [editingMedication, setEditingMedication] = useState<Medication | undefined>(undefined);
 
   // Get patients ready for consultation
   const patientsReadyForConsultation = queue.filter(entry =>
@@ -141,6 +149,8 @@ const DoctorConsultation: React.FC<DoctorConsultationProps> = ({
     setChiefComplaints('');
     setDiagnosis('');
     setNotes('');
+    setTreatmentNotes('');
+    setMedications([]);
     setActiveTab('symptoms');
   };
 
@@ -174,7 +184,24 @@ const DoctorConsultation: React.FC<DoctorConsultationProps> = ({
   const handleSendToPharmacy = () => {
     if (!selectedPatient) return;
 
+    if (medications.length === 0) {
+      showToast('error', 'Please add at least one medication before sending to pharmacy');
+      return;
+    }
+
+    // Prescribe medications
+    prescribeMedications(selectedPatient.id, medications);
+
+    // Update patient status
     updatePatientStatus(selectedPatient.id, 'pharmacy');
+
+    // Notify pharmacy
+    notifyPrescriptionReady(
+      selectedPatient.patientId,
+      selectedPatient.patientName,
+      selectedPatient.tokenNumber
+    );
+
     showToast('success', `${selectedPatient.patientName} sent to pharmacy`);
 
     // Reset form and selection
@@ -497,7 +524,14 @@ const DoctorConsultation: React.FC<DoctorConsultationProps> = ({
                       <div>
                         <div className="flex justify-between items-center mb-2">
                           <label className="block text-sm font-medium">Medications</label>
-                          <Button variant="ghost" size="sm">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setEditingMedication(undefined);
+                              setIsMedicationFormOpen(true);
+                            }}
+                          >
                             <PlusCircle className="h-4 w-4 mr-1" />
                             Add Medication
                           </Button>
@@ -511,15 +545,55 @@ const DoctorConsultation: React.FC<DoctorConsultationProps> = ({
                                 <TableHead>Dosage</TableHead>
                                 <TableHead>Frequency</TableHead>
                                 <TableHead>Duration</TableHead>
-                                <TableHead className="w-[50px]"></TableHead>
+                                <TableHead>Quantity</TableHead>
+                                <TableHead className="w-[100px]">Actions</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              <TableRow>
-                                <TableCell colSpan={5} className="text-center py-4 text-gray-500">
-                                  No medications added yet
-                                </TableCell>
-                              </TableRow>
+                              {medications.length === 0 ? (
+                                <TableRow>
+                                  <TableCell colSpan={6} className="text-center py-4 text-gray-500">
+                                    No medications added yet
+                                  </TableCell>
+                                </TableRow>
+                              ) : (
+                                medications.map((medication, index) => (
+                                  <TableRow key={medication.id || index}>
+                                    <TableCell className="font-medium">{medication.name}</TableCell>
+                                    <TableCell>{medication.dosage}</TableCell>
+                                    <TableCell>{medication.frequency}</TableCell>
+                                    <TableCell>{medication.duration}</TableCell>
+                                    <TableCell>{medication.quantity}</TableCell>
+                                    <TableCell>
+                                      <div className="flex gap-2">
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => {
+                                            setEditingMedication(medication);
+                                            setIsMedicationFormOpen(true);
+                                          }}
+                                        >
+                                          <PlusCircle className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                          variant="ghost"
+                                          size="icon"
+                                          onClick={() => {
+                                            setMedications(medications.filter((_, i) =>
+                                              medication.id
+                                                ? medication.id !== medications[i].id
+                                                : i !== index
+                                            ));
+                                          }}
+                                        >
+                                          <Trash2 className="h-4 w-4 text-red-500" />
+                                        </Button>
+                                      </div>
+                                    </TableCell>
+                                  </TableRow>
+                                ))
+                              )}
                             </TableBody>
                           </Table>
                         </div>
@@ -528,10 +602,32 @@ const DoctorConsultation: React.FC<DoctorConsultationProps> = ({
                       <div>
                         <label className="block text-sm font-medium mb-1">Treatment Notes</label>
                         <Textarea
+                          value={treatmentNotes}
+                          onChange={(e) => setTreatmentNotes(e.target.value)}
                           placeholder="Enter treatment notes and instructions"
                           className="min-h-[100px]"
                         />
                       </div>
+
+                      {/* Medication Form Dialog */}
+                      <MedicationForm
+                        isOpen={isMedicationFormOpen}
+                        onClose={() => setIsMedicationFormOpen(false)}
+                        onSave={(medication) => {
+                          if (editingMedication) {
+                            // Update existing medication
+                            setMedications(medications.map(med =>
+                              med.id === editingMedication.id ? { ...medication, id: med.id } : med
+                            ));
+                          } else {
+                            // Add new medication
+                            setMedications([...medications, { ...medication, id: `med-${Date.now()}` }]);
+                          }
+                          setIsMedicationFormOpen(false);
+                          setEditingMedication(undefined);
+                        }}
+                        editingMedication={editingMedication}
+                      />
                     </TabsContent>
                   </Tabs>
 

@@ -31,35 +31,62 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
     setSearchResults([]);
     setIsLoading(true);
 
-    // Simulate AJAX-like delay
+    // Log the patients array to debug
+    console.log('Patients array for search:', patients);
+
+    // Process search with a small delay to show loading state
     setTimeout(() => {
       let results = [];
       const term = searchTerm.toLowerCase().trim();
 
+      // Check if patients is an array
+      if (!Array.isArray(patients)) {
+        console.error('Patients is not an array:', patients);
+        showToast('error', 'Error searching patients. Please try again.');
+        setIsLoading(false);
+        return;
+      }
+
+      // Map patient properties based on API response format
+      const processedPatients = patients.map(patient => {
+        // Handle different property naming conventions
+        return {
+          id: patient.id,
+          firstName: patient.firstName || patient.first_name,
+          lastName: patient.lastName || patient.last_name,
+          phone: patient.phone || '',
+          email: patient.email || '',
+          nationalId: patient.nationalId || patient.national_id || '',
+          dateOfBirth: patient.dateOfBirth || patient.date_of_birth || '',
+          gender: patient.gender || '',
+        };
+      });
+
       switch (searchBy) {
         case 'name':
-          results = patients.filter(patient => {
+          results = processedPatients.filter(patient => {
             const fullName = `${patient.firstName} ${patient.lastName}`.toLowerCase();
             return fullName.includes(term);
           });
           break;
         case 'id':
-          results = patients.filter(patient =>
+          results = processedPatients.filter(patient =>
             patient.id.toString().includes(term)
           );
           break;
         case 'phone':
-          results = patients.filter(patient =>
-            patient.phone.replace(/\D/g, '').includes(term.replace(/\D/g, ''))
+          results = processedPatients.filter(patient =>
+            patient.phone && patient.phone.replace(/\D/g, '').includes(term.replace(/\D/g, ''))
           );
           break;
         case 'nationalId':
-          results = patients.filter(patient =>
-            patient.nationalId?.toLowerCase().includes(term)
+          results = processedPatients.filter(patient =>
+            patient.nationalId && patient.nationalId.toLowerCase().includes(term)
           );
           break;
       }
 
+      console.log('Search results:', results);
       setSearchResults(results);
 
       if (results.length === 0) {
@@ -69,7 +96,7 @@ export const PatientSearch: React.FC<PatientSearchProps> = ({
       }
 
       setIsLoading(false);
-    }, 500); // Simulate network delay
+    }, 500); // Small delay to show loading state
   };
 
   const clearSearch = () => {

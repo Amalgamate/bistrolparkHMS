@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../context/ToastContext';
 import { useInsurance } from '../../context/InsuranceContext';
+import { usePatient } from '../../context/PatientContext';
 import { notifyPatientRegistration } from '../../utils/smsUtils';
 import '../../styles/theme.css';
 
@@ -223,6 +224,7 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { showToast } = useToast();
   const { getActiveInsuranceProviders } = useInsurance();
+  const { addPatient } = usePatient();
 
   // Form management
   const {
@@ -275,30 +277,62 @@ export const PatientRegistration: React.FC<PatientRegistrationProps> = ({
         }
       }
 
-      // Here you would typically send the data to your backend
-      // For integration with the legacy system, you would use:
-      //
-      // try {
-      //   const { createPatient } = await import('../../hooks/useLegacyApi');
-      //   await createPatient(data);
-      // } catch (err) {
-      //   console.error('Error saving to legacy system:', err);
-      //   // Fall back to local save if legacy system is unavailable
-      //   onSave(data);
-      // }
+      // Try to save to the API first
+      try {
+        // Call the onSave function which will try to save to the API
+        onSave(data);
 
-      // For now, just use the local save function
-      onSave(data);
+        // Send SMS notification to the patient
+        const patientName = `${data.firstName} ${data.lastName}`;
+        const smsResult = await notifyPatientRegistration(patientName, data.phone);
 
-      // Send SMS notification to the patient
-      const patientName = `${data.firstName} ${data.lastName}`;
-      const smsResult = await notifyPatientRegistration(patientName, data.phone);
+        if (smsResult.success) {
+          showToast('success', 'Patient registered successfully! SMS notification sent.');
+        } else {
+          showToast('success', 'Patient registered successfully! SMS notification could not be sent.');
+          console.error('SMS notification failed:', smsResult.error);
+        }
+      } catch (apiError) {
+        console.error('Error saving to API:', apiError);
 
-      if (smsResult.success) {
-        showToast('success', 'Patient registered successfully! SMS notification sent.');
-      } else {
-        showToast('success', 'Patient registered successfully! SMS notification could not be sent.');
-        console.error('SMS notification failed:', smsResult.error);
+        // Fall back to local context if API fails
+        try {
+          // Format the data for the PatientContext
+          const patientData = {
+            firstName: data.firstName,
+            lastName: data.lastName,
+            middleName: data.middleName,
+            dateOfBirth: data.dateOfBirth,
+            gender: data.gender,
+            nationalId: data.nationalId,
+            maritalStatus: data.maritalStatus,
+            email: data.email,
+            phone: data.phone,
+            residence: data.residence,
+            address: data.address,
+            city: data.city,
+            state: data.state,
+            zipCode: data.zipCode,
+            bloodGroup: data.bloodType,
+            allergies: data.allergies,
+            chronicConditions: data.chronicConditions,
+            currentMedications: data.currentMedications,
+            shaNumber: data.shaNumber,
+            paymentType: data.paymentType,
+            nextOfKinName: data.nextOfKinName,
+            nextOfKinPhone: data.nextOfKinPhone,
+            emergencyContact: data.emergencyContact,
+            status: 'Active' as const
+          };
+
+          // Add patient to local context
+          await addPatient(patientData);
+
+          showToast('success', 'Patient registered successfully in offline mode!');
+        } catch (contextError) {
+          console.error('Error saving to local context:', contextError);
+          throw new Error('Failed to save patient data in both API and local context');
+        }
       }
 
       reset();

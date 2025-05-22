@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { mockAdmittedPatients, mockDischargedPatients, mockRooms } from '../data/mockAdmissionsData';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import admissionService from '../services/admissionService';
 
 // Define the shape of an admission
 export interface Admission {
@@ -59,14 +59,16 @@ interface AdmissionContextType {
   admittedPatients: Admission[];
   dischargedPatients: Admission[];
   rooms: Room[];
-  addAdmission: (admission: Omit<Admission, 'id' | 'status'>) => void;
+  loading: boolean;
+  error: string | null;
+  addAdmission: (admission: Omit<Admission, 'id' | 'status'>) => Promise<Admission | null>;
   dischargePatient: (admissionId: string, dischargeDetails: {
     dischargeDate: string;
     dischargeTime: string;
     dischargeNotes?: string;
     billAmount?: number;
     billPaid?: boolean;
-  }) => void;
+  }) => Promise<Admission | null | undefined>;
   updateAdmission: (id: string, admission: Partial<Admission>) => void;
   deleteAdmission: (id: string) => void;
   getAdmission: (id: string) => Admission | undefined;
@@ -83,59 +85,135 @@ const AdmissionContext = createContext<AdmissionContextType | undefined>(undefin
 
 // Create the provider component
 export const AdmissionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [admittedPatients, setAdmittedPatients] = useState<Admission[]>(mockAdmittedPatients);
-  const [dischargedPatients, setDischargedPatients] = useState<Admission[]>(mockDischargedPatients);
-  const [rooms, setRooms] = useState<Room[]>(mockRooms);
+  const [admittedPatients, setAdmittedPatients] = useState<Admission[]>([]);
+  const [dischargedPatients, setDischargedPatients] = useState<Admission[]>([]);
+  const [rooms, setRooms] = useState<Room[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch admissions and rooms on component mount
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        if (isMounted) setLoading(true);
+
+        // Fetch admissions
+        console.log('Fetching admissions from API');
+        const admissionsData = await admissionService.getAllAdmissions();
+
+        if (isMounted) {
+          // Split into admitted and discharged
+          const admitted = admissionsData.filter(a => a.status === 'admitted');
+          const discharged = admissionsData.filter(a => a.status === 'discharged');
+
+          console.log(`Setting ${admitted.length} admitted patients and ${discharged.length} discharged patients`);
+          setAdmittedPatients(admitted);
+          setDischargedPatients(discharged);
+        }
+
+        // Fetch rooms
+        console.log('Fetching rooms from API');
+        const roomsData = await admissionService.getAllRooms();
+
+        if (isMounted) {
+          console.log(`Setting ${roomsData.length} rooms`);
+          setRooms(roomsData);
+        }
+
+        if (isMounted) {
+          setError(null);
+        }
+      } catch (err: any) {
+        console.error('Error fetching admission data:', err);
+
+        if (isMounted) {
+          setError('Failed to load admission data. Please try again later.');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchData();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Add a new admission
-  const addAdmission = (admission: Omit<Admission, 'id' | 'status'>) => {
-    const newAdmission = {
-      ...admission,
-      id: `ADM${Date.now()}`,
-      status: 'admitted' as const
-    };
-    setAdmittedPatients([...admittedPatients, newAdmission]);
-    
-    // Update room status
-    updateRoom(admission.roomId, { 
-      status: 'Occupied',
-      patientId: admission.patientId,
-      patientName: admission.patientName,
-      admissionDate: admission.admissionDate
-    });
+  const addAdmission = async (admission: Omit<Admission, 'id' | 'status'>) => {
+    try {
+      // Call API to create admission
+      const newAdmission = await admissionService.createAdmission(admission);
+
+      if (newAdmission) {
+        // Update local state
+        setAdmittedPatients([...admittedPatients, newAdmission]);
+
+        // Update room status
+        updateRoom(admission.roomId, {
+          status: 'Occupied',
+          patientId: admission.patientId,
+          patientName: admission.patientName,
+          admissionDate: admission.admissionDate
+        });
+
+        return newAdmission;
+      } else {
+        console.error('Failed to create admission');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error creating admission:', error);
+      return null;
+    }
   };
 
   // Discharge a patient
-  const dischargePatient = (admissionId: string, dischargeDetails: {
+  const dischargePatient = async (admissionId: string, dischargeDetails: {
     dischargeDate: string;
     dischargeTime: string;
     dischargeNotes?: string;
     billAmount?: number;
     billPaid?: boolean;
   }) => {
-    const admission = admittedPatients.find(a => a.id === admissionId);
-    if (!admission) return;
+    try {
+      const admission = admittedPatients.find(a => a.id === admissionId);
+      if (!admission) return;
 
-    // Update admission with discharge details
-    const updatedAdmission = {
-      ...admission,
-      ...dischargeDetails,
-      status: 'discharged' as const
-    };
+      // Call API to discharge patient
+      const updatedAdmission = await admissionService.dischargePatient(admissionId, dischargeDetails);
 
-    // Remove from admitted patients
-    setAdmittedPatients(admittedPatients.filter(a => a.id !== admissionId));
-    
-    // Add to discharged patients
-    setDischargedPatients([...dischargedPatients, updatedAdmission]);
-    
-    // Update room status
-    updateRoom(admission.roomId, { 
-      status: 'Available',
-      patientId: undefined,
-      patientName: undefined,
-      admissionDate: undefined
-    });
+      if (updatedAdmission) {
+        // Remove from admitted patients
+        setAdmittedPatients(admittedPatients.filter(a => a.id !== admissionId));
+
+        // Add to discharged patients
+        setDischargedPatients([...dischargedPatients, updatedAdmission]);
+
+        // Update room status
+        updateRoom(admission.roomId, {
+          status: 'Available',
+          patientId: undefined,
+          patientName: undefined,
+          admissionDate: undefined
+        });
+
+        return updatedAdmission;
+      } else {
+        console.error('Failed to discharge patient');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error discharging patient:', error);
+      return null;
+    }
   };
 
   // Update an existing admission
@@ -147,7 +225,7 @@ export const AdmissionProvider: React.FC<{ children: ReactNode }> = ({ children 
           admission.id === id ? { ...admission, ...updatedAdmission } : admission
         )
       );
-    } 
+    }
     // Check if the admission is in discharged patients
     else if (dischargedPatients.some(a => a.id === id)) {
       setDischargedPatients(
@@ -163,7 +241,7 @@ export const AdmissionProvider: React.FC<{ children: ReactNode }> = ({ children 
     // Check if the admission is in admitted patients
     if (admittedPatients.some(a => a.id === id)) {
       setAdmittedPatients(admittedPatients.filter(a => a.id !== id));
-    } 
+    }
     // Check if the admission is in discharged patients
     else if (dischargedPatients.some(a => a.id === id)) {
       setDischargedPatients(dischargedPatients.filter(a => a.id !== id));
@@ -187,8 +265,8 @@ export const AdmissionProvider: React.FC<{ children: ReactNode }> = ({ children 
 
   // Get available rooms
   const getAvailableRooms = (type?: string) => {
-    return rooms.filter(room => 
-      room.status === 'Available' && 
+    return rooms.filter(room =>
+      room.status === 'Available' &&
       (!type || room.type === type)
     );
   };
@@ -232,6 +310,8 @@ export const AdmissionProvider: React.FC<{ children: ReactNode }> = ({ children 
         admittedPatients,
         dischargedPatients,
         rooms,
+        loading,
+        error,
         addAdmission,
         dischargePatient,
         updateAdmission,

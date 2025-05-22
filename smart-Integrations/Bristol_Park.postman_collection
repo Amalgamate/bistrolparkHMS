@@ -1,0 +1,613 @@
+{
+	"info": {
+		"_postman_id": "8dffa20b-eae5-413d-a6c9-83787cd1bb17",
+		"name": "ProviderAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "27639885"
+	},
+	"item": [
+		{
+			"name": "Generate Token",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "P@55W00rd",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "hopkins_hms1",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "SKSP_4729",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "P@55W00rd",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/oauth/token?",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"oauth",
+						"token"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": null
+						}
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Generate Token",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "Ruphasoft",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "P@S5W00rd",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/oauth/token?",
+							"protocol": "https",
+							"host": [
+								"data",
+								"smartapplicationsgroup",
+								"com"
+							],
+							"path": [
+								"providerapi-dev",
+								"oauth",
+								"token"
+							],
+							"query": [
+								{
+									"key": "",
+									"value": null
+								}
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "vary",
+							"value": "Origin"
+						},
+						{
+							"key": "vary",
+							"value": "Access-Control-Request-Method"
+						},
+						{
+							"key": "vary",
+							"value": "Access-Control-Request-Headers"
+						},
+						{
+							"key": "cache-control",
+							"value": "no-store"
+						},
+						{
+							"key": "pragma",
+							"value": "no-cache"
+						},
+						{
+							"key": "x-content-type-options",
+							"value": "nosniff"
+						},
+						{
+							"key": "x-xss-protection",
+							"value": "1; mode=block"
+						},
+						{
+							"key": "strict-transport-security",
+							"value": "max-age=31536000 ; includeSubDomains"
+						},
+						{
+							"key": "x-frame-options",
+							"value": "DENY"
+						},
+						{
+							"key": "x-frame-options",
+							"value": "SAMEORIGIN"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json;charset=UTF-8"
+						},
+						{
+							"key": "transfer-encoding",
+							"value": "chunked"
+						},
+						{
+							"key": "date",
+							"value": "Fri, 02 Aug 2024 06:51:09 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"access_token\": \"ecef7ba7-df53-46c1-9889-84cac541ca05\",\n    \"token_type\": \"bearer\",\n    \"refresh_token\": \"6fefbf7e-e579-41f3-bdf4-00e1604f8028\",\n    \"expires_in\": 93599,\n    \"scope\": \"read  write\",\n    \"iat\": 1722581469,\n    \"client_id\": \"Ruphasoft\"\n}"
+				}
+			]
+		},
+		{
+			"name": "Fetch Visits",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "d09a0e7a-bb03-408f-bec3-e7810ddf0c17",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/visit?patientNumber=456&sessionStatus=PENDING",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"visit"
+					],
+					"query": [
+						{
+							"key": "patientNumber",
+							"value": "456"
+						},
+						{
+							"key": "sessionStatus",
+							"value": "PENDING"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Merging Visit & visit ID",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "d09a0e7a-bb03-408f-bec3-e7810ddf0c17",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "default"
+						},
+						{
+							"key": "username",
+							"value": "kutrrh",
+							"type": "default"
+						},
+						{
+							"key": "password",
+							"value": "P@55w0rd",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/patient-number/456/visit-number/11",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"patient-number",
+						"456",
+						"visit-number",
+						"11"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Member details",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "d09a0e7a-bb03-408f-bec3-e7810ddf0c17",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "default"
+						},
+						{
+							"key": "username",
+							"value": "kutrrh",
+							"type": "default"
+						},
+						{
+							"key": "password",
+							"value": "P@55w0rd",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/member?patientNumber=456&sessionId=22958",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"member"
+					],
+					"query": [
+						{
+							"key": "patientNumber",
+							"value": "456"
+						},
+						{
+							"key": "sessionId",
+							"value": "22958"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Upload Claim(Invoice)",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "442e0691-c8fe-4664-94fc-6ae19723e741",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n   \"claim_code\":\"Invoce134\",\r\n   \"payer_code\":\"19190\",\r\n   \"payer_name\":\"AAR INSURANCE\",\r\n   \"medicalaid_code\":\"SAMPLE\",\r\n   \"amount\":600,\r\n   \"gross_amount\":900,\r\n   \"batch_number\":\"batch4\",\r\n   \"dispatch_date\":\"2022-09-21 00:00:00\",\r\n   \"patient_number\":\"3025\",\r\n   \"patient_name\":\"JOSEPH MAINA\",\r\n   \"location_code\":\"PHAR1\",\r\n   \"location_name\":\"PHARMACY1\",\r\n   \"scheme_code\":\"SAMPLEX2\",\r\n   \"scheme_name\":\"SAMPLE SCHEME\",\r\n   \"member_number\":\"QASAMPLE1-00\",\r\n   \"visit_number\":\"1111\",\r\n   \"session_id\":14282,\r\n   \"visit_start\":\"2022-09-21 00:00:00\",\r\n   \"visit_end\":\"2022-09-21 00:00:00\",\r\n   \"currency\":\"KES\",\r\n   \"doctor_name\":\"DR. Omondi\",\r\n   \"sp_id\":569,\r\n   \"diagnosis\":[\r\n      {\r\n         \"code\":\"A01.3\",\r\n         \"coding_standard\":\"ICD10\",\r\n         \"is_added_with_claim\":true,\r\n         \"name\":\"Paratyphoid fever C\",\r\n         \"is_primary\":true\r\n      },\r\n      {\r\n         \"code\":\"K02.4\",\r\n         \"coding_standard\":\"ICD10\",\r\n         \"is_added_with_claim\":true,\r\n         \"name\":\"Odontoclasia\",\r\n         \"is_primary\":true\r\n      },\r\n      {\r\n         \"code\":\"A06.1\",\r\n         \"coding_standard\":\"ICD10\",\r\n         \"is_added_with_claim\":true,\r\n         \"name\":\"Chronic intestinal amoebiasis \",\r\n         \"is_primary\":true\r\n      }\r\n   ],\r\n   \"pre_authorization\":[\r\n      {\r\n         \"code\":\"P150\",\r\n         \"amount\":5000,\r\n         \"authorized_by\":\"Esther\",\r\n         \"message\":\"Authorized up to 5000 by Esther\"\r\n      }\r\n   ],\r\n   \"admission\":{\r\n      \"additional_info\":\"string\",\r\n      \"admission_date\":\"2021-01-01 00:00:00\",\r\n      \"admission_number\":\"string\",\r\n      \"discharge_date\":\"2021-01-01 00:00:00\",\r\n      \"discharge_summary\":\"string\"\r\n   },\r\n   \"invoices\":[\r\n      {\r\n         \"amount\":600,\r\n         \"gross_amount\":900,\r\n         \"invoice_date\":\"2022-02-16 00:00:00\",\r\n         \"invoice_number\":\"INV27API.14.9\",\r\n         \"invoice_ref_number\":\"INV27API.14.9\",\r\n         \"lines\":[\r\n            {\r\n               \"additional_info\":\"string\",\r\n               \"amount\":100,\r\n               \"charge_date\":\"2021-01-01\",\r\n               \"charge_time\":\"10:00:05\",\r\n               \"item_code\":\"CONS-111\",\r\n               \"item_name\":\"CONSULTATION FEES\",\r\n               \"pre_authorization_code\":\"string\",\r\n               \"quantity\":1,\r\n               \"service_group\":\"Consultation\",\r\n               \"unit_price\":100\r\n            },\r\n            {\r\n               \"additional_info\":\"string\",\r\n               \"amount\":50,\r\n               \"charge_date\":\"2021-01-01\",\r\n               \"charge_time\":\"10:00:05\",\r\n               \"item_code\":\"ST01878\",\r\n               \"item_name\":\"SYRUP ALLOPURINOL 100MG 30S\",\r\n               \"pre_authorization_code\":\"001\",\r\n               \"quantity\":1,\r\n               \"service_group\":\"Pharmacy\",\r\n               \"unit_price\":50\r\n            },\r\n            {\r\n               \"additional_info\":\"string\",\r\n               \"amount\":250,\r\n               \"charge_date\":\"2021-01-01\",\r\n               \"charge_time\":\"10:00:05\",\r\n               \"item_code\":\"ST0792\",\r\n               \"item_name\":\"ETORICOXIB  560MG TABS\",\r\n               \"pre_authorization_code\":\"001\",\r\n               \"quantity\":10,\r\n               \"service_group\":\"Pharmacy\",\r\n               \"unit_price\":25\r\n            },\r\n            {\r\n               \"additional_info\":\"string\",\r\n               \"amount\":300,\r\n               \"charge_date\":\"2021-01-01\",\r\n               \"charge_time\":\"10:00:05\",\r\n               \"item_code\":\"LAB-05003\",\r\n               \"item_name\":\"STOOL OC\",\r\n               \"pre_authorization_code\":\"001\",\r\n               \"quantity\":1,\r\n               \"service_group\":\"Laboratory\",\r\n               \"unit_price\":300\r\n            },\r\n            {\r\n               \"additional_info\":\"string\",\r\n               \"amount\":200,\r\n               \"charge_date\":\"2021-01-01\",\r\n               \"charge_time\":\"10:00:05\",\r\n               \"item_code\":\"LAB-058944\",\r\n               \"item_name\":\"Malaria Rapid  Test\",\r\n               \"pre_authorization_code\":\"001\",\r\n               \"quantity\":1,\r\n               \"service_group\":\"Laboratory\",\r\n               \"unit_price\":200\r\n            }\r\n         ],\r\n         \"payment_modifiers\":[],\r\n         \"pool_number\":\"1\",\r\n         \"service_type\":\"Outpatient\"\r\n      }\r\n   ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/claims?patientNumber=3767&sessionId=55",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"claims"
+					],
+					"query": [
+						{
+							"key": "patientNumber",
+							"value": "3767"
+						},
+						{
+							"key": "sessionId",
+							"value": "55"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Claim Status",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Diagnosis",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "03567f7c-4cbe-4e80-ad9b-9ee685f88619",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"diagnosis\": [\r\n\t\t{\r\n\t\t\t\"code\": \"CO1.19\",\r\n\t\t\t\"coding_standard\": \"icd 10\",\r\n\t\t\t\"is_added_with_claim\": \"True\",\r\n\t\t\t\"name\": \"COVID 19\",\r\n\t\t\t\"is_primary\": \"True\"\r\n\t\t}\r\n  ],\r\n  \"invoice_number\": \"DAIGNOSIS TEST001\",\r\n  \"member_number\": \"SAMPLETEST111\",\r\n  \"patient_number\": \"94517\",\r\n  \"session_id\": 29066,\r\n  \"visit_number\": \"291\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/clinic-record",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"clinic-record"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Close session",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "d09a0e7a-bb03-408f-bec3-e7810ddf0c17",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/visit/22855/close-session",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"visit",
+						"22855",
+						"close-session"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "forward member benefit-dont use",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "ffef4a9e-cf65-47d0-ba37-0044ff1182f7",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"admit_id\": \"607\",\r\n  \"benefits\": [\r\n    {\r\n      \"amount\": 50000,\r\n      \"billing_status\": \"Available\",\r\n      \"claimable\": true,\r\n      \"groups\": [\r\n        {\r\n          \"code\": \"CONS\",\r\n          \"name\": \"CONSULTATION\"\r\n        }\r\n      ],\r\n      \"location_id\": 13,\r\n      \"location_name\": \"BILLING 1\",\r\n      \"parent_pool_nr\": 0,\r\n      \"pool_desc\": \"OUT PATIENT OVERALL (ALL BABY VACCINES COVERED FOR CHILDREN UP TO 5 YEARS)\",\r\n      \"pool_nr\": \"1\",\r\n      \"sp_id\": 569\r\n    }\r\n  ],\r\n  \"card_serial_number\": \"000000100007F633\",\r\n  \"co_pay_amount\": 0,\r\n  \"global_id\": \"KE000000000000000000000000001623222\",\r\n  \"has_copay\": true,\r\n  \"medicalaid_code\": \"SAMPLEX2\",\r\n  \"medicalaid_expiry\": \"2023-01-01\",\r\n  \"medicalaid_name\": \"EDI DEMO CLIENT\",\r\n  \"medicalaid_number\": \"NGR172\",\r\n  \"medicalaid_plan\": \"string\",\r\n  \"medicalaid_regdate\": \"yyyy-MM-dd\",\r\n  \"medicalaid_scheme_code\": \"SAMPLE2\",\r\n  \"medicalaid_scheme_name\": \"MCI TEST SCHEME\",\r\n  \"member_name\": \"VITALIS\",\r\n  \"patient_dob\": \"1990-12-23\",\r\n  \"patient_forenames\": \"VITALIS\",\r\n  \"patient_gender\": \"Male\",\r\n  \"patient_number\": \"3767\",\r\n  \"patient_surname\": \"OMWERI\",\r\n  \"policy_country\": \"1001065\",\r\n  \"policy_currency\": \"404\",\r\n  \"policy_id\": \"939735\",\r\n  \"session_type\": \"Outpatient\",\r\n  \"vip_message\": \"string\",\r\n  \"visit_number\": \"string\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/member",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"member"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Benefit details-dont use",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "870cb090-b5d7-4b33-8944-f9edc0ef8752",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "default"
+						},
+						{
+							"key": "username",
+							"value": "SKSP_1845",
+							"type": "default"
+						},
+						{
+							"key": "password",
+							"value": "P@ssW0rd",
+							"type": "default"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://data.smartapplicationsgroup.com/providerapi-dev/api/benefits?patientNumber=COPAYTEST1&sessionId=486 \n",
+					"protocol": "https",
+					"host": [
+						"data",
+						"smartapplicationsgroup",
+						"com"
+					],
+					"path": [
+						"providerapi-dev",
+						"api",
+						"benefits"
+					],
+					"query": [
+						{
+							"key": "patientNumber",
+							"value": "COPAYTEST1"
+						},
+						{
+							"key": "sessionId",
+							"value": "486 \n"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -41,10 +41,12 @@ import {
   CheckCircle2,
   AlertTriangle,
   Building,
-  Layers
+  Layers,
+  LucideIcon
 } from 'lucide-react';
 import { useAdmission, Room, Bed as BedType } from '../../../context/AdmissionContext';
 import { useToast } from '../../../context/ToastContext';
+import { ColoredIcon } from '../../ui/colored-icon';
 
 interface FacilityManagementProps {
   onClose: () => void;
@@ -217,15 +219,15 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid grid-cols-3 mb-4">
           <TabsTrigger value="rooms" className="flex items-center gap-1 data-[state=active]:bg-blue-600 data-[state=active]:text-white">
-            <Building2 size={16} />
+            <ColoredIcon icon={Building2} color="blue" size="xs" variant="text" />
             Rooms
           </TabsTrigger>
           <TabsTrigger value="floors" className="flex items-center gap-1 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
-            <Layers size={16} />
+            <ColoredIcon icon={Layers} color="purple" size="xs" variant="text" />
             Floors & Wings
           </TabsTrigger>
           <TabsTrigger value="beds" className="flex items-center gap-1 data-[state=active]:bg-teal-600 data-[state=active]:text-white">
-            <Bed size={16} />
+            <ColoredIcon icon={Bed} color="teal" size="xs" variant="text" />
             Beds
           </TabsTrigger>
         </TabsList>
@@ -234,7 +236,7 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
         <TabsContent value="rooms">
           <div className="flex justify-between mb-4">
             <h3 className="text-lg font-medium text-blue-700 flex items-center">
-              <Building2 className="h-5 w-5 mr-2 text-blue-600" />
+              <ColoredIcon icon={Building2} color="blue" size="sm" variant="outline" className="mr-2" />
               Rooms Management
             </h3>
             <Button
@@ -242,7 +244,7 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
               size="sm"
               className="bg-blue-600 hover:bg-blue-700"
             >
-              <Plus className="h-4 w-4 mr-1" />
+              <ColoredIcon icon={Plus} color="green" size="xs" variant="text" className="mr-1" />
               Add Room
             </Button>
           </div>
@@ -397,25 +399,23 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
         <TabsContent value="floors">
           <div className="mb-4">
             <h3 className="text-lg font-medium text-purple-700 flex items-center mb-4">
-              <Layers className="h-5 w-5 mr-2 text-purple-600" />
+              <ColoredIcon icon={Layers} color="purple" size="sm" variant="outline" className="mr-2" />
               Floors & Wings Management
             </h3>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card className="border-purple-200 shadow-sm">
               <CardHeader className="bg-purple-50 border-b border-purple-100">
                 <CardTitle className="text-lg text-purple-800">Floors</CardTitle>
-                <CardDescription>Manage hospital floors</CardDescription>
+                <CardDescription>Current branch floors</CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-2">
                   {floors.map((floor, index) => (
                     <div key={index} className="flex justify-between items-center p-3 bg-white border border-purple-100 rounded-md hover:bg-purple-50 transition-colors">
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-purple-100 flex items-center justify-center mr-2">
-                          <Layers className="h-4 w-4 text-purple-600" />
-                        </div>
+                        <ColoredIcon icon={Layers} color="purple" size="sm" variant="outline" className="mr-2" />
                         <span className="font-medium">{floor}</span>
                       </div>
                       <div className="text-sm bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
@@ -430,16 +430,14 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
             <Card className="border-indigo-200 shadow-sm">
               <CardHeader className="bg-indigo-50 border-b border-indigo-100">
                 <CardTitle className="text-lg text-indigo-800">Wings</CardTitle>
-                <CardDescription>Manage hospital wings</CardDescription>
+                <CardDescription>Current branch wings</CardDescription>
               </CardHeader>
               <CardContent className="pt-4">
                 <div className="space-y-2">
                   {wings.map((wing, index) => (
                     <div key={index} className="flex justify-between items-center p-3 bg-white border border-indigo-100 rounded-md hover:bg-indigo-50 transition-colors">
                       <div className="flex items-center">
-                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center mr-2">
-                          <Building className="h-4 w-4 text-indigo-600" />
-                        </div>
+                        <ColoredIcon icon={Building} color="indigo" size="sm" variant="outline" className="mr-2" />
                         <span className="font-medium">{wing}</span>
                       </div>
                       <div className="text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">
@@ -457,7 +455,7 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
         <TabsContent value="beds">
           <div className="mb-4">
             <h3 className="text-lg font-medium text-teal-700 flex items-center mb-4">
-              <Bed className="h-5 w-5 mr-2 text-teal-600" />
+              <ColoredIcon icon={Bed} color="teal" size="sm" variant="outline" className="mr-2" />
               Beds Management
             </h3>
           </div>
@@ -468,7 +466,7 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
                 <CardHeader className="pb-2 bg-teal-50 border-b border-teal-100">
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-lg text-teal-800 flex items-center">
-                      <Building2 className="h-5 w-5 mr-2 text-teal-600" />
+                      <ColoredIcon icon={Building2} color="teal" size="sm" variant="outline" className="mr-2" />
                       {room.name}
                     </CardTitle>
                     <Button
@@ -476,7 +474,7 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
                       onClick={() => handleAddBed(room.id)}
                       className="bg-teal-600 hover:bg-teal-700"
                     >
-                      <Plus className="h-4 w-4 mr-1" />
+                      <ColoredIcon icon={Plus} color="green" size="xs" variant="text" className="mr-1" />
                       Add Bed
                     </Button>
                   </div>
@@ -486,7 +484,7 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
                   {newBed && newBed.roomId === room.id && (
                     <div className="mb-6 p-4 border-2 border-teal-200 bg-gradient-to-br from-teal-50 to-white rounded-lg shadow-sm">
                       <h4 className="text-sm font-medium mb-3 text-teal-800 flex items-center">
-                        <Plus className="h-4 w-4 mr-2 text-teal-600" />
+                        <ColoredIcon icon={Plus} color="teal" size="xs" variant="outline" className="mr-2" />
                         Add New Bed
                       </h4>
                       <div className="grid grid-cols-2 gap-4 mb-4">
@@ -517,13 +515,13 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
                             <SelectContent>
                               <SelectItem value="Available">
                                 <div className="flex items-center">
-                                  <CheckCircle2 className="h-3.5 w-3.5 mr-2 text-emerald-500" />
+                                  <ColoredIcon icon={CheckCircle2} color="green" size="xs" variant="text" className="mr-2" />
                                   <span>Available</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="Maintenance">
                                 <div className="flex items-center">
-                                  <AlertTriangle className="h-3.5 w-3.5 mr-2 text-amber-500" />
+                                  <ColoredIcon icon={AlertTriangle} color="orange" size="xs" variant="text" className="mr-2" />
                                   <span>Maintenance</span>
                                 </div>
                               </SelectItem>
@@ -572,12 +570,14 @@ const FacilityManagement: React.FC<FacilityManagementProps> = ({ onClose }) => {
                                 bed.status === 'Maintenance' ? 'bg-amber-100' :
                                 'bg-sky-100'}
                             `}>
-                              <Bed className={`
-                                h-4 w-4
-                                ${bed.status === 'Available' ? 'text-emerald-600' :
-                                  bed.status === 'Maintenance' ? 'text-amber-600' :
-                                  'text-sky-600'}
-                              `} />
+                              <ColoredIcon
+                                icon={Bed}
+                                color={bed.status === 'Available' ? 'green' :
+                                       bed.status === 'Maintenance' ? 'orange' :
+                                       'blue'}
+                                size="xs"
+                                variant="text"
+                              />
                             </div>
                             <span className="font-medium">{bed.number}</span>
                           </div>

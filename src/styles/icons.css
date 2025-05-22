@@ -1,0 +1,81 @@
+/* Colored Icon Styles */
+
+/* Blue */
+.icon-blue {
+  background-color: #3b82f6;
+}
+.icon-blue-outline {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+/* Green */
+.icon-green {
+  background-color: #10b981;
+}
+.icon-green-outline {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Purple */
+.icon-purple {
+  background-color: #8b5cf6;
+}
+.icon-purple-outline {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+/* Orange */
+.icon-orange {
+  background-color: #f97316;
+}
+.icon-orange-outline {
+  background-color: rgba(249, 115, 22, 0.1);
+}
+
+/* Red */
+.icon-red {
+  background-color: #ef4444;
+}
+.icon-red-outline {
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+/* Teal */
+.icon-teal {
+  background-color: #14b8a6;
+}
+.icon-teal-outline {
+  background-color: rgba(20, 184, 166, 0.1);
+}
+
+/* Indigo */
+.icon-indigo {
+  background-color: #6366f1;
+}
+.icon-indigo-outline {
+  background-color: rgba(99, 102, 241, 0.1);
+}
+
+/* Pink */
+.icon-pink {
+  background-color: #ec4899;
+}
+.icon-pink-outline {
+  background-color: rgba(236, 72, 153, 0.1);
+}
+
+/* Amber */
+.icon-amber {
+  background-color: #f59e0b;
+}
+.icon-amber-outline {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+/* Gray */
+.icon-gray {
+  background-color: #6b7280;
+}
+.icon-gray-outline {
+  background-color: rgba(107, 114, 128, 0.1);
+}

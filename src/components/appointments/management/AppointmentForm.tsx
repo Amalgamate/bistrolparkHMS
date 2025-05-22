@@ -228,9 +228,9 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl">
-        <div className="flex justify-between items-center px-6 py-4 border-b">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl my-8">
+        <div className="flex justify-between items-center px-6 py-4 border-b sticky top-0 bg-white z-10">
           <h2 className="text-xl font-semibold text-gray-800">
             {isEditing ? 'Edit Appointment' : 'New Appointment'}
           </h2>
@@ -242,7 +242,7 @@ const AppointmentForm: React.FC<AppointmentFormProps> = ({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6">
+        <form onSubmit={handleSubmit} className="p-6 max-h-[70vh] overflow-y-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

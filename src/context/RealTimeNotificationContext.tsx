@@ -21,6 +21,8 @@ interface RealTimeNotificationContextType {
   notifyRole: (role: string, type: NotificationType, message: string, details?: any) => void;
   notifyUser: (userId: string, type: NotificationType, message: string, details?: any) => void;
   notifyBranch: (branch: string, type: NotificationType, message: string, details?: any) => void;
+
+  // Clinical workflow notifications
   notifyPatientRegistered: (patientId: string, patientName: string, tokenNumber: number) => void;
   notifyVitalsReady: (patientId: string, patientName: string, tokenNumber: number) => void;
   notifyVitalsTaken: (patientId: string, patientName: string, tokenNumber: number, doctorId?: string) => void;
@@ -30,6 +32,18 @@ interface RealTimeNotificationContextType {
   notifyPrescriptionReady: (patientId: string, patientName: string, tokenNumber: number) => void;
   notifyEmergencyPatient: (patientId: string, patientName: string, tokenNumber: number) => void;
   notifyTokenCalled: (patientId: string, patientName: string, tokenNumber: number, destination: string) => void;
+
+  // Chat-specific notifications
+  notifyChatMessage: (chatId: string, messageId: string, senderId: string, senderName: string, receiverId: string, content: string, messageType?: 'text' | 'image' | 'file' | 'video' | 'audio' | 'location' | 'contact') => void;
+  notifyTyping: (chatId: string, userId: string, userName: string, isTyping: boolean) => void;
+  notifyMessageRead: (chatId: string, messageId: string, userId: string) => void;
+  notifyCallInitiated: (callId: string, chatId: string, callerId: string, callerName: string, receiverId: string, receiverName: string, callType: 'audio' | 'video') => void;
+  notifyCallAnswered: (callId: string, receiverId: string) => void;
+  notifyCallRejected: (callId: string, receiverId: string) => void;
+  notifyCallEnded: (callId: string, userId: string) => void;
+
+  // External chat notifications
+  notifyExternalMessage: (externalChatId: string, externalUserId: string, senderName: string, content: string, source: string) => void;
 }
 
 // Create context
@@ -76,9 +90,21 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
 
   // Handle incoming notifications
   const handleIncomingNotification = (notification: NotificationPayload) => {
+    // Skip typing notifications for the notification list
+    if (notification.type === 'CHAT_TYPING') {
+      // Just update the UI for typing indicators, don't add to notifications list
+      return;
+    }
+
+    // Skip read receipts for the notification list
+    if (notification.type === 'CHAT_READ') {
+      // Just update the UI for read receipts, don't add to notifications list
+      return;
+    }
+
     // Check if the notification is targeted at the current user
     if (
-      notification.details.targetUserId && 
+      notification.details.targetUserId &&
       notification.details.targetUserId !== user?.id
     ) {
       return;
@@ -86,7 +112,7 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
 
     // Check if the notification is targeted at the current role
     if (
-      notification.details.targetRole && 
+      notification.details.targetRole &&
       notification.details.targetRole !== user?.role
     ) {
       return;
@@ -94,10 +120,37 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
 
     // Check if the notification is targeted at the current branch
     if (
-      notification.details.targetBranch && 
+      notification.details.targetBranch &&
       notification.details.targetBranch !== user?.branch
     ) {
       return;
+    }
+
+    // For chat messages, check if the receiver is the current user
+    if (
+      notification.type === 'CHAT_MESSAGE' &&
+      notification.details.receiverId &&
+      notification.details.receiverId !== user?.id
+    ) {
+      return;
+    }
+
+    // For calls, check if the receiver is the current user
+    if (
+      (notification.type === 'CALL_INITIATED' ||
+       notification.type === 'CALL_ANSWERED' ||
+       notification.type === 'CALL_REJECTED') &&
+      notification.details.receiverId &&
+      notification.details.receiverId !== user?.id
+    ) {
+      return;
+    }
+
+    // For external messages, always show them to all users
+    // In a real implementation, you might want to route these to specific users or roles
+    if (notification.type === 'EXTERNAL_MESSAGE') {
+      // Handle external message - we'll let it pass through to be displayed
+      // This will be handled by the ChatContext
     }
 
     // Add notification to the list
@@ -111,17 +164,18 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
     setNotifications(prev => [newNotification, ...prev]);
 
     // Show toast notification
-    showToast(
-      getToastTypeForNotification(notification.type),
-      notification.message,
-      getToastTitleForNotification(notification.type)
-    );
+    showToast({
+      title: getToastTitleForNotification(notification.type),
+      description: notification.message,
+      variant: getToastTypeForNotification(notification.type),
+    });
 
-    // Play sound for urgent notifications
-    if (
-      notification.details.priority === 'urgent' || 
-      notification.details.priority === 'emergency' ||
-      notification.type === 'EMERGENCY_PATIENT'
+    // Play sound based on notification type
+    if (shouldPlaySound(notification.type)) {
+      playNotificationSound(notification.type);
+    } else if (
+      notification.details.priority === 'urgent' ||
+      notification.details.priority === 'emergency'
     ) {
       playNotificationSound('urgent');
     } else {
@@ -130,10 +184,12 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
 
     // Show desktop notification for important notifications
     if (
-      notification.details.priority === 'urgent' || 
+      notification.details.priority === 'urgent' ||
       notification.details.priority === 'emergency' ||
       notification.type === 'EMERGENCY_PATIENT' ||
-      notification.type === 'LAB_RESULTS_READY'
+      notification.type === 'LAB_RESULTS_READY' ||
+      notification.type === 'CALL_INITIATED' ||
+      notification.type === 'CHAT_MESSAGE'
     ) {
       showDesktopNotification(
         getToastTitleForNotification(notification.type),
@@ -142,22 +198,50 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
     }
   };
 
+  // Determine if a sound should be played for a notification type
+  const shouldPlaySound = (type: NotificationType): boolean => {
+    // Play sounds for these notification types
+    return [
+      'CHAT_MESSAGE',
+      'CALL_INITIATED',
+      'EMERGENCY_PATIENT',
+      'TOKEN_CALLED'
+    ].includes(type);
+  };
+
   // Helper function to get toast type based on notification type
   const getToastTypeForNotification = (type: NotificationType): 'success' | 'info' | 'warning' | 'error' => {
     switch (type) {
+      // Success notifications
       case 'PATIENT_REGISTERED':
       case 'VITALS_TAKEN':
       case 'LAB_RESULTS_READY':
       case 'PRESCRIPTION_READY':
       case 'PATIENT_COMPLETED':
+      case 'CHAT_READ':
+      case 'CALL_ANSWERED':
         return 'success';
+
+      // Info notifications
       case 'VITALS_READY':
       case 'DOCTOR_ASSIGNED':
       case 'LAB_ORDERED':
       case 'TOKEN_CALLED':
+      case 'CHAT_MESSAGE':
+      case 'CHAT_TYPING':
+      case 'EXTERNAL_MESSAGE':
         return 'info';
+
+      // Warning notifications
+      case 'CALL_REJECTED':
+      case 'CALL_ENDED':
+        return 'warning';
+
+      // Error notifications
       case 'EMERGENCY_PATIENT':
         return 'error';
+
+      // Default to info
       default:
         return 'info';
     }
@@ -166,6 +250,7 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
   // Helper function to get toast title based on notification type
   const getToastTitleForNotification = (type: NotificationType): string => {
     switch (type) {
+      // Clinical workflow notifications
       case 'PATIENT_REGISTERED':
         return 'New Patient Registered';
       case 'VITALS_READY':
@@ -186,16 +271,49 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
         return 'EMERGENCY PATIENT';
       case 'TOKEN_CALLED':
         return 'Token Called';
+
+      // Chat-specific notifications
+      case 'CHAT_MESSAGE':
+        return 'New Message';
+      case 'CHAT_TYPING':
+        return 'Typing Notification';
+      case 'CHAT_READ':
+        return 'Message Read';
+      case 'CALL_INITIATED':
+        return 'Incoming Call';
+      case 'CALL_ANSWERED':
+        return 'Call Connected';
+      case 'CALL_REJECTED':
+        return 'Call Rejected';
+      case 'CALL_ENDED':
+        return 'Call Ended';
+
       default:
         return 'Notification';
     }
   };
 
   // Play notification sound
-  const playNotificationSound = (type: 'normal' | 'urgent') => {
+  const playNotificationSound = (type: 'normal' | 'urgent' | NotificationType) => {
     try {
-      const audio = new Audio(type === 'urgent' ? '/sounds/urgent-notification.mp3' : '/sounds/notification.mp3');
-      audio.play();
+      let soundFile = '/sounds/notification.mp3';
+
+      if (type === 'urgent') {
+        soundFile = '/sounds/urgent-notification.mp3';
+      } else if (type === 'CHAT_MESSAGE' || type === 'EXTERNAL_MESSAGE') {
+        soundFile = '/sounds/message.mp3';
+      } else if (type === 'CALL_INITIATED') {
+        soundFile = '/sounds/call.mp3';
+      } else if (type === 'EMERGENCY_PATIENT') {
+        soundFile = '/sounds/emergency.mp3';
+      } else if (type === 'TOKEN_CALLED') {
+        soundFile = '/sounds/token-called.mp3';
+      }
+
+      const audio = new Audio(soundFile);
+      audio.play().catch(error => {
+        console.error('Error playing notification sound:', error);
+      });
     } catch (error) {
       console.error('Failed to play notification sound:', error);
     }
@@ -218,10 +336,10 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
 
   // Mark notification as read
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(notification => 
-        notification.id === id 
-          ? { ...notification, read: true } 
+    setNotifications(prev =>
+      prev.map(notification =>
+        notification.id === id
+          ? { ...notification, read: true }
           : notification
       )
     );
@@ -229,7 +347,7 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
 
   // Mark all notifications as read
   const markAllAsRead = () => {
-    setNotifications(prev => 
+    setNotifications(prev =>
       prev.map(notification => ({ ...notification, read: true }))
     );
   };
@@ -370,6 +488,84 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
     });
   };
 
+  // Chat-specific notification methods
+  const notifyChatMessage = (
+    chatId: string,
+    messageId: string,
+    senderId: string,
+    senderName: string,
+    receiverId: string,
+    content: string,
+    messageType: 'text' | 'image' | 'file' | 'video' | 'audio' | 'location' | 'contact' = 'text'
+  ) => {
+    webSocketService.notifyChatMessage(
+      chatId,
+      messageId,
+      senderId,
+      senderName,
+      receiverId,
+      content,
+      messageType
+    );
+  };
+
+  const notifyTyping = (chatId: string, userId: string, userName: string, isTyping: boolean) => {
+    webSocketService.notifyTyping(chatId, userId, userName, isTyping);
+  };
+
+  const notifyMessageRead = (chatId: string, messageId: string, userId: string) => {
+    webSocketService.notifyMessageRead(chatId, messageId, userId);
+  };
+
+  const notifyCallInitiated = (
+    callId: string,
+    chatId: string,
+    callerId: string,
+    callerName: string,
+    receiverId: string,
+    receiverName: string,
+    callType: 'audio' | 'video'
+  ) => {
+    webSocketService.notifyCallInitiated(
+      callId,
+      chatId,
+      callerId,
+      callerName,
+      receiverId,
+      receiverName,
+      callType
+    );
+  };
+
+  const notifyCallAnswered = (callId: string, receiverId: string) => {
+    webSocketService.notifyCallAnswered(callId, receiverId);
+  };
+
+  const notifyCallRejected = (callId: string, receiverId: string) => {
+    webSocketService.notifyCallRejected(callId, receiverId);
+  };
+
+  const notifyCallEnded = (callId: string, userId: string) => {
+    webSocketService.notifyCallEnded(callId, userId);
+  };
+
+  // External message notification
+  const notifyExternalMessage = (
+    externalChatId: string,
+    externalUserId: string,
+    senderName: string,
+    content: string,
+    source: string
+  ) => {
+    webSocketService.notifyExternalMessage(
+      externalChatId,
+      externalUserId,
+      senderName,
+      content,
+      source
+    );
+  };
+
   return (
     <RealTimeNotificationContext.Provider
       value={{
@@ -382,6 +578,8 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
         notifyRole,
         notifyUser,
         notifyBranch,
+
+        // Clinical workflow notifications
         notifyPatientRegistered,
         notifyVitalsReady,
         notifyVitalsTaken,
@@ -390,7 +588,19 @@ export const RealTimeNotificationProvider: React.FC<{ children: ReactNode }> = (
         notifyLabResultsReady,
         notifyPrescriptionReady,
         notifyEmergencyPatient,
-        notifyTokenCalled
+        notifyTokenCalled,
+
+        // Chat-specific notifications
+        notifyChatMessage,
+        notifyTyping,
+        notifyMessageRead,
+        notifyCallInitiated,
+        notifyCallAnswered,
+        notifyCallRejected,
+        notifyCallEnded,
+
+        // External chat notifications
+        notifyExternalMessage
       }}
     >
       {children}

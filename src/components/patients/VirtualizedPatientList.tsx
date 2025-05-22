@@ -5,19 +5,28 @@ import { Eye, Edit, Trash2, Phone, Calendar, Clock, User } from 'lucide-react';
 import { generatePastelColor, isLightColor } from '../../utils/colorUtils';
 
 interface Patient {
-  id: number;
-  firstName: string;
-  lastName: string;
-  gender: string;
-  dateOfBirth: string;
-  phone: string;
+  id: number | string;
+  firstName?: string;
+  lastName?: string;
+  first_name?: string;
+  last_name?: string;
+  gender?: string;
+  dateOfBirth?: string;
+  date_of_birth?: string;
+  phone?: string;
   nationalId?: string;
+  national_id?: string;
   bloodGroup?: string;
+  blood_type?: string;
   lastVisit?: string;
-  status: string;
+  last_visit?: string;
+  status?: string;
   isAdmitted?: boolean;
   isCleared?: boolean;
   vitals?: any[];
+  mrn?: string;
+  email?: string;
+  address?: string;
 }
 
 interface VirtualizedPatientListProps {
@@ -47,11 +56,26 @@ const Row = ({
   const { patients, calculateAge, onView, onEdit, onDelete } = data;
   const patient = patients[index];
 
+  // Handle potentially undefined patient
+  if (!patient) {
+    console.error('Patient is undefined at index', index);
+    return null;
+  }
+
+  // Get first and last name from either naming convention
+  const firstName = patient.firstName || patient.first_name || '';
+  const lastName = patient.lastName || patient.last_name || '';
+
+  // Log patient data for debugging
+  if (index === 0) {
+    console.log('Patient data structure:', patient);
+  }
+
   // Generate a pastel color based on the patient's name
   const avatarColor = useMemo(() => {
-    const fullName = `${patient.firstName} ${patient.lastName}`;
+    const fullName = `${firstName} ${lastName}`;
     return generatePastelColor(fullName);
-  }, [patient.firstName, patient.lastName]);
+  }, [firstName, lastName]);
 
   // Determine if text should be dark or light based on background color
   const textColor = useMemo(() => {
@@ -66,12 +90,12 @@ const Row = ({
             className="flex items-center justify-center rounded-full w-10 h-10 font-semibold"
             style={{ backgroundColor: avatarColor, color: textColor }}
           >
-            {patient.firstName.charAt(0)}{patient.lastName.charAt(0)}
+            {firstName.charAt(0)}{lastName.charAt(0)}
           </div>
           <div>
-            <div className="font-semibold">{patient.firstName} {patient.lastName}</div>
+            <div className="font-semibold">{firstName} {lastName}</div>
             <div className="text-sm text-muted">
-              {patient.gender}, {calculateAge(patient.dateOfBirth)} years
+              {patient.gender || 'Unknown'}, {calculateAge(patient.dateOfBirth || patient.date_of_birth || '')} years
             </div>
           </div>
         </div>
@@ -81,17 +105,17 @@ const Row = ({
         <div className="flex flex-col">
           <div className="flex items-center">
             <Phone className="w-4 h-4 mr-1 text-gray-400" />
-            <span>{patient.phone}</span>
+            <span>{patient.phone || patient.mrn || 'N/A'}</span>
           </div>
           <div className="text-xs text-gray-500 mt-1">
-            ID: {patient.nationalId || 'N/A'}
+            ID: {patient.nationalId || patient.national_id || patient.mrn || 'N/A'}
           </div>
         </div>
       </div>
 
       <div className="w-24 p-4 flex items-center justify-center">
         <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium">
-          {patient.bloodGroup || 'Unknown'}
+          {patient.bloodGroup || patient.blood_type || 'Unknown'}
         </span>
       </div>
 
@@ -99,7 +123,7 @@ const Row = ({
         <div className="flex flex-col">
           <div className="flex items-center">
             <Calendar className="w-4 h-4 mr-1 text-gray-400" />
-            <span>{patient.lastVisit || 'Never'}</span>
+            <span>{patient.lastVisit || patient.last_visit || 'Never'}</span>
           </div>
           <div className="text-xs text-gray-500 mt-1 flex items-center">
             <Clock className="w-3 h-3 mr-1" />
@@ -110,7 +134,7 @@ const Row = ({
 
       <div className="w-24 p-4 flex items-center justify-center">
         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          patient.status === 'Active'
+          (patient.status === 'Active' || !patient.status)
             ? patient.isAdmitted
               ? 'bg-blue-50 text-blue-700'
               : patient.isCleared
@@ -122,7 +146,7 @@ const Row = ({
             ? 'Admitted'
             : patient.isCleared
               ? 'Cleared'
-              : patient.status}
+              : patient.status || 'Active'}
         </span>
       </div>
 

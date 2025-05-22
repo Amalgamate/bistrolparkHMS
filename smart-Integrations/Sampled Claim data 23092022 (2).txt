@@ -1,0 +1,152 @@
+{
+   "claim_code":"Invoce17835",
+   "payer_code":"19190",
+   "payer_name":"AAR INSURANCE",
+   "medicalaid_code":"SAMPLE",
+   "amount":90.000,...amount payable by insurance
+   "gross_amount":100,000,..total of all line items 
+   "batch_number":"batch4",
+   "dispatch_date":"2022-09-21 00:00:00",
+   "patient_number":"3025",
+   "patient_name":"JOSEPH MAINA",
+   "location_code":"PHAR1",
+   "location_name":"PHARMACY1",
+   "scheme_code":"SAMPLEX2",
+   "scheme_name":"SAMPLE SCHEME",
+   "member_number":"QASAMPLE1-00",
+   "visit_number":"1111",
+   "session_id":14282,
+   "visit_start":"2022-09-21 00:00:00",
+   "visit_end":"2022-09-21 00:00:00",
+   "currency":"KES",
+   "doctor_name":"DR. Omondi",
+   "sp_id":569,
+   "diagnosis":[
+      {
+         "code":"A01.3",
+         "coding_standard":"ICD10",
+         "is_added_with_claim":true,
+         "name":"Paratyphoid fever C",
+         "is_primary":true
+      },
+      {
+         "code":"K02.4",
+         "coding_standard":"ICD10",
+         "is_added_with_claim":true,
+         "name":"Odontoclasia",
+         "is_primary":true
+      },
+      {
+         "code":"A06.1",
+         "coding_standard":"ICD10",
+         "is_added_with_claim":true,
+         "name":"Chronic intestinal amoebiasis ",
+         "is_primary":true
+      }
+   ],
+   "pre_authorization":[
+      {
+         "code":"P150",
+         "amount":5000,
+         "authorized_by":"Esther",
+         "message":"Authorized up to 5000 by Esther"
+      }
+   ],
+   "admission":{
+      "additional_info":"string",
+      "admission_date":"2021-01-01 00:00:00",
+      "admission_number":"string",
+      "discharge_date":"2021-01-01 00:00:00",
+      "discharge_summary":"string"
+   },
+   "invoices":[
+      {
+         "amount":600,
+         "gross_amount":900,
+         "invoice_date":"2022-02-16 00:00:00",
+         "invoice_number":"INV27API.14.9",
+         "invoice_ref_number":"INV27API.14.9",
+         "lines":[
+            {
+               "additional_info":"string",
+               "amount":200,
+               "charge_date":"2021-01-01",
+               "charge_time":"10:00:05",
+               "item_code":"CONS-111",
+               "item_name":"CONSULTATION FEES",
+               "pre_authorization_code":"string",
+               "quantity":2,
+               "service_group":"Consultation",
+               "unit_price":100
+            },
+            {
+               "additional_info":"string",
+               "amount":50,
+               "charge_date":"2021-01-01",
+               "charge_time":"10:00:05",
+               "item_code":"ST01878",
+               "item_name":"SYRUP ALLOPURINOL 100MG 30S",
+               "pre_authorization_code":"001",
+               "quantity":1,
+               "service_group":"Pharmacy",
+               "unit_price":50
+            },
+            {
+               "additional_info":"string",
+               "amount":250,
+               "charge_date":"2021-01-01",
+               "charge_time":"10:00:05",
+               "item_code":"ST0792",
+               "item_name":"ETORICOXIB  560MG TABS",
+               "pre_authorization_code":"001",
+               "quantity":10,
+               "service_group":"Pharmacy",
+               "unit_price":25
+            },
+            {
+               "additional_info":"string",
+               "amount":300,
+               "charge_date":"2021-01-01",
+               "charge_time":"10:00:05",
+               "item_code":"LAB-05003",
+               "item_name":"STOOL OC",
+               "pre_authorization_code":"001",
+               "quantity":1,
+               "service_group":"Laboratory",
+               "unit_price":300
+            },
+            {
+               "additional_info":"string",
+               "amount":200,
+               "charge_date":"2021-01-01",
+               "charge_time":"10:00:05",
+               "item_code":"LAB-058944",
+               "item_name":"Malaria Rapid  Test",
+               "pre_authorization_code":"001",
+               "quantity":1,
+               "service_group":"Laboratory",
+               "unit_price":200
+            }
+         ],
+         "payment_modifiers":[
+            {
+               "type":"6",
+               "amount":10000,
+               "reference_number":"406"
+            },
+			{
+          "amount": 100,
+          "nhif_contributor_nr": "1994",
+          "nhif_employer_code": "SMART",
+          "nhif_member_nr": "1234567",
+          "nhif_patient_relation": "Self",
+          "nhif_site_nr": "1234",
+          "reference_number": "456",
+          "type": "5"
+        }
+         ],
+         "pool_number":"1",
+         "service_type":"Outpatient"
+      }
+   ]
+}

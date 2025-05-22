@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { PatientList } from '../components/patients/PatientList';
-import { PatientRegistration } from '../components/patients/PatientRegistration';
 import { PatientDetails } from '../components/patients/PatientDetails';
 import { PatientSearch } from '../components/patients/PatientSearch';
 import { PatientProvider } from '../context/PatientContext';
 import { ToastProvider } from '../context/ToastContext';
+import EnhancedPatientRegistration from '../components/patients/EnhancedPatientRegistration';
 import '../styles/theme.css';
 
 export const PatientModule: React.FC = () => {
@@ -101,7 +101,7 @@ export const PatientModule: React.FC = () => {
   return (
     <PatientProvider>
       <ToastProvider>
-        <div className="flex flex-col h-full bg-background">
+        <div className="flex flex-col h-full">
           {/* Main Content */}
           <div className="flex-1 overflow-auto">
             {/* Page Header */}
@@ -220,8 +220,8 @@ export const PatientModule: React.FC = () => {
           {/* Patient Registration Modal */}
           {showRegistrationForm && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-md shadow-lg w-full max-w-4xl max-h-[90vh] overflow-auto">
-                <PatientRegistration
+              <div className="w-full max-w-4xl max-h-[90vh] overflow-auto">
+                <EnhancedPatientRegistration
                   onClose={() => setShowRegistrationForm(false)}
                   onSave={handleSavePatient}
                 />

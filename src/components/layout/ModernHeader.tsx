@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  Search, Bell, Plus, User, Settings, LogOut,
+  User, Settings, LogOut,
   Calendar, FileText, Users, MessageSquare, HelpCircle,
-  ChevronDown, Menu, Building, MapPin, RefreshCw
+  ChevronDown, Menu, Building, MapPin, RefreshCw,
+  LucideIcon
 } from 'lucide-react';
 import IntelligentBranchSwitcher from '../auth/IntelligentBranchSwitcher';
 import { useAuth } from '../../context/AuthContext';
@@ -10,7 +11,10 @@ import { GlobalSearch } from '../search/GlobalSearch';
 import { useNavigate } from 'react-router-dom';
 import { refreshCache } from '../../utils/cacheUtils';
 import NotificationCenter from '../notifications/NotificationCenter';
+import ModuleQuickActionsButton from './ModuleQuickActionsButton';
 import '../../styles/theme.css';
+import { ColoredIcon } from '../ui/colored-icon';
+import { ColorVariant } from '../ui/colored-icon-button';
 
 interface ModernHeaderProps {
   onMenuButtonClick: () => void;
@@ -23,19 +27,14 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
 }) => {
   const { user, logout } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [quickActionOpen, setQuickActionOpen] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-  const quickActionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Close the menus when clicking outside
+  // Close the user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
-      }
-      if (quickActionRef.current && !quickActionRef.current.contains(event.target as Node)) {
-        setQuickActionOpen(false);
       }
     };
 
@@ -50,10 +49,10 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
       <div className="flex items-center">
         <button
           type="button"
-          className="p-2 text-[#2B3990] rounded-md focus:outline-none hover:bg-gray-100 transition-all duration-150"
+          className="p-2 rounded-md focus:outline-none hover:bg-gray-100 transition-all duration-150"
           onClick={onMenuButtonClick}
         >
-          <Menu className="w-5 h-5" />
+          <ColoredIcon icon={Menu} color="blue" size="sm" variant="text" />
         </button>
         <div className="ml-2 md:ml-0">
           <IntelligentBranchSwitcher />
@@ -79,7 +78,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
         {/* Refresh Cache Button */}
         <button
           type="button"
-          className="p-1.5 text-gray-600 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#F5B800] relative"
+          className="p-1.5 rounded-md hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#F5B800] relative"
           onClick={() => {
             if (confirm('This will refresh the application cache and reload the page. Continue?')) {
               refreshCache(true, true);
@@ -87,62 +86,13 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
           }}
           title="Refresh Application Cache"
         >
-          <RefreshCw className="w-5 h-5" />
+          <ColoredIcon icon={RefreshCw} color="green" size="sm" variant="text" />
         </button>
 
 
 
-        {/* Quick Action Button */}
-        <div className="relative" ref={quickActionRef}>
-          <button
-            type="button"
-            className="p-1.5 text-white bg-[#F5B800] rounded-md hover:bg-[#E5A800] focus:outline-none focus:ring-2 focus:ring-[#F5B800]"
-            onClick={() => setQuickActionOpen(!quickActionOpen)}
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-
-          {quickActionOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-[1000] border border-gray-200 overflow-hidden">
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-                <h3 className="text-sm font-semibold text-gray-800">Quick Actions</h3>
-                <p className="text-xs text-gray-500 mt-1">Frequently used actions</p>
-              </div>
-              <div className="py-2">
-                <button
-                  onClick={() => {
-                    navigate('/clinical');
-                    setQuickActionOpen(false);
-                  }}
-                  className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center mr-3">
-                    <Users className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <span>New Patient</span>
-                </button>
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-green-50 flex items-center justify-center mr-3">
-                    <Calendar className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span>New Appointment</span>
-                </a>
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-purple-50 flex items-center justify-center mr-3">
-                    <FileText className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <span>Create Invoice</span>
-                </a>
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-yellow-50 flex items-center justify-center mr-3">
-                    <MessageSquare className="w-4 h-4 text-yellow-600" />
-                  </div>
-                  <span>Send Message</span>
-                </a>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Module-specific Quick Action Button */}
+        <ModuleQuickActionsButton />
 
         {/* User Profile */}
         <div className="relative flex-shrink-0 ml-4" ref={userMenuRef}>
@@ -203,7 +153,7 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
                   </div>
                   <div className="mt-3 flex items-center justify-between bg-white rounded-md p-2 border border-gray-100">
                     <div className="flex items-center">
-                      <Building className="w-4 h-4 text-[#2B3990] mr-2" />
+                      <ColoredIcon icon={Building} color="blue" size="xs" variant="text" className="mr-2" />
                       <span className="text-sm font-bold text-[#2B3990]">{user?.branch || 'FEDHA'}</span>
                     </div>
                     <span className="text-xs px-1.5 py-0.5 bg-green-100 text-green-800 rounded-full">Active</span>
@@ -216,18 +166,18 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
                     href="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
                   >
-                    <User className="h-4 w-4 mr-2 text-gray-500" />
+                    <ColoredIcon icon={User} color="blue" size="xs" variant="text" className="mr-2" />
                     My Profile
                   </a>
                   <a href="#" className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <div className="w-8 h-8 rounded-md bg-purple-50 flex items-center justify-center mr-3">
-                      <Settings className="w-4 h-4 text-purple-600" />
+                    <div className="mr-3">
+                      <ColoredIcon icon={Settings} color="purple" size="sm" variant="outline" />
                     </div>
                     <span>Account Settings</span>
                   </a>
                   <a href="#" className="flex items-center px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                    <div className="w-8 h-8 rounded-md bg-green-50 flex items-center justify-center mr-3">
-                      <HelpCircle className="w-4 h-4 text-green-600" />
+                    <div className="mr-3">
+                      <ColoredIcon icon={HelpCircle} color="green" size="sm" variant="outline" />
                     </div>
                     <span>Help & Support</span>
                   </a>
@@ -236,8 +186,8 @@ export const ModernHeader: React.FC<ModernHeaderProps> = ({
                     onClick={logout}
                     className="flex items-center w-full text-left px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
-                    <div className="w-8 h-8 rounded-md bg-red-50 flex items-center justify-center mr-3">
-                      <LogOut className="w-4 h-4 text-red-600" />
+                    <div className="mr-3">
+                      <ColoredIcon icon={LogOut} color="red" size="sm" variant="outline" />
                     </div>
                     <span>Sign out</span>
                   </button>

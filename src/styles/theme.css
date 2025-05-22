@@ -1,15 +1,28 @@
 :root {
   /* Color Theme */
-  --color-primary: #2B3990;
-  --color-secondary: #008080; /* Changed to teal */
-  --color-accent: #A61F1F;
-  --color-warning: #A61F1F;
-  --color-success: #4CAF50;
-  --color-background: #E6F3F7;
-  --color-teal: #008080; /* Added teal color */
+  --color-primary: #0100F6;
+  --color-secondary: #F5B800;
+  --color-accent: #78DCE8;
+  --color-warning: #FFC107;
+  --color-success: #28A745;
+  --color-error: #DC3545;
+  --color-info: #17A2B8;
+  --color-background: #FFFFFF;
+
+  /* Module Colors */
+  --color-blue: #0100F6;
+  --color-green: #28A745;
+  --color-purple: #9C27B0;
+  --color-orange: #FF9800;
+  --color-red: #DC3545;
+  --color-teal: #20C997;
+  --color-indigo: #6610F2;
+  --color-pink: #E83E8C;
+  --color-amber: #FFC107;
+  --color-gray: #6C757D;
 
   /* Text Colors */
-  --text-primary: #2B3990;
+  --text-primary: #2B4F60;
   --text-secondary: #4A5568;
   --text-muted: #718096;
   --text-light: #F7FAFC;
@@ -39,7 +52,7 @@
 
 /* Global Styles */
 body {
-  background-color: var(--color-background);
+  background-color: #FFFFFF; /* Explicitly set to white */
   color: var(--text-primary);
   font-family: 'NEXA', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
@@ -449,6 +462,118 @@ body {
 
 .bg-background {
   background-color: var(--color-background);
+}
+
+/* Colored Icon Styles */
+.icon-blue {
+  background-color: var(--color-blue);
+  color: white;
+}
+
+.icon-green {
+  background-color: var(--color-green);
+  color: white;
+}
+
+.icon-purple {
+  background-color: var(--color-purple);
+  color: white;
+}
+
+.icon-orange {
+  background-color: var(--color-orange);
+  color: white;
+}
+
+.icon-red {
+  background-color: var(--color-red);
+  color: white;
+}
+
+.icon-teal {
+  background-color: var(--color-teal);
+  color: white;
+}
+
+.icon-indigo {
+  background-color: var(--color-indigo);
+  color: white;
+}
+
+.icon-pink {
+  background-color: var(--color-pink);
+  color: white;
+}
+
+.icon-amber {
+  background-color: var(--color-amber);
+  color: white;
+}
+
+.icon-gray {
+  background-color: var(--color-gray);
+  color: white;
+}
+
+/* Outline Icon Styles */
+.icon-blue-outline {
+  background-color: #E6E6FF;
+  color: var(--color-blue);
+  border: 1px solid var(--color-blue);
+}
+
+.icon-green-outline {
+  background-color: #E6F5E9;
+  color: var(--color-green);
+  border: 1px solid var(--color-green);
+}
+
+.icon-purple-outline {
+  background-color: #F3E5F5;
+  color: var(--color-purple);
+  border: 1px solid var(--color-purple);
+}
+
+.icon-orange-outline {
+  background-color: #FFF3E0;
+  color: var(--color-orange);
+  border: 1px solid var(--color-orange);
+}
+
+.icon-red-outline {
+  background-color: #FBEAEC;
+  color: var(--color-red);
+  border: 1px solid var(--color-red);
+}
+
+.icon-teal-outline {
+  background-color: #E6F7F4;
+  color: var(--color-teal);
+  border: 1px solid var(--color-teal);
+}
+
+.icon-indigo-outline {
+  background-color: #EFE6FD;
+  color: var(--color-indigo);
+  border: 1px solid var(--color-indigo);
+}
+
+.icon-pink-outline {
+  background-color: #FCEBF3;
+  color: var(--color-pink);
+  border: 1px solid var(--color-pink);
+}
+
+.icon-amber-outline {
+  background-color: #FFF8E1;
+  color: var(--color-amber);
+  border: 1px solid var(--color-amber);
+}
+
+.icon-gray-outline {
+  background-color: #F0F0F0;
+  color: var(--color-gray);
+  border: 1px solid var(--color-gray);
 }
 
 

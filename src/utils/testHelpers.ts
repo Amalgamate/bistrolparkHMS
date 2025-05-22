@@ -1,49 +1,25 @@
 /**
  * Test Helper Utilities
- * 
+ *
  * This file contains helper functions for testing the patient flow
  * through the system with different user roles.
  */
 
 import { User } from '../context/AuthContext';
 
-// Test user credentials
-export const TEST_USERS = {
-  FRONT_OFFICE: {
-    id: 'front1',
-    email: 'front@bristol.com',
-    password: 'password123',
-    name: 'Front Office User',
-    role: 'front-office',
-    branch: 'fedha',
-    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela']
-  },
-  NURSE: {
-    id: 'nurse1',
-    email: 'nurse@bristol.com',
-    password: 'password123',
-    name: 'Nurse User',
-    role: 'nurse',
-    branch: 'fedha',
-    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela']
+// Database user credentials (for reference only, not used for authentication)
+export const DB_USERS = {
+  ADMIN: {
+    email: 'superadmin@bristolpark.com',
+    role: 'admin'
   },
   DOCTOR: {
-    id: 'doctor1',
-    email: 'doctor@bristol.com',
-    password: 'password123',
-    name: 'Doctor User',
-    role: 'doctor',
-    branch: 'fedha',
-    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela']
+    email: 'doctor@bristolpark.com',
+    role: 'doctor'
   },
-  LAB: {
-    id: 'lab1',
-    email: 'lab@bristol.com',
-    password: 'password123',
-    name: 'Lab Technician',
-    role: 'lab-technician',
-    branch: 'fedha',
-    allowedBranches: ['fedha', 'utawala', 'machakos', 'tassia', 'kitengela']
+  TEST: {
+    email: 'test@test.com',
+    role: 'admin'
   }
 };
 
@@ -175,37 +151,4 @@ export const simulateNotification = (title: string, message: string, type: 'succ
   console.log(message);
 };
 
-/**
- * Helper function to add test users to the system
- * This should be called once during application initialization for testing
- */
-export const setupTestUsers = () => {
-  // Check if test users already exist in localStorage
-  const storedUsers = localStorage.getItem('users');
-  if (storedUsers) {
-    const users = JSON.parse(storedUsers);
-    
-    // Add test users if they don't exist
-    let updated = false;
-    Object.values(TEST_USERS).forEach(testUser => {
-      if (!users.some((u: any) => u.email === testUser.email)) {
-        users.push({
-          ...testUser,
-          active: true,
-          remoteAccessAllowed: true,
-          jobId: testUser.id
-        });
-        updated = true;
-      }
-    });
-    
-    // Update localStorage if users were added
-    if (updated) {
-      localStorage.setItem('users', JSON.stringify(users));
-      console.log('%c[TEST] Test users added to the system', 'color: green; font-weight: bold');
-    }
-  }
-};
-
-// Export test user types
-export type TestUser = typeof TEST_USERS.FRONT_OFFICE;
+// No longer needed - using database users instead

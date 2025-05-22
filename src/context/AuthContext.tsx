@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useSettings } from './SettingsContext';
 import { useUserRoles } from './UserRolesContext';
+import apiClient from '../services/apiClient';
 
 // Define the user type
 export interface User {
@@ -74,109 +75,45 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     );
   };
 
-  // Login function
+  // Login function - simplified to only use API authentication
   const login = async (identifier: string, password: string, branchId?: string): Promise<LoginResult> => {
     setIsLoading(true);
     try {
-      // Find user by email or job ID
-      const foundUser = findUser(identifier);
+      // Authenticate with the API
+      try {
+        const response = await apiClient.login({
+          username: identifier,
+          password
+        });
 
-      // Check if user exists and password matches
-      if (!foundUser || foundUser.password !== password || !foundUser.active) {
-        return { success: false, message: 'Invalid credentials or inactive account' };
-      }
+        if (response.data && response.data.token) {
+          // Store the token
+          localStorage.setItem('token', response.data.token);
 
-      // If no branch is specified, try to detect current location
-      if (!branchId) {
-        const position = await settings.getCurrentLocation();
+          // Get the user data from the response
+          const apiUser = response.data.user;
 
-        if (position) {
-          // Find the closest branch within allowed branches
-          const { latitude, longitude } = position.coords;
-          let closestBranch = null;
-          let minDistance = Infinity;
-
-          for (const branchId of foundUser.allowedBranches) {
-            const branch = settings.getBranchById(branchId);
-            if (!branch) continue;
-
-            // Calculate distance to this branch
-            const distance = calculateDistance(
-              latitude,
-              longitude,
-              branch.location.latitude,
-              branch.location.longitude
-            );
-
-            // If within radius and closer than previous closest
-            if (distance <= branch.location.radius && distance < minDistance) {
-              closestBranch = branch;
-              minDistance = distance;
-            }
-          }
-
-          // If we found a branch within radius, use it
-          if (closestBranch) {
-            branchId = closestBranch.id;
-          }
-        }
-      }
-
-      // If we have a branch ID, check if user is allowed to access it
-      if (branchId) {
-        // Check if user is allowed to access this branch
-        if (!foundUser.allowedBranches.includes(branchId)) {
-          return {
-            success: false,
-            message: 'You do not have access to this branch'
+          // Create a user object from the API response
+          const userObj: User = {
+            id: apiUser.id.toString(),
+            name: `${apiUser.first_name} ${apiUser.last_name}`,
+            email: apiUser.email,
+            role: apiUser.role,
+            branch: branchId || 'default', // Use provided branch or default
+            allowedBranches: [branchId || 'default'], // Default to single branch access
           };
+
+          setUser(userObj);
+          setIsAuthenticated(true);
+          localStorage.setItem('user', JSON.stringify(userObj));
+          return { success: true };
         }
 
-        // Check if user is within the branch's geofence (if remote access is not allowed)
-        const branch = settings.getBranchById(branchId);
-
-        // If the branch doesn't allow remote access OR the user doesn't have remote access permission
-        if ((branch && !branch.allowRemoteAccess) || !foundUser.remoteAccessAllowed) {
-          const hasAccess = await settings.checkBranchAccess(branchId);
-          if (!hasAccess) {
-            return {
-              success: false,
-              message: foundUser.remoteAccessAllowed
-                ? 'This branch requires physical presence to access'
-                : 'You do not have permission to access the system remotely. Please visit the branch.'
-            };
-          }
-        }
-
-        // Create user object with selected branch
-        const userObj: User = {
-          id: foundUser.id,
-          name: foundUser.name,
-          email: foundUser.email,
-          jobId: foundUser.jobId,
-          role: foundUser.role,
-          branch: branchId,
-          allowedBranches: foundUser.allowedBranches,
-        };
-
-        // Set user and authentication state
-        setUser(userObj);
-        setIsAuthenticated(true);
-        localStorage.setItem('user', JSON.stringify(userObj));
-        return { success: true };
+        return { success: false, message: 'Invalid credentials' };
+      } catch (apiError) {
+        console.log('API authentication failed', apiError);
+        return { success: false, message: 'Authentication failed. Please check your credentials.' };
       }
-
-      // If we don't have a branch ID and user has multiple allowed branches,
-      // return success: false with requiresBranchSelection: true
-      if (foundUser.allowedBranches.length > 0) {
-        return {
-          success: false,
-          requiresBranchSelection: true,
-          allowedBranches: foundUser.allowedBranches,
-        };
-      }
-
-      return { success: false, message: 'No accessible branches found' };
     } catch (error) {
       console.error('Login error:', error);
       return { success: false, message: 'An error occurred during login' };
@@ -185,66 +122,26 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Select branch function (used after initial login if branch selection is required)
+  // Select branch function (simplified for API users)
   const selectBranch = async (branchId: string): Promise<LoginResult> => {
     setIsLoading(true);
     try {
-      // Get the last attempted login credentials from session storage
-      const lastAttemptStr = sessionStorage.getItem('lastLoginAttempt');
-      if (!lastAttemptStr) {
-        return { success: false, message: 'No login attempt found' };
+      if (!user) {
+        return { success: false, message: 'You must be logged in to select a branch' };
       }
 
-      const lastAttempt = JSON.parse(lastAttemptStr);
-      const { identifier } = lastAttempt;
-
-      // Find user
-      const foundUser = findUser(identifier);
-      if (!foundUser) {
-        return { success: false, message: 'User not found' };
-      }
-
-      // Check if user is allowed to access this branch
-      if (!foundUser.allowedBranches.includes(branchId)) {
-        return {
-          success: false,
-          message: 'You do not have access to this branch'
-        };
-      }
-
-      // Check if user is within the branch's geofence (if remote access is not allowed)
-      const branch = settings.getBranchById(branchId);
-
-      // If the branch doesn't allow remote access OR the user doesn't have remote access permission
-      if ((branch && !branch.allowRemoteAccess) || !foundUser.remoteAccessAllowed) {
-        const hasAccess = await settings.checkBranchAccess(branchId);
-        if (!hasAccess) {
-          return {
-            success: false,
-            message: foundUser.remoteAccessAllowed
-              ? 'This branch requires physical presence to access'
-              : 'You do not have permission to access the system remotely. Please visit the branch.'
-          };
-        }
-      }
-
-      // Create user object with selected branch
-      const userObj: User = {
-        id: foundUser.id,
-        name: foundUser.name,
-        email: foundUser.email,
-        jobId: foundUser.jobId,
-        role: foundUser.role,
+      // Update the user object with the selected branch
+      const updatedUser: User = {
+        ...user,
         branch: branchId,
-        allowedBranches: foundUser.allowedBranches,
+        allowedBranches: [...user.allowedBranches, branchId]
       };
 
       // Set user and authentication state
-      setUser(userObj);
-      setIsAuthenticated(true);
-      localStorage.setItem('user', JSON.stringify(userObj));
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
 
-      // Clear the last login attempt
+      // Clear any stored login attempt
       sessionStorage.removeItem('lastLoginAttempt');
 
       return { success: true };
@@ -256,43 +153,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Branch switching function for already logged-in users
+  // Branch switching function (simplified for API users)
   const switchBranch = async (branchId: string): Promise<LoginResult> => {
     setIsLoading(true);
     try {
       // Make sure user is logged in
       if (!user) {
         return { success: false, message: 'You must be logged in to switch branches' };
-      }
-
-      // Find the current user in the database
-      const foundUser = roleUsers.find(u => u.id === user.id);
-      if (!foundUser || !foundUser.active) {
-        return { success: false, message: 'User not found or inactive' };
-      }
-
-      // Check if user is allowed to access this branch
-      if (!foundUser.allowedBranches.includes(branchId)) {
-        return {
-          success: false,
-          message: 'You do not have access to this branch'
-        };
-      }
-
-      // Check if user is within the branch's geofence (if remote access is not allowed)
-      const branch = settings.getBranchById(branchId);
-
-      // If the branch doesn't allow remote access OR the user doesn't have remote access permission
-      if ((branch && !branch.allowRemoteAccess) || !foundUser.remoteAccessAllowed) {
-        const hasAccess = await settings.checkBranchAccess(branchId);
-        if (!hasAccess) {
-          return {
-            success: false,
-            message: foundUser.remoteAccessAllowed
-              ? 'This branch requires physical presence to access'
-              : 'You do not have permission to access the system remotely. Please visit the branch.'
-          };
-        }
       }
 
       // Create updated user object with new branch
@@ -319,6 +186,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     setIsAuthenticated(false);
     localStorage.removeItem('user');
+    localStorage.removeItem('token'); // Clear API token
     sessionStorage.removeItem('lastLoginAttempt');
   };
 
@@ -348,16 +216,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const hasPermission = (permission: string) => {
     if (!user) return false;
 
-    // Find the user's role
-    const userRole = roleUsers.find(u => u.id === user.id)?.role;
-    if (!userRole) return false;
+    // For API users, we'll grant permissions based on role
+    // Admin users have all permissions
+    if (user.role === 'admin') return true;
 
-    // Find the role's permissions
-    const role = roles.find(r => r.id === userRole);
-    if (!role) return false;
+    // Doctor users have clinical permissions
+    if (user.role === 'doctor') {
+      const doctorPermissions = [
+        'view_patients', 'view_appointments', 'view_patient_charges',
+        'view_patient_notes', 'view_discharge_summary', 'bill_consultation',
+        'view_laboratory_price_list', 'view_radiology_price_list',
+        'view_medicine_price_list', 'view_waiting_patients'
+      ];
+      return doctorPermissions.includes(permission);
+    }
 
-    // Check if the role has the requested permission
-    return role.permissions.includes(permission as any);
+    // For other roles, check the roles context
+    const role = roles.find(r => r.id === user.role);
+    if (role) {
+      return role.permissions.includes(permission as any);
+    }
+
+    return false;
   };
 
   return (

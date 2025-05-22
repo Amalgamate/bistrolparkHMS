@@ -1,22 +1,71 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Filter, Calendar, Clock, User, FileText, MapPin, ArrowRight, Download, Printer } from 'lucide-react';
+import apiClient from '../../services/apiClient';
+
+interface Patient {
+  id: string;
+  name?: string;
+  first_name?: string;
+  last_name?: string;
+  visitDate?: string;
+  visitTime?: string;
+  purpose?: string;
+  status?: string;
+  location?: string;
+}
 
 export const NewPatientTracking: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterDate, setFilterDate] = useState('');
-  const [filteredPatients, setFilteredPatients] = useState(mockPatients);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [filteredPatients, setFilteredPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch patients from API
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/patients');
+
+        if (response.data && Array.isArray(response.data)) {
+          // Format the data
+          const formattedPatients = response.data.map((patient: any) => ({
+            id: patient.id || patient.mrn,
+            name: `${patient.first_name} ${patient.last_name}`,
+            first_name: patient.first_name,
+            last_name: patient.last_name,
+            visitDate: new Date().toISOString().split('T')[0], // Today's date as default
+            visitTime: new Date().toTimeString().split(' ')[0].substring(0, 5), // Current time as default
+            purpose: 'General Checkup',
+            status: 'waiting',
+            location: 'Waiting Room'
+          }));
+
+          setPatients(formattedPatients);
+          setFilteredPatients(formattedPatients);
+        }
+      } catch (error) {
+        console.error('Error fetching patients:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatients();
+  }, []);
 
   // Handle search and filtering
   const handleSearch = () => {
-    let results = [...mockPatients];
+    let results = [...patients];
 
     // Apply search query
     if (searchQuery) {
       results = results.filter(
         patient =>
           patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          patient.name.toLowerCase().includes(searchQuery.toLowerCase())
+          (patient.name && patient.name.toLowerCase().includes(searchQuery.toLowerCase()))
       );
     }
 
@@ -38,7 +87,7 @@ export const NewPatientTracking: React.FC = () => {
     setSearchQuery('');
     setFilterStatus('all');
     setFilterDate('');
-    setFilteredPatients(mockPatients);
+    setFilteredPatients(patients);
   };
 
   return (
@@ -290,79 +339,4 @@ const getStatusLabel = (status: string) => {
   }
 };
 
-// Mock data
-interface Patient {
-  id: string;
-  name: string;
-  visitDate: string;
-  visitTime: string;
-  purpose: string;
-  status: string;
-  location: string;
-}
-
-const mockPatients: Patient[] = [
-  {
-    id: 'BP10023456',
-    name: 'David Kamau',
-    visitDate: '2024-06-12',
-    visitTime: '09:30 AM',
-    purpose: 'General Checkup',
-    status: 'waiting',
-    location: 'Waiting Room'
-  },
-  {
-    id: 'BP10023457',
-    name: 'Faith Wanjiku',
-    visitDate: '2024-06-12',
-    visitTime: '10:15 AM',
-    purpose: 'Follow-up',
-    status: 'in-progress',
-    location: 'Examination Room 2'
-  },
-  {
-    id: 'BP10023458',
-    name: 'Peter Omondi',
-    visitDate: '2024-06-12',
-    visitTime: '11:00 AM',
-    purpose: 'Lab Results',
-    status: 'completed',
-    location: 'Discharged'
-  },
-  {
-    id: 'BP10023459',
-    name: 'Esther Muthoni',
-    visitDate: '2024-06-12',
-    visitTime: '11:45 AM',
-    purpose: 'Vaccination',
-    status: 'no-show',
-    location: 'N/A'
-  },
-  {
-    id: 'BP10023460',
-    name: 'Richard Kimani',
-    visitDate: '2024-06-12',
-    visitTime: '01:30 PM',
-    purpose: 'Prescription Refill',
-    status: 'waiting',
-    location: 'Waiting Room'
-  },
-  {
-    id: 'BP10023461',
-    name: 'Jane Auma',
-    visitDate: '2024-06-12',
-    visitTime: '02:15 PM',
-    purpose: 'Blood Test',
-    status: 'waiting',
-    location: 'Waiting Room'
-  },
-  {
-    id: 'BP10023462',
-    name: 'Dennis Mwangi',
-    visitDate: '2024-06-12',
-    visitTime: '03:00 PM',
-    purpose: 'X-Ray Results',
-    status: 'in-progress',
-    location: 'Radiology'
-  }
-];
+// End of component

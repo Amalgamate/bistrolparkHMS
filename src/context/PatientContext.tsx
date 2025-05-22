@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // Define the shape of a patient
 export interface Patient {
@@ -100,482 +100,371 @@ export interface Patient {
 // Define the context shape
 interface PatientContextType {
   patients: Patient[];
-  addPatient: (patient: Omit<Patient, 'id'>) => void;
-  updatePatient: (id: number, patient: Partial<Patient>) => void;
-  deletePatient: (id: number) => void;
-  getPatient: (id: number) => Patient | undefined;
+  loading: boolean;
+  error: string | null;
+  addPatient: (patient: Omit<Patient, 'id'>) => Promise<any>;
+  updatePatient: (id: number, patient: Partial<Patient>) => Promise<void>;
+  deletePatient: (id: number) => Promise<void>;
+  getPatient: (id: number) => Promise<Patient | undefined>;
 }
 
 // Create the context
 const PatientContext = createContext<PatientContextType | undefined>(undefined);
 
-// Mock data for initial patients with Kenyan names and addresses
-const INITIAL_PATIENTS: Patient[] = [
-  {
-    id: 1,
-    // File Numbers
-    outPatientFileNumber: 'OP-12345',
-    oldReferenceNumber: 'REF-98765',
-    inPatientFileNumber: 'IP-54321',
+// Empty array for initial patients - no hardcoded data
+const INITIAL_PATIENTS: Patient[] = [];
 
-    // Personal Information
-    firstName: 'Wanjiku',
-    middleName: 'Njeri',
-    lastName: 'Kamau',
-    dateOfBirth: '1985-05-15',
-    birthDay: '15',
-    birthMonth: '5',
-    birthYear: '1985',
-    gender: 'Female',
-    nationalId: '22456789',
-    maritalStatus: 'married',
-
-    // Contact Information
-    email: 'wanjiku.kamau@gmail.com',
-    phone: '0722 123 456',
-    residence: 'Fedha Estate, Nairobi',
-    address: 'Block C, Apt 304',
-    city: 'Nairobi',
-    state: 'Nairobi County',
-    zipCode: '00100',
-
-    // Medical Information
-    bloodGroup: 'O+',
-    allergies: 'Penicillin, Peanuts',
-    chronicConditions: 'Hypertension, Asthma',
-    currentMedications: 'Lisinopril 10mg daily, Ventolin inhaler as needed',
-    shaNumber: 'SHA12345678',
-    paymentType: 'insurance',
-
-    // Next of Kin
-    nextOfKinName: 'James Kamau',
-    nextOfKinPhone: '0733 987 654',
-
-    // Emergency Contact
-    emergencyContact: {
-      name: 'James Kamau',
-      relationship: 'Husband',
-      phone: '0733 987 654'
-    },
-    insurance: {
-      provider: 'SHA',
-      policyNumber: 'SHA23456789',
-      groupNumber: 'GRP987654',
-      holderName: 'Wanjiku Kamau',
-      coverageType: 'Premium',
-      coverageLimit: 1000000,
-      expiryDate: '2024-12-31'
-    },
-    payments: [
-      {
-        id: 1001,
-        date: '2023-11-05',
-        amount: 15000,
-        paymentMethod: 'Insurance',
-        paymentType: 'Consultation',
-        reference: 'INV-2023-1001',
-        status: 'Paid',
-        insuranceProvider: 'SHA',
-        insuranceCoverage: 12000,
-        patientResponsibility: 3000,
-        description: 'Consultation with Dr. Sarah Johnson'
-      },
-      {
-        id: 1002,
-        date: '2023-10-15',
-        amount: 25000,
-        paymentMethod: 'Insurance',
-        paymentType: 'Lab Test',
-        reference: 'INV-2023-985',
-        status: 'Paid',
-        insuranceProvider: 'SHA',
-        insuranceCoverage: 20000,
-        patientResponsibility: 5000,
-        description: 'Complete Blood Count and Lipid Panel'
-      },
-      {
-        id: 1003,
-        date: '2023-09-22',
-        amount: 5000,
-        paymentMethod: 'Cash',
-        paymentType: 'Medication',
-        reference: 'INV-2023-876',
-        status: 'Paid',
-        description: 'Prescription medications'
-      }
-    ],
-    referral: {
-      isReferred: true,
-      referringHospital: 'Kenyatta National Hospital',
-      referringDoctor: 'Dr. James Mwangi',
-      referralReason: 'Specialized cardiac care',
-      referralDate: '2023-10-25'
-    },
-    vitals: [
-      {
-        id: 1,
-        date: '2023-11-05T09:30:00',
-        temperature: 36.8,
-        bloodPressureSystolic: 120,
-        bloodPressureDiastolic: 80,
-        weight: 65,
-        height: 165,
-        pulseRate: 72,
-        notes: 'Patient appears healthy'
-      },
-      {
-        id: 2,
-        date: '2023-10-15T14:45:00',
-        temperature: 37.2,
-        bloodPressureSystolic: 130,
-        bloodPressureDiastolic: 85,
-        weight: 66,
-        height: 165,
-        pulseRate: 78,
-        notes: 'Patient complained of mild headache'
-      }
-    ],
-    lastVisit: '2023-11-05',
-    status: 'Active',
-    isAdmitted: true
-  },
-  {
-    id: 2,
-    firstName: 'Otieno',
-    lastName: 'Odhiambo',
-    dateOfBirth: '1990-08-22',
-    gender: 'Male',
-    nationalId: '30987654',
-    email: 'otieno.odhiambo@yahoo.com',
-    phone: '0711 987 654',
-    address: 'Nyayo Estate, Phase 2, House 45',
-    city: 'Nairobi',
-    state: 'Nairobi County',
-    zipCode: '00200',
-    bloodGroup: 'A-',
-    allergies: 'Sulfa drugs',
-    chronicConditions: 'Diabetes Type 2',
-    currentMedications: 'Metformin 500mg twice daily',
-    emergencyContact: {
-      name: 'Akinyi Odhiambo',
-      relationship: 'Wife',
-      phone: '0712 456 789'
-    },
-    insurance: {
-      provider: 'AAR Insurance',
-      policyNumber: 'AAR987654321',
-      groupNumber: 'GRP123456',
-      holderName: 'Otieno Odhiambo'
-    },
-    referral: {
-      isReferred: false
-    },
-    vitals: [
-      {
-        id: 1,
-        date: '2023-11-02T10:15:00',
-        temperature: 36.5,
-        bloodPressureSystolic: 110,
-        bloodPressureDiastolic: 70,
-        weight: 75,
-        height: 175,
-        pulseRate: 68,
-        notes: 'Regular checkup'
-      }
-    ],
-    lastVisit: '2023-11-02',
-    status: 'Active',
-    isCleared: true
-  },
-  {
-    id: 3,
-    firstName: 'Njeri',
-    lastName: 'Waweru',
-    dateOfBirth: '1978-03-12',
-    gender: 'Female',
-    nationalId: '19876543',
-    email: 'njeri.waweru@gmail.com',
-    phone: '0700 234 567',
-    address: 'Kileleshwa, Gatundu Road, House 12',
-    city: 'Nairobi',
-    state: 'Nairobi County',
-    zipCode: '00100',
-    bloodGroup: 'B+',
-    allergies: 'None',
-    chronicConditions: 'None',
-    currentMedications: 'None',
-    emergencyContact: {
-      name: 'John Waweru',
-      relationship: 'Husband',
-      phone: '0722 345 678'
-    },
-    insurance: {
-      provider: 'Jubilee Insurance',
-      policyNumber: 'JUB23456789',
-      groupNumber: 'GRP345678',
-      holderName: 'Njeri Waweru',
-      coverageType: 'Corporate',
-      coverageLimit: 2000000,
-      expiryDate: '2024-08-31'
-    },
-    payments: [
-      {
-        id: 3001,
-        date: '2023-10-20',
-        amount: 35000,
-        paymentMethod: 'Corporate',
-        paymentType: 'Procedure',
-        reference: 'INV-2023-950',
-        status: 'Paid',
-        insuranceProvider: 'Jubilee Insurance',
-        insuranceCoverage: 35000,
-        patientResponsibility: 0,
-        description: 'Annual physical examination and wellness check'
-      },
-      {
-        id: 3002,
-        date: '2023-09-15',
-        amount: 18000,
-        paymentMethod: 'Corporate',
-        paymentType: 'Lab Test',
-        reference: 'INV-2023-875',
-        status: 'Paid',
-        insuranceProvider: 'Jubilee Insurance',
-        insuranceCoverage: 18000,
-        patientResponsibility: 0,
-        description: 'Comprehensive blood work and hormone panel'
-      }
-    ],
-    referral: {
-      isReferred: false
-    },
-    vitals: [
-      {
-        id: 1,
-        date: '2023-10-20T11:00:00',
-        temperature: 36.6,
-        bloodPressureSystolic: 118,
-        bloodPressureDiastolic: 78,
-        weight: 62,
-        height: 160,
-        pulseRate: 70,
-        notes: 'Annual physical'
-      }
-    ],
-    lastVisit: '2023-10-20',
-    status: 'Active'
-  },
-  {
-    id: 4,
-    firstName: 'Mwangi',
-    lastName: 'Kariuki',
-    dateOfBirth: '1982-11-30',
-    gender: 'Male',
-    nationalId: '25678901',
-    email: 'mwangi.kariuki@gmail.com',
-    phone: '0733 456 789',
-    address: 'South B, Mumias Road, Apt 7B',
-    city: 'Nairobi',
-    state: 'Nairobi County',
-    zipCode: '00200',
-    bloodGroup: 'AB+',
-    allergies: 'Shellfish',
-    chronicConditions: 'Hypertension',
-    currentMedications: 'Amlodipine 5mg daily',
-    emergencyContact: {
-      name: 'Grace Kariuki',
-      relationship: 'Wife',
-      phone: '0722 567 890'
-    },
-    insurance: {
-      provider: 'SHA',
-      policyNumber: 'SHA34567890',
-      groupNumber: 'GRP456789',
-      holderName: 'Mwangi Kariuki',
-      coverageType: 'Standard',
-      coverageLimit: 500000,
-      expiryDate: '2024-10-15'
-    },
-    payments: [
-      {
-        id: 2001,
-        date: '2023-11-10',
-        amount: 12000,
-        paymentMethod: 'Insurance',
-        paymentType: 'Consultation',
-        reference: 'INV-2023-1105',
-        status: 'Paid',
-        insuranceProvider: 'SHA',
-        insuranceCoverage: 10000,
-        patientResponsibility: 2000,
-        description: 'Consultation with Dr. Michael Chen'
-      },
-      {
-        id: 2002,
-        date: '2023-10-05',
-        amount: 8000,
-        paymentMethod: 'Mobile Money',
-        paymentType: 'Medication',
-        reference: 'INV-2023-1050',
-        status: 'Paid',
-        description: 'Prescription medications'
-      }
-    ],
-    referral: {
-      isReferred: false
-    },
-    vitals: [
-      {
-        id: 1,
-        date: '2023-11-10T14:30:00',
-        temperature: 36.7,
-        bloodPressureSystolic: 135,
-        bloodPressureDiastolic: 85,
-        weight: 78,
-        height: 172,
-        pulseRate: 75,
-        notes: 'Blood pressure slightly elevated'
-      }
-    ],
-    lastVisit: '2023-11-10',
-    status: 'Active'
-  },
-  {
-    id: 5,
-    firstName: 'Auma',
-    lastName: 'Onyango',
-    dateOfBirth: '1995-07-18',
-    gender: 'Female',
-    nationalId: '32109876',
-    email: 'auma.onyango@yahoo.com',
-    phone: '0712 345 678',
-    address: 'Umoja Estate, Phase 1, Block D, House 23',
-    city: 'Nairobi',
-    state: 'Nairobi County',
-    zipCode: '00100',
-    bloodGroup: 'O-',
-    allergies: 'Dust, Pollen',
-    chronicConditions: 'Asthma',
-    currentMedications: 'Symbicort inhaler as needed',
-    emergencyContact: {
-      name: 'Peter Onyango',
-      relationship: 'Father',
-      phone: '0722 678 901'
-    },
-    insurance: {
-      provider: 'Britam Insurance',
-      policyNumber: 'BRT45678901',
-      groupNumber: 'GRP567890',
-      holderName: 'Auma Onyango'
-    },
-    referral: {
-      isReferred: true,
-      referringHospital: 'Aga Khan Hospital',
-      referringDoctor: 'Dr. Sarah Omondi',
-      referralReason: 'Pulmonary function testing',
-      referralDate: '2023-11-15'
-    },
-    vitals: [
-      {
-        id: 1,
-        date: '2023-11-20T10:45:00',
-        temperature: 36.6,
-        bloodPressureSystolic: 115,
-        bloodPressureDiastolic: 75,
-        weight: 58,
-        height: 162,
-        pulseRate: 72,
-        notes: 'Mild wheezing on examination'
-      }
-    ],
-    lastVisit: '2023-11-20',
-    status: 'Active'
-  },
-  {
-    id: 6,
-    firstName: 'Kipchoge',
-    lastName: 'Kipruto',
-    dateOfBirth: '1970-04-05',
-    gender: 'Male',
-    nationalId: '12345670',
-    email: 'kipchoge.kipruto@gmail.com',
-    phone: '0722 890 123',
-    address: 'Langata, Maasai Road, House 45',
-    city: 'Nairobi',
-    state: 'Nairobi County',
-    zipCode: '00509',
-    bloodGroup: 'A+',
-    allergies: 'None',
-    chronicConditions: 'Arthritis',
-    currentMedications: 'Diclofenac 50mg as needed',
-    emergencyContact: {
-      name: 'Chebet Kipruto',
-      relationship: 'Daughter',
-      phone: '0711 234 567'
-    },
-    insurance: {
-      provider: 'CIC Insurance',
-      policyNumber: 'CIC56789012',
-      groupNumber: 'GRP678901',
-      holderName: 'Kipchoge Kipruto'
-    },
-    referral: {
-      isReferred: false
-    },
-    vitals: [
-      {
-        id: 1,
-        date: '2023-11-25T09:00:00',
-        temperature: 36.5,
-        bloodPressureSystolic: 140,
-        bloodPressureDiastolic: 90,
-        weight: 82,
-        height: 168,
-        pulseRate: 80,
-        notes: 'Joint pain in knees and hips'
-      }
-    ],
-    lastVisit: '2023-11-25',
-    status: 'Inactive'
-  }
-];
+// Import the patient service
+import patientService from '../services/patientService';
 
 // Create the provider component
 export const PatientProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [patients, setPatients] = useState<Patient[]>(INITIAL_PATIENTS);
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch patients on component mount
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const fetchPatients = async () => {
+      try {
+        if (isMounted) setLoading(true);
+
+        // We're not requiring authentication for now
+        console.log('Proceeding without authentication check for development');
+
+        // Try to fetch patients from API with abort signal
+        try {
+          // Log that we're about to fetch patients
+          console.log('Preparing to fetch patients from API');
+
+          // Pass the abort signal to the service
+          console.log('Calling patientService.getAllPatients()');
+          const data = await patientService.getAllPatients();
+
+          if (isMounted) {
+            console.log('Patients fetched from API:', data);
+
+            if (Array.isArray(data)) {
+              console.log('Setting', data.length, 'patients from API response');
+              setPatients(data);
+            } else {
+              console.warn('Unexpected API response format:', data);
+              setPatients([]);
+            }
+
+            setError(null);
+          }
+        } catch (apiErr: any) {
+          // Don't process if the request was aborted or component unmounted
+          if (apiErr.name === 'AbortError' || !isMounted) {
+            console.log('Patient fetch aborted or component unmounted');
+            return;
+          }
+
+          console.error('Error fetching patients from API:', apiErr);
+
+          if (isMounted) {
+            // Check if it's an authentication error
+            if (apiErr.response && apiErr.response.status === 401) {
+              setError('Your session has expired. Please log in again.');
+              // Clear token to force re-login
+              localStorage.removeItem('token');
+            } else {
+              // If API fails for other reasons, check for locally stored patients
+              try {
+                const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+                if (localPatients.length > 0) {
+                  console.log('Using locally stored patients:', localPatients);
+                  setPatients(localPatients);
+                  setError('Could not connect to API. Using locally stored patients.');
+                } else {
+                  console.log('No locally stored patients found');
+                  setPatients([]);
+                  setError('Failed to load patients from API. Starting with empty patient list.');
+                }
+              } catch (storageErr) {
+                console.error('Error reading from localStorage:', storageErr);
+                setPatients([]);
+                setError('Failed to load patients from API and localStorage. Starting with empty patient list.');
+              }
+            }
+          }
+        }
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchPatients();
+
+    // Cleanup function to run when component unmounts
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, []);
 
   // Add a new patient
-  const addPatient = (patient: Omit<Patient, 'id'>) => {
-    const newPatient = {
-      ...patient,
-      id: patients.length > 0 ? Math.max(...patients.map(p => p.id)) + 1 : 1
-    };
-    setPatients([...patients, newPatient as Patient]);
+  const addPatient = async (patient: Omit<Patient, 'id'>) => {
+    try {
+      // We're not requiring authentication for now
+      console.log('Proceeding without authentication check for development');
+
+      // Try to create the patient via API
+      const newPatient = await patientService.createPatient(patient);
+      console.log('Patient created successfully via API:', newPatient);
+
+      // Update local state
+      setPatients(prevPatients => [...prevPatients, newPatient as Patient]);
+
+      // Also update local storage for offline access
+      try {
+        const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+        localStorage.setItem('localPatients', JSON.stringify([...localPatients, newPatient]));
+      } catch (storageErr) {
+        console.error('Error updating localStorage with new patient:', storageErr);
+      }
+
+      return newPatient;
+    } catch (err: any) {
+      console.error('Error creating patient via API:', err);
+
+      // Check if it's an authentication error
+      if (err.response && err.response.status === 401) {
+        setError('Your session has expired. Please log in again.');
+        // Clear token to force re-login
+        localStorage.removeItem('token');
+        throw new Error('Authentication required. Please log in again.');
+      }
+
+      // Fallback to local creation if API fails for other reasons
+      const localNewPatient = {
+        ...patient,
+        id: patients.length > 0 ? Math.max(...patients.map(p => p.id)) + 1 : 1,
+        status: 'Active' as const
+      };
+
+      console.log('Creating patient locally as fallback (API error):', localNewPatient);
+      setPatients(prevPatients => [...prevPatients, localNewPatient as Patient]);
+
+      // Store in localStorage for persistence across refreshes
+      try {
+        const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+        localStorage.setItem('localPatients', JSON.stringify([...localPatients, localNewPatient]));
+        console.log('Patient saved to localStorage for persistence');
+      } catch (storageErr) {
+        console.error('Error saving patient to localStorage:', storageErr);
+      }
+
+      return localNewPatient;
+    }
   };
 
   // Update an existing patient
-  const updatePatient = (id: number, updatedPatient: Partial<Patient>) => {
-    setPatients(
-      patients.map(patient =>
-        patient.id === id ? { ...patient, ...updatedPatient } : patient
-      )
-    );
+  const updatePatient = async (id: number, updatedPatient: Partial<Patient>) => {
+    try {
+      // Check for token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn('No authentication token found. User may need to log in.');
+        setError('Authentication required. Please log in to update patients.');
+
+        // Update locally anyway
+        setPatients(
+          patients.map(patient =>
+            patient.id === id ? { ...patient, ...updatedPatient } : patient
+          )
+        );
+
+        // Update localStorage
+        try {
+          const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+          const updatedLocalPatients = localPatients.map((patient: Patient) =>
+            patient.id === id ? { ...patient, ...updatedPatient } : patient
+          );
+          localStorage.setItem('localPatients', JSON.stringify(updatedLocalPatients));
+        } catch (storageErr) {
+          console.error('Error updating patient in localStorage:', storageErr);
+        }
+
+        return;
+      }
+
+      // Try API update
+      await patientService.updatePatient(id, updatedPatient);
+
+      // Update local state
+      setPatients(
+        patients.map(patient =>
+          patient.id === id ? { ...patient, ...updatedPatient } : patient
+        )
+      );
+
+      // Update localStorage
+      try {
+        const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+        const updatedLocalPatients = localPatients.map((patient: Patient) =>
+          patient.id === id ? { ...patient, ...updatedPatient } : patient
+        );
+        localStorage.setItem('localPatients', JSON.stringify(updatedLocalPatients));
+      } catch (storageErr) {
+        console.error('Error updating patient in localStorage:', storageErr);
+      }
+    } catch (err: any) {
+      console.error('Error updating patient:', err);
+
+      // Check if it's an authentication error
+      if (err.response && err.response.status === 401) {
+        setError('Your session has expired. Please log in again.');
+        // Clear token to force re-login
+        localStorage.removeItem('token');
+      } else {
+        // Fallback to local update if API fails for other reasons
+        setPatients(
+          patients.map(patient =>
+            patient.id === id ? { ...patient, ...updatedPatient } : patient
+          )
+        );
+
+        // Update localStorage
+        try {
+          const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+          const updatedLocalPatients = localPatients.map((patient: Patient) =>
+            patient.id === id ? { ...patient, ...updatedPatient } : patient
+          );
+          localStorage.setItem('localPatients', JSON.stringify(updatedLocalPatients));
+        } catch (storageErr) {
+          console.error('Error updating patient in localStorage:', storageErr);
+        }
+      }
+    }
   };
 
   // Delete a patient
-  const deletePatient = (id: number) => {
-    setPatients(patients.filter(patient => patient.id !== id));
+  const deletePatient = async (id: number) => {
+    try {
+      // Check for token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn('No authentication token found. User may need to log in.');
+        setError('Authentication required. Please log in to delete patients.');
+
+        // Delete locally anyway
+        setPatients(patients.filter(patient => patient.id !== id));
+
+        // Update localStorage
+        try {
+          const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+          const updatedLocalPatients = localPatients.filter((patient: Patient) => patient.id !== id);
+          localStorage.setItem('localPatients', JSON.stringify(updatedLocalPatients));
+        } catch (storageErr) {
+          console.error('Error removing patient from localStorage:', storageErr);
+        }
+
+        return;
+      }
+
+      // Try API deletion
+      await patientService.deletePatient(id);
+
+      // Update local state
+      setPatients(patients.filter(patient => patient.id !== id));
+
+      // Update localStorage
+      try {
+        const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+        const updatedLocalPatients = localPatients.filter((patient: Patient) => patient.id !== id);
+        localStorage.setItem('localPatients', JSON.stringify(updatedLocalPatients));
+      } catch (storageErr) {
+        console.error('Error removing patient from localStorage:', storageErr);
+      }
+    } catch (err: any) {
+      console.error('Error deleting patient:', err);
+
+      // Check if it's an authentication error
+      if (err.response && err.response.status === 401) {
+        setError('Your session has expired. Please log in again.');
+        // Clear token to force re-login
+        localStorage.removeItem('token');
+      } else {
+        // Fallback to local deletion if API fails for other reasons
+        setPatients(patients.filter(patient => patient.id !== id));
+
+        // Update localStorage
+        try {
+          const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+          const updatedLocalPatients = localPatients.filter((patient: Patient) => patient.id !== id);
+          localStorage.setItem('localPatients', JSON.stringify(updatedLocalPatients));
+        } catch (storageErr) {
+          console.error('Error removing patient from localStorage:', storageErr);
+        }
+      }
+    }
   };
 
   // Get a patient by ID
-  const getPatient = (id: number) => {
-    return patients.find(patient => patient.id === id);
+  const getPatient = async (id: number) => {
+    try {
+      // Check for token
+      const token = localStorage.getItem('token');
+      if (!token) {
+        console.warn('No authentication token found. User may need to log in.');
+        setError('Authentication required. Please log in to access patient details.');
+
+        // Try to find patient in local state
+        const localPatient = patients.find(patient => patient.id === id);
+        if (localPatient) {
+          return localPatient;
+        }
+
+        // If not in state, try localStorage
+        try {
+          const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+          return localPatients.find((patient: Patient) => patient.id === id);
+        } catch (storageErr) {
+          console.error('Error reading from localStorage:', storageErr);
+          return undefined;
+        }
+      }
+
+      // Try API fetch
+      return await patientService.getPatientById(id);
+    } catch (err: any) {
+      console.error(`Error fetching patient with ID ${id}:`, err);
+
+      // Check if it's an authentication error
+      if (err.response && err.response.status === 401) {
+        setError('Your session has expired. Please log in again.');
+        // Clear token to force re-login
+        localStorage.removeItem('token');
+      }
+
+      // Fallback to local lookup if API fails
+      const localPatient = patients.find(patient => patient.id === id);
+      if (localPatient) {
+        return localPatient;
+      }
+
+      // If not in state, try localStorage
+      try {
+        const localPatients = JSON.parse(localStorage.getItem('localPatients') || '[]');
+        return localPatients.find((patient: Patient) => patient.id === id);
+      } catch (storageErr) {
+        console.error('Error reading from localStorage:', storageErr);
+        return undefined;
+      }
+    }
   };
 
   return (
     <PatientContext.Provider
       value={{
         patients,
+        loading,
+        error,
         addPatient,
         updatePatient,
         deletePatient,

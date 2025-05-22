@@ -19,8 +19,36 @@ A modern hospital management system built with React, TypeScript, and Tailwind C
 
 - Node.js (v16 or higher)
 - npm or yarn
+- Docker and Docker Compose (for containerized deployment)
 
 ### Installation
+
+#### Option 1: Docker (Recommended)
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/Ricoamal/bristolparkhospital.git
+   cd bristolparkhospital
+   ```
+
+2. Start with Docker:
+   ```bash
+   # Development mode with hot-reloading
+   docker-compose -f docker-compose.dev.yml up
+
+   # Production mode
+   docker-compose up
+
+   # Or use the deployment script
+   ./deploy.sh -e dev    # Development
+   ./deploy.sh -e prod   # Production
+   ```
+
+3. Access the application:
+   - Development: http://localhost:5173
+   - Production: http://localhost:80
+
+#### Option 2: Manual Installation
 
 1. Clone the repository:
    ```bash
@@ -78,11 +106,19 @@ Instead of integrating with the legacy Java backend, we are migrating data to a 
 
 ## Available Scripts
 
+### Local Development
 - `npm run dev` - Start the development server
 - `npm run build` - Build the production-ready application
 - `npm run preview` - Preview the production build locally
 - `npm run lint` - Run ESLint to check for code quality issues
 - `npm run test` - Run tests
+
+### Docker Commands
+- `docker-compose -f docker-compose.dev.yml up` - Start development environment
+- `docker-compose up` - Start production environment
+- `./deploy.sh -e dev` - Start development with deployment script
+- `./deploy.sh -e prod -b -d` - Build and start production in detached mode
+- `./health-check.sh` - Check the health of all services
 
 ## Design System
 

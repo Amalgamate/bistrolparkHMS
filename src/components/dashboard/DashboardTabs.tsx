@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Grid, Building2, Clock } from 'lucide-react';
+import { Grid, Building2, Clock, Users } from 'lucide-react';
 
 interface TabProps {
   id: string;
@@ -7,23 +7,31 @@ interface TabProps {
   icon: React.ReactNode;
   isActive: boolean;
   onClick: (id: string) => void;
+  customStyle?: string;
 }
 
-const Tab: React.FC<TabProps> = ({ id, label, icon, isActive, onClick }) => {
+const Tab: React.FC<TabProps> = ({ id, label, icon, isActive, onClick, customStyle }) => {
   return (
     <div
       className={`
         dashboard-tab flex items-center justify-center gap-3 px-4 py-3
         rounded-lg cursor-pointer transition-all duration-200 border border-gray-200
-        ${isActive ? 'active bg-white shadow-sm' : 'bg-gray-100 hover:bg-gray-50'}
+        ${isActive ? 'active shadow-sm' : 'hover:bg-gray-50'}
+        ${id === 'queues' ? 'queues-tab' : ''}
         ${id === 'quick-access' ? 'quick-access' : ''}
         ${id === 'hospital-overview' ? 'hospital-reports' : ''}
         ${id === 'financial-reports' ? 'accounts-overview' : ''}
+        ${customStyle || ''}
+        ${isActive && id === 'queues' ? 'bg-black text-white' :
+          isActive ? 'bg-white' : 'bg-gray-100'}
       `}
       onClick={() => onClick(id)}
     >
-      <span className="text-gray-500">{icon}</span>
-      <span className={`font-medium ${isActive ? 'text-gray-800' : 'text-gray-600'}`}>{label}</span>
+      <span className={`${id === 'queues' ? 'text-white' : 'text-gray-500'}`}>{icon}</span>
+      <span className={`font-medium ${
+        id === 'queues' ? 'text-white' :
+        isActive ? 'text-gray-800' : 'text-gray-600'
+      }`}>{label}</span>
     </div>
   );
 };
@@ -35,6 +43,12 @@ interface DashboardTabsProps {
 
 const DashboardTabs: React.FC<DashboardTabsProps> = ({ activeTab, onChange }) => {
   const tabs = [
+    {
+      id: 'queues',
+      label: 'Queues',
+      icon: <Users className="w-5 h-5" />,
+      customStyle: 'bg-black text-white border-black'
+    },
     {
       id: 'quick-access',
       label: 'Quick Access',
@@ -53,7 +67,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({ activeTab, onChange }) =>
   ];
 
   return (
-    <div className="dashboard-tabs grid grid-cols-3 gap-4 mb-6">
+    <div className="dashboard-tabs grid grid-cols-4 gap-4 mb-6">
       {tabs.map((tab) => (
         <Tab
           key={tab.id}
@@ -62,6 +76,7 @@ const DashboardTabs: React.FC<DashboardTabsProps> = ({ activeTab, onChange }) =>
           icon={tab.icon}
           isActive={activeTab === tab.id}
           onClick={onChange}
+          customStyle={tab.customStyle}
         />
       ))}
     </div>

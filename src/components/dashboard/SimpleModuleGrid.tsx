@@ -18,9 +18,12 @@ import {
   BarChart,
   Droplet,
   Heart,
-  UserCog
+  UserCog,
+  LucideIcon
 } from 'lucide-react';
 import { APP_VERSION } from '../../utils/cacheUtils';
+import { ColoredIcon } from '../ui/colored-icon';
+import { ColorVariant } from '../ui/colored-icon-button';
 
 // Module grid version - should match APP_VERSION
 const MODULE_GRID_VERSION = APP_VERSION;
@@ -28,10 +31,10 @@ const MODULE_GRID_VERSION = APP_VERSION;
 interface ModuleIcon {
   id: string;
   name: string;
-  icon: React.ReactNode;
+  icon: LucideIcon;
   path: string;
   active: boolean;
-  color: string;
+  color: ColorVariant;
   usageCount: number;
 }
 
@@ -50,163 +53,163 @@ export const SimpleModuleGrid: React.FC = () => {
     {
       id: 'patient-register',
       name: 'Patient Register',
-      icon: <User size={22} />,
+      icon: User,
       path: '/patient-module',
       active: true,
-      color: 'bg-blue-500',
+      color: 'blue',
       usageCount: 0
     },
     {
       id: 'document-center',
       name: 'Document Center',
-      icon: <FileText size={22} />,
+      icon: FileText,
       path: '/document-center',
       active: true,
-      color: 'bg-green-500',
+      color: 'green',
       usageCount: 0
     },
     {
       id: 'settings',
       name: 'Branch Settings',
-      icon: <Settings size={22} />,
+      icon: Settings,
       path: '/settings',
       active: true,
-      color: 'bg-purple-500',
+      color: 'purple',
       usageCount: 0
     },
     {
       id: 'user-management',
       name: 'User Management',
-      icon: <UserCog size={22} />,
+      icon: UserCog,
       path: '/users',
       active: true,
-      color: 'bg-orange-500',
+      color: 'orange',
       usageCount: 0
     },
     {
       id: 'appointments',
       name: 'Appointments',
-      icon: <Calendar size={22} />,
+      icon: Calendar,
       path: '/appointments',
       active: true,
-      color: 'bg-indigo-500',
+      color: 'indigo',
       usageCount: 0
     },
     {
       id: 'clinical-notes',
       name: 'Clinical Notes',
-      icon: <Clipboard size={22} />,
+      icon: Clipboard,
       path: '/clinical-notes',
       active: true,
-      color: 'bg-teal-500',
+      color: 'teal',
       usageCount: 0
     },
     {
       id: 'pharmacy',
       name: 'Pharmacy',
-      icon: <Pill size={22} />,
+      icon: Pill,
       path: '/pharmacy',
       active: true,
-      color: 'bg-pink-500',
+      color: 'pink',
       usageCount: 0
     },
     {
       id: 'billing',
       name: 'Billing',
-      icon: <DollarSign size={22} />,
+      icon: DollarSign,
       path: '/billing',
       active: true,
-      color: 'bg-yellow-500',
+      color: 'amber',
       usageCount: 0
     },
     {
       id: 'vitals',
       name: 'Vitals',
-      icon: <Activity size={22} />,
+      icon: Activity,
       path: '/vitals',
       active: true,
-      color: 'bg-red-500',
+      color: 'red',
       usageCount: 0
     },
     {
       id: 'lab-tests',
       name: 'Lab Tests',
-      icon: <Thermometer size={22} />,
+      icon: Thermometer,
       path: '/lab-tests',
       active: true,
-      color: 'bg-cyan-500',
+      color: 'teal',
       usageCount: 0
     },
     {
       id: 'lab-results',
       name: 'Lab Results',
-      icon: <Beaker size={22} />,
+      icon: Beaker,
       path: '/lab-results',
       active: true,
-      color: 'bg-emerald-500',
+      color: 'green',
       usageCount: 0
     },
     {
       id: 'radiology',
       name: 'Radiology',
-      icon: <Scan size={22} />,
+      icon: Scan,
       path: '/radiology',
       active: true,
-      color: 'bg-violet-500',
+      color: 'indigo',
       usageCount: 0
     },
     {
       id: 'inpatient',
       name: 'Inpatient',
-      icon: <Bed size={22} />,
+      icon: Bed,
       path: '/inpatient',
       active: true,
-      color: 'bg-amber-500',
+      color: 'amber',
       usageCount: 0
     },
     {
       id: 'doctors',
       name: 'Doctors',
-      icon: <Stethoscope size={22} />,
+      icon: Stethoscope,
       path: '/doctors',
       active: true,
-      color: 'bg-lime-500',
+      color: 'purple',
       usageCount: 0
     },
     {
       id: 'ambulance',
       name: 'Ambulance',
-      icon: <Ambulance size={22} />,
+      icon: Ambulance,
       path: '/ambulance',
       active: true,
-      color: 'bg-rose-500',
+      color: 'red',
       usageCount: 0
     },
     {
       id: 'reports',
       name: 'Reports',
-      icon: <BarChart size={22} />,
+      icon: BarChart,
       path: '/reports',
       active: true,
-      color: 'bg-sky-500',
+      color: 'blue',
       usageCount: 0
     },
     {
       id: 'blood-bank',
       name: 'Blood Bank',
-      icon: <Droplet size={22} />,
+      icon: Droplet,
       path: '/blood-bank',
       active: true,
-      color: 'bg-fuchsia-500',
+      color: 'red',
       usageCount: 0
     },
     {
       id: 'emergency',
       name: 'Emergency',
-      icon: <Heart size={22} />,
+      icon: Heart,
       path: '/emergency',
       active: true,
-      color: 'bg-red-600',
+      color: 'red',
       usageCount: 0
     }
   ];
@@ -310,17 +313,19 @@ export const SimpleModuleGrid: React.FC = () => {
             }`}
             onClick={() => handleModuleClick(module)}
           >
-            <div
-              className={`p-3 rounded-full mb-2 shadow-sm ${
-                module.active
-                  ? module.color
-                  : 'bg-gray-200'
-              }`}
-            >
-              <div className={module.active ? 'text-white' : 'text-gray-500'}>
-                {module.icon}
+            {module.active ? (
+              <ColoredIcon
+                icon={module.icon}
+                color={module.color}
+                size="md"
+                variant="solid"
+                className="mb-2 shadow-sm"
+              />
+            ) : (
+              <div className="p-3 rounded-full mb-2 shadow-sm bg-gray-200">
+                <module.icon className="h-5 w-5 text-gray-500" />
               </div>
-            </div>
+            )}
             <span className={`text-sm text-center font-medium ${
               module.active ? 'text-gray-800' : 'text-gray-500'
             }`}>

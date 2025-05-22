@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Bell, Menu, MessageSquare, LogOut, User, Settings,
-  Plus, Calendar, FileText, Users, HelpCircle, ChevronDown, Building,
+  Calendar, FileText, Users, HelpCircle, ChevronDown, Building,
   RefreshCw
 } from 'lucide-react';
 import IntelligentBranchSwitcher from '../auth/IntelligentBranchSwitcher';
@@ -10,28 +10,25 @@ import { GlobalSearch } from '../search/GlobalSearch';
 import { useNavigate } from 'react-router-dom';
 import LoginAs from '../auth/LoginAs';
 import { refreshCache } from '../../utils/cacheUtils';
+import ModuleQuickActionsButton from './ModuleQuickActionsButton';
 
 interface HeaderProps {
   onMenuButtonClick: () => void;
   onMessageButtonClick: () => void;
+  sidebarOpen?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButtonClick }) => {
+export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButtonClick, sidebarOpen = true }) => {
   const { user, logout } = useAuth();
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-  const [quickActionOpen, setQuickActionOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const quickActionRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
-  // Close the menus when clicking outside
+  // Close the user menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setUserMenuOpen(false);
-      }
-      if (quickActionRef.current && !quickActionRef.current.contains(event.target as Node)) {
-        setQuickActionOpen(false);
       }
     };
 
@@ -45,7 +42,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
       <div className="flex items-center">
         <button
           type="button"
-          className="p-2 text-[#2B3990] rounded-md focus:outline-none hover:bg-gray-100 transition-all duration-150"
+          className={`p-2 rounded-md focus:outline-none hover:bg-gray-100 transition-all duration-150 ${
+            !sidebarOpen
+              ? 'bg-[#2B3990] text-white hover:bg-[#1E2A6B]'
+              : 'text-[#2B3990]'
+          }`}
           onClick={onMenuButtonClick}
         >
           <Menu className="w-5 h-5" />
@@ -102,51 +103,8 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
         {/* Login As Button - Only visible for admins */}
         <LoginAs />
 
-        {/* Quick Action Button */}
-        <div className="relative" ref={quickActionRef}>
-          <button
-            type="button"
-            className="p-1.5 text-white bg-[#F5B800] rounded-md hover:bg-[#E5A800] focus:outline-none focus:ring-2 focus:ring-[#F5B800]"
-            onClick={() => setQuickActionOpen(!quickActionOpen)}
-          >
-            <Plus className="w-5 h-5" />
-          </button>
-
-          {quickActionOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl z-[1000] border border-gray-200 overflow-hidden">
-              <div className="px-4 py-3 bg-gray-50 border-b border-gray-100">
-                <h3 className="text-sm font-semibold text-gray-800">Quick Actions</h3>
-                <p className="text-xs text-gray-500 mt-1">Frequently used actions</p>
-              </div>
-              <div className="py-2">
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center mr-3">
-                    <Users className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <span>New Patient</span>
-                </a>
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-green-50 flex items-center justify-center mr-3">
-                    <Calendar className="w-4 h-4 text-green-600" />
-                  </div>
-                  <span>New Appointment</span>
-                </a>
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-purple-50 flex items-center justify-center mr-3">
-                    <FileText className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <span>Create Invoice</span>
-                </a>
-                <a href="#" className="flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                  <div className="w-8 h-8 rounded-md bg-yellow-50 flex items-center justify-center mr-3">
-                    <MessageSquare className="w-4 h-4 text-yellow-600" />
-                  </div>
-                  <span>Send Message</span>
-                </a>
-              </div>
-            </div>
-          )}
-        </div>
+        {/* Module-specific Quick Action Button */}
+        <ModuleQuickActionsButton />
 
         <div className="flex items-center">
           <div className="relative flex-shrink-0 ml-4" ref={menuRef}>

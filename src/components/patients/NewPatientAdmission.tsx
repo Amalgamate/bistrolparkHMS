@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Search, User, Bed, Calendar, FileText, Clock, UserCheck, AlertCircle } from 'lucide-react';
+import apiClient from '../../services/apiClient';
 
 const admissionSchema = z.object({
   patientId: z.string().min(1, 'Patient ID is required'),
@@ -18,10 +19,42 @@ const admissionSchema = z.object({
 
 type AdmissionFormData = z.infer<typeof admissionSchema>;
 
+// Define interfaces for API data
+interface Patient {
+  id: string;
+  first_name: string;
+  last_name: string;
+  date_of_birth: string;
+  gender: string;
+  phone: string;
+  blood_type?: string;
+  mrn?: string;
+}
+
+interface Room {
+  id: string;
+  name: string;
+  type: string;
+  status: string;
+  floor?: string;
+  wing?: string;
+  daily_rate?: number;
+}
+
+interface Doctor {
+  id: string;
+  first_name: string;
+  last_name: string;
+  specialty?: string;
+  role?: string;
+}
+
 export const NewPatientAdmission: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -41,38 +74,119 @@ export const NewPatientAdmission: React.FC = () => {
   const roomType = watch('roomType');
 
   // Search for patient
-  const handleSearch = () => {
-    // In a real application, this would be an API call
-    const foundPatient = mockPatients.find(
-      p => p.id === searchQuery ||
-           p.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  const handleSearch = async () => {
+    if (!searchQuery.trim()) {
+      alert('Please enter a patient ID or name to search');
+      return;
+    }
 
-    if (foundPatient) {
-      setSelectedPatient(foundPatient);
-      setValue('patientId', foundPatient.id);
-    } else {
+    try {
+      setLoading(true);
+      const response = await apiClient.get(`/patients?search=${encodeURIComponent(searchQuery)}`);
+
+      if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+        const foundPatient = response.data[0]; // Get the first matching patient
+        setSelectedPatient(foundPatient);
+        setValue('patientId', foundPatient.id || foundPatient.mrn);
+      } else {
+        setSelectedPatient(null);
+        alert('Patient not found. Please check the ID or name and try again.');
+      }
+    } catch (error) {
+      console.error('Error searching for patient:', error);
+      alert('An error occurred while searching for the patient. Please try again later.');
       setSelectedPatient(null);
-      alert('Patient not found. Please check the ID or name and try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Fetch doctors on component mount
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        setLoading(true);
+        const response = await apiClient.get('/users?role=doctor');
+
+        if (response.data && Array.isArray(response.data)) {
+          setDoctors(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+        alert('Failed to load doctors. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+
   // Update available rooms when room type changes
-  React.useEffect(() => {
-    if (roomType) {
-      const filteredRooms = mockRooms.filter(room => room.type === roomType && room.available);
-      setAvailableRooms(filteredRooms);
-    } else {
-      setAvailableRooms([]);
-    }
+  useEffect(() => {
+    const fetchRooms = async () => {
+      if (!roomType) {
+        setAvailableRooms([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const response = await apiClient.get(`/rooms?type=${roomType}&status=Available`);
+
+        if (response.data && Array.isArray(response.data)) {
+          setAvailableRooms(response.data);
+        } else {
+          setAvailableRooms([]);
+        }
+      } catch (error) {
+        console.error('Error fetching rooms:', error);
+        alert('Failed to load available rooms. Please try again later.');
+        setAvailableRooms([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRooms();
   }, [roomType]);
 
-  const onSubmit = (data: AdmissionFormData) => {
-    console.log(data);
-    alert('Patient admitted successfully!');
-    reset();
-    setSelectedPatient(null);
-    setAvailableRooms([]);
+  const onSubmit = async (data: AdmissionFormData) => {
+    try {
+      setLoading(true);
+      console.log('Submitting admission data:', data);
+
+      // Format the data for the API
+      const admissionData = {
+        patient_id: data.patientId,
+        room_id: data.roomNumber,
+        doctor_id: data.attendingDoctor,
+        admission_date: data.admissionDate,
+        admission_time: data.admissionTime,
+        diagnosis: data.initialDiagnosis,
+        notes: `${data.admissionReason}\n\n${data.specialInstructions || ''}`.trim(),
+        status: 'admitted'
+      };
+
+      // Send the data to the API
+      const response = await apiClient.post('/admissions', admissionData);
+
+      if (response.data) {
+        console.log('Admission created successfully:', response.data);
+        alert('Patient admitted successfully!');
+        reset();
+        setSelectedPatient(null);
+        setAvailableRooms([]);
+      } else {
+        console.error('Failed to create admission');
+        alert('Failed to admit patient. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating admission:', error);
+      alert('An error occurred while admitting the patient.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -320,13 +434,20 @@ export const NewPatientAdmission: React.FC = () => {
                 className={`pl-10 block w-full rounded-md shadow-sm focus:ring-[#0100F6] focus:border-[#0100F6] sm:text-sm ${
                   errors.attendingDoctor ? 'border-red-300' : 'border-gray-300'
                 }`}
+                disabled={loading}
               >
                 <option value="">Select doctor</option>
-                {mockDoctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>
-                    Dr. {doctor.name} - {doctor.specialty}
-                  </option>
-                ))}
+                {loading ? (
+                  <option value="" disabled>Loading doctors...</option>
+                ) : doctors.length > 0 ? (
+                  doctors.map(doctor => (
+                    <option key={doctor.id} value={doctor.id}>
+                      Dr. {doctor.first_name} {doctor.last_name} {doctor.specialty ? `(${doctor.specialty})` : ''}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>No doctors available</option>
+                )}
               </select>
             </div>
             {errors.attendingDoctor && (
@@ -458,77 +579,4 @@ export const NewPatientAdmission: React.FC = () => {
   );
 };
 
-// Mock data
-interface Patient {
-  id: string;
-  name: string;
-  age: number;
-  gender: string;
-  phone: string;
-  bloodType: string;
-  lastVisit?: string;
-}
-
-interface Room {
-  number: string;
-  type: string;
-  description: string;
-  available: boolean;
-}
-
-interface Doctor {
-  id: string;
-  name: string;
-  specialty: string;
-}
-
-const mockPatients: Patient[] = [
-  {
-    id: 'BP10023456',
-    name: 'David Kamau',
-    age: 45,
-    gender: 'Male',
-    phone: '0712 345 678',
-    bloodType: 'O+',
-    lastVisit: '10 May 2024'
-  },
-  {
-    id: 'BP10023457',
-    name: 'Faith Wanjiku',
-    age: 32,
-    gender: 'Female',
-    phone: '0723 456 789',
-    bloodType: 'A-',
-    lastVisit: '15 May 2024'
-  },
-  {
-    id: 'BP10023458',
-    name: 'Peter Omondi',
-    age: 28,
-    gender: 'Male',
-    phone: '0734 567 890',
-    bloodType: 'B+',
-    lastVisit: '20 May 2024'
-  }
-];
-
-const mockRooms: Room[] = [
-  { number: '101', type: 'executive', description: 'Executive Suite', available: true },
-  { number: '102', type: 'executive', description: 'Executive Suite', available: true },
-  { number: '201', type: 'premium', description: 'Premium Room', available: true },
-  { number: '202', type: 'premium', description: 'Premium Room', available: true },
-  { number: '203', type: 'premium', description: 'Premium Room', available: false },
-  { number: '301', type: 'basic', description: 'Basic Room', available: true },
-  { number: '302', type: 'basic', description: 'Basic Room', available: true },
-  { number: '401', type: 'ward', description: 'General Ward - Bed 1', available: true },
-  { number: '402', type: 'ward', description: 'General Ward - Bed 2', available: true },
-  { number: '403', type: 'ward', description: 'General Ward - Bed 3', available: true },
-];
-
-const mockDoctors: Doctor[] = [
-  { id: 'D001', name: 'John Mwangi', specialty: 'Cardiology' },
-  { id: 'D002', name: 'Elizabeth Njeri', specialty: 'Neurology' },
-  { id: 'D003', name: 'Samuel Kipchoge', specialty: 'Orthopedics' },
-  { id: 'D004', name: 'Grace Akinyi', specialty: 'Pediatrics' },
-  { id: 'D005', name: 'Daniel Otieno', specialty: 'Internal Medicine' },
-];
+// End of component
