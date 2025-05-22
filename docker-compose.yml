@@ -5,7 +5,7 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.simple
     ports:
       - "80:80"
     depends_on:
@@ -28,11 +28,11 @@ services:
       - PORT=3001
       - DB_HOST=db
       - DB_PORT=5432
-      - DB_NAME=bristol_park_hmis
-      - DB_USER=postgres
-      - DB_PASSWORD=password
+      - DB_NAME=${DB_NAME:-bristol_park_hmis}
+      - DB_USER=${DB_USER:-postgres}
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_SSL=false
-      - JWT_SECRET=your_jwt_secret_key
+      - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=24h
     networks:
       - bristol-park-network
