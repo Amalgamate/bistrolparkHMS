@@ -9,7 +9,7 @@ services:
   frontend:
     image: bristol-park-hms-frontend:latest
     build:
-      context: https://github.com/Amalgamate/bistrolparkHMS.git
+      context: https://github.com/Amalgamate/bistrolparkHMS.git#master
       dockerfile: docker/Dockerfile.simple
     ports:
       - "${FRONTEND_PORT:-80}:80"
