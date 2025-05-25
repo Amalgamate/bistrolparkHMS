@@ -45,7 +45,7 @@ logs
 Thumbs.db
 
 # Backend folders (not needed for frontend build)
-api/
+# api/ - commented out as it's needed for API Docker build
 server/
 bristol-park-hmis/
 
