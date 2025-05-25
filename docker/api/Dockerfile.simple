@@ -5,8 +5,8 @@ WORKDIR /app
 # Install netcat for database connection check
 RUN apk add --no-cache netcat-openbsd
 
-# Copy all files (including node_modules)
-COPY . .
+# Copy API directory from root context
+COPY api/ .
 
 # Create a simple wait script
 RUN echo '#!/bin/sh\necho "Waiting for PostgreSQL to start..."\nwhile ! nc -z db 5432; do\n  sleep 1\ndone\necho "PostgreSQL started"\necho "Starting application..."\nexec "$@"' > /wait-for-db.sh
