@@ -1,9 +1,9 @@
 import React from 'react';
 import { ActionCard, ActionCardGrid } from '../ui/action-card';
-import { 
-  Stethoscope, 
-  Pill, 
-  Microscope, 
+import {
+  Stethoscope,
+  Pill,
+  Microscope,
   Dumbbell,
   Bed,
   Calendar,
@@ -12,7 +12,8 @@ import {
   Droplets,
   FileText,
   Scissors,
-  Users
+  Users,
+  Settings
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -22,7 +23,7 @@ export const ModuleAccessCards: React.FC = () => {
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold text-gray-800">Hospital Modules</h2>
-      
+
       <ActionCardGrid columns={4}>
         <ActionCard
           icon={Stethoscope}
@@ -31,7 +32,7 @@ export const ModuleAccessCards: React.FC = () => {
           description="Patient consultations and care"
           onClick={() => navigate('/clinical')}
         />
-        
+
         <ActionCard
           icon={Pill}
           color="green"
@@ -39,7 +40,7 @@ export const ModuleAccessCards: React.FC = () => {
           description="Medication management"
           onClick={() => navigate('/pharmacy')}
         />
-        
+
         <ActionCard
           icon={Microscope}
           color="purple"
@@ -47,7 +48,7 @@ export const ModuleAccessCards: React.FC = () => {
           description="Medical tests and results"
           onClick={() => navigate('/lab')}
         />
-        
+
         <ActionCard
           icon={Dumbbell}
           color="orange"
@@ -90,7 +91,7 @@ export const ModuleAccessCards: React.FC = () => {
       </ActionCardGrid>
 
       <h2 className="text-xl font-semibold text-gray-800 mt-8">Additional Services</h2>
-      
+
       <ActionCardGrid columns={4}>
         <ActionCard
           icon={Droplets}
@@ -99,7 +100,7 @@ export const ModuleAccessCards: React.FC = () => {
           description="Blood inventory management"
           onClick={() => navigate('/blood-bank')}
         />
-        
+
         <ActionCard
           icon={FileText}
           color="blue"
@@ -107,7 +108,7 @@ export const ModuleAccessCards: React.FC = () => {
           description="Maternal and newborn care"
           onClick={() => navigate('/maternity')}
         />
-        
+
         <ActionCard
           icon={Scissors}
           color="purple"
@@ -115,7 +116,7 @@ export const ModuleAccessCards: React.FC = () => {
           description="Surgical and medical procedures"
           onClick={() => navigate('/procedures')}
         />
-        
+
         <ActionCard
           icon={Users}
           color="gray"

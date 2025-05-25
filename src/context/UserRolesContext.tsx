@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 // Define permission types based on the list provided
 export type Permission =
@@ -193,7 +193,22 @@ export type Permission =
 
   // Tax Management
   | 'process_etims_invoice'
-  | 'process_etims_invoice_manually';
+  | 'process_etims_invoice_manually'
+
+  // System Administration (Super Admin only)
+  | 'manage_service_control'
+  | 'access_system_administration'
+  | 'manage_all_users'
+  | 'control_server_services'
+  | 'access_service_management'
+  | 'manage_system_settings'
+  | 'view_audit_logs'
+  | 'manage_security_settings'
+  | 'manage_database'
+
+  // Hospital Administration (Bristol Admin)
+  | 'manage_hospital_users'
+  | 'manage_basic_settings';
 
 // Define role interface
 export interface Role {
@@ -234,9 +249,9 @@ interface UserRolesContextType {
 // Initial roles
 const INITIAL_ROLES: Role[] = [
   {
-    id: 'supa-admin',
-    name: 'Supa Admin',
-    description: 'Super administrator with full system access',
+    id: 'super-admin',
+    name: 'Super Admin',
+    description: 'Super administrator with full system access including service management',
     permissions: [
       // All permissions - this is a placeholder, in a real system we would list all permissions
       'register_patient', 'view_patients', 'register_user', 'view_users', 'create_data',
@@ -295,7 +310,48 @@ const INITIAL_ROLES: Role[] = [
       'director_payroll_verification', 'view_appointment_individual_limits_report',
       'add_offline_mpesa_payment', 'view_edited_charges_report', 'view_waiting_patients',
       'process_etims_invoice', 'process_etims_invoice_manually', 'discharge_with_balance',
-      'payroll_restriction', 'stores_requisitions', 'register_items', 'view_items'
+      'payroll_restriction', 'stores_requisitions', 'register_items', 'view_items',
+      // Super Admin exclusive permissions
+      'manage_service_control', 'access_system_administration', 'manage_all_users',
+      'control_server_services', 'access_service_management', 'manage_system_settings',
+      'view_audit_logs', 'manage_security_settings', 'manage_database'
+    ]
+  },
+  {
+    id: 'bristol-admin',
+    name: 'Bristol Admin',
+    description: 'Hospital operations administrator with full back office access but limited system administration',
+    permissions: [
+      // All hospital and back office permissions
+      'register_patient', 'view_patients', 'register_user', 'view_users',
+      'view_invoices', 'add_invoice_payment', 'handle_main_store_transactions',
+      'view_patients_seen_on_a_selected_period', 'register_inpatient', 'view_admitted_patients',
+      'view_appointments', 'view_patient_charges', 'reconcile_personal_charges_payments',
+      'daily_cash_reports', 'daily_credit_reports', 'record_expense', 'expenses_report',
+      'items_that_need_reorder', 'upload_hospital_logo', 'logo_details',
+      'view_waiting_patients_for_lab', 'view_patient_visits_on_lab',
+      'view_waiting_patients_for_pharmacy', 'medicine_stock_report',
+      'view_waiting_patients_for_radiology', 'view_patient_visits_on_radiology',
+      'edit_patient_charges', 'collections_per_service_corporate_report',
+      'record_vital_signs', 'view_inpatient_admission_profile',
+      'view_interim_inpatient_bill', 'discharge_patient',
+      'upload_appointment_files', 'view_patients_diagnoses',
+      'view_physiotherapy_stock', 'assets', 'leave_management',
+      'view_ministry_of_health_reports', 'view_management_reports',
+      'view_patient_notes', 'view_discharge_summary',
+      'view_laboratory_price_list', 'view_radiology_price_list',
+      'view_medicine_price_list', 'view_services_price_list',
+      'view_user_activity_logs', 'register_clinic', 'view_clinic',
+      'view_waiting_patients', 'register_items', 'view_items',
+      // Back office permissions
+      'handle_payroll', 'chart_of_accounts', 'general_journal', 'banking', 'petty_cash',
+      'taxes', 'general_accounting_items', 'money_in_items', 'money_out_items',
+      'view_accounting_reports', 'stores', 'issue_items_to_cost_centres',
+      'loan_items_to_cost_centres', 'internal_transfers', 'stock_adjustment',
+      'inventory_reports', 'create_and_view_purchase_orders', 'employee_performance_management',
+      'stores_requisitions',
+      // Limited administration permissions (no service control)
+      'manage_hospital_users', 'manage_basic_settings'
     ]
   },
   {
@@ -458,6 +514,12 @@ const UserRolesContext = createContext<UserRolesContextType | undefined>(undefin
 
 // Provider component
 export const UserRolesProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Safety check for React context
+  if (typeof React === 'undefined' || !React.useState) {
+    console.error('React is not properly loaded in UserRolesProvider');
+    return <>{children}</>;
+  }
+
   const [roles, setRoles] = useState<Role[]>(() => {
     const storedRoles = localStorage.getItem('roles');
     return storedRoles ? JSON.parse(storedRoles) : INITIAL_ROLES;

@@ -4,9 +4,9 @@ import UnifiedDashboard from '../pages/UnifiedDashboard';
 import PatientFlow from '../pages/PatientFlow';
 import DocumentCenter from '../pages/DocumentCenter';
 import { PatientRegister } from '../pages/PatientRegister';
-import DesignSystem from '../pages/DesignSystem.jsx';
+import DesignSystem from '../pages/DesignSystem';
 import Settings from '../pages/Settings';
-import UserManagement from '../pages/UserManagement';
+// import UserManagement from '../pages/UserManagement'; // Old component
 import PermissionTest from '../pages/PermissionTest';
 import LoginCredentials from '../pages/LoginCredentials';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
@@ -28,6 +28,7 @@ import AppointmentReports from '../pages/appointments/AppointmentReports';
 
 // Admissions Module
 import AdmissionsModule from '../pages/admissions/AdmissionsModule';
+import BristolParkWardsModule from '../pages/admissions/BristolParkWardsModule';
 
 // Clinical Module
 import ClinicalModule from '../pages/clinical/ClinicalModule';
@@ -59,9 +60,16 @@ import AmbulanceModule from '../pages/ambulance/AmbulanceModule';
 // Back Office Module
 import BackOfficeModule from '../pages/back-office/BackOfficeModule';
 
+// Admin Service Management
+import ServiceManagement from '../pages/admin/ServiceManagement';
+import UserManagement from '../pages/admin/UserManagement';
+
 // Settings Pages
 import NotificationSettings from '../pages/settings/NotificationSettings';
-import PatientDetailsDemo from '../pages/PatientDetailsDemo';
+import PatientRegisterModule from '../pages/PatientRegisterModule';
+import PatientDetailsView from '../pages/PatientDetailsView';
+import PatientEditForm from '../pages/PatientEditForm';
+import AppointmentScheduler from '../pages/AppointmentScheduler';
 import IconTest from '../components/IconTest';
 
 export const AppRoutes: React.FC = () => {
@@ -71,23 +79,43 @@ export const AppRoutes: React.FC = () => {
         <Route path="/" element={<UnifiedDashboard />} />
         <Route path="/dashboard" element={<UnifiedDashboard />} />
 
-        <Route path="/patients/*" element={
+        <Route path="/patients" element={
           <ProtectedRoute requiredPermission="view_patients">
-            <PatientFlow />
-          </ProtectedRoute>
-        } />
-
-        <Route path="/patient-module" element={
-          <ProtectedRoute requiredPermission="register_patient">
             <PatientProvider>
               <ToastProvider>
                 <InsuranceProvider>
-                  <PatientRegister />
+                  <PatientRegisterModule />
                 </InsuranceProvider>
               </ToastProvider>
             </PatientProvider>
           </ProtectedRoute>
         } />
+
+        <Route path="/patients/details/:patientId" element={
+          <ProtectedRoute requiredPermission="view_patients">
+            <PatientProvider>
+              <ToastProvider>
+                <InsuranceProvider>
+                  <PatientDetailsView />
+                </InsuranceProvider>
+              </ToastProvider>
+            </PatientProvider>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/patients/edit/:patientId" element={
+          <ProtectedRoute requiredPermission="edit_patients">
+            <PatientProvider>
+              <ToastProvider>
+                <InsuranceProvider>
+                  <PatientEditForm />
+                </InsuranceProvider>
+              </ToastProvider>
+            </PatientProvider>
+          </ProtectedRoute>
+        } />
+
+
 
         <Route path="/settings" element={
           <ProtectedRoute requiredPermission="upload_hospital_logo">
@@ -108,8 +136,10 @@ export const AppRoutes: React.FC = () => {
         } />
 
         <Route path="/users" element={
-          <ProtectedRoute requiredPermission="register_user">
-            <UserManagement />
+          <ProtectedRoute requiredPermission="manage_hospital_users">
+            <ToastProvider>
+              <UserManagement />
+            </ToastProvider>
           </ProtectedRoute>
         } />
 
@@ -124,6 +154,11 @@ export const AppRoutes: React.FC = () => {
 
         {/* Appointment Module Routes */}
         <Route path="/appointments">
+          <Route path="new" element={
+            <ProtectedRoute requiredPermission="create_appointments">
+              <AppointmentScheduler />
+            </ProtectedRoute>
+          } />
           <Route path="queue" element={
             <ProtectedRoute requiredPermission="view_queue">
               <ToastProvider>
@@ -154,13 +189,22 @@ export const AppRoutes: React.FC = () => {
           } />
         </Route>
 
-        {/* Admissions Module Route */}
+        {/* Admissions Module Routes */}
         <Route path="/admissions" element={
           <ProtectedRoute requiredPermission="view_admitted_patients">
             <ToastProvider>
               <AdmissionProvider>
                 <AdmissionsModule />
               </AdmissionProvider>
+            </ToastProvider>
+          </ProtectedRoute>
+        } />
+
+        {/* Bristol Park Wards Module Route */}
+        <Route path="/wards" element={
+          <ProtectedRoute requiredPermission="view_admitted_patients">
+            <ToastProvider>
+              <BristolParkWardsModule />
             </ToastProvider>
           </ProtectedRoute>
         } />
@@ -324,6 +368,51 @@ export const AppRoutes: React.FC = () => {
           </ProtectedRoute>
         } />
 
+        {/* Administration Module Routes */}
+        <Route path="/admin/services" element={
+          <ProtectedRoute requiredPermission="access_service_management">
+            <ToastProvider>
+              <ServiceManagement />
+            </ToastProvider>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/roles" element={
+          <ProtectedRoute requiredPermission="manage_hospital_users">
+            <div className="p-6">
+              <h1 className="text-2xl font-bold">Role & Permissions Management</h1>
+              <p className="text-gray-600 mt-2">Manage user roles and permissions (Coming Soon)</p>
+            </div>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/database" element={
+          <ProtectedRoute requiredPermission="manage_database">
+            <div className="p-6">
+              <h1 className="text-2xl font-bold">Database Management</h1>
+              <p className="text-gray-600 mt-2">Database administration and maintenance (Coming Soon)</p>
+            </div>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/audit" element={
+          <ProtectedRoute requiredPermission="view_audit_logs">
+            <div className="p-6">
+              <h1 className="text-2xl font-bold">Audit Logs</h1>
+              <p className="text-gray-600 mt-2">System audit logs and user activity tracking (Coming Soon)</p>
+            </div>
+          </ProtectedRoute>
+        } />
+
+        <Route path="/admin/security" element={
+          <ProtectedRoute requiredPermission="manage_security_settings">
+            <div className="p-6">
+              <h1 className="text-2xl font-bold">Security Settings</h1>
+              <p className="text-gray-600 mt-2">System security configuration and policies (Coming Soon)</p>
+            </div>
+          </ProtectedRoute>
+        } />
+
         {/* Back Office Module Route */}
         <Route path="/back-office/*" element={
           <ProtectedRoute requiredPermission="view_patients">
@@ -357,7 +446,6 @@ export const AppRoutes: React.FC = () => {
         <Route path="/design-system" element={<DesignSystem />} />
         <Route path="/permissions" element={<PermissionTest />} />
         <Route path="/login-credentials" element={<LoginCredentials />} />
-        <Route path="/patient-demo" element={<PatientDetailsDemo />} />
         <Route path="/icon-test" element={<IconTest />} />
         <Route path="/test-patient-flow" element={
           <PatientProvider>

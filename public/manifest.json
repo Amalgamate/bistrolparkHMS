@@ -1,0 +1,65 @@
+{
+  "name": "Bristol Park Hospital Management System",
+  "short_name": "Bristol Park HMS",
+  "description": "Comprehensive hospital management system for Bristol Park Hospital",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0100f6",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["medical", "healthcare", "productivity"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTkyIiBoZWlnaHQ9IjE5MiIgdmlld0JveD0iMCAwIDE5MiAxOTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxOTIiIGhlaWdodD0iMTkyIiByeD0iMjQiIGZpbGw9IiMwMTAwZjYiLz4KPHN2ZyB4PSI0OCIgeT0iNDgiIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IndoaXRlIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCI+CjxwYXRoIGQ9Im0xMiAzLTEuOTEyIDUuODEzYTIgMiAwIDAgMS0xLjI5NSAxLjI5NUwzIDEybDUuODEzIDEuOTEyYTIgMiAwIDAgMSAxLjI5NSAxLjI5NUwxMiAyMWwxLjkxMi01LjgxM2EyIDIgMCAwIDEgMS4yOTUtMS4yOTVMMjEgMTJsLTUuODEzLTEuOTEyYTIgMiAwIDAgMS0xLjI5NS0xLjI5NVoiLz4KPC9zdmc+Cjwvc3ZnPgo=",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTEyIiBoZWlnaHQ9IjUxMiIgdmlld0JveD0iMCAwIDUxMiA1MTIiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI1MTIiIGhlaWdodD0iNTEyIiByeD0iNjQiIGZpbGw9IiMwMTAwZjYiLz4KPHN2ZyB4PSIxMjgiIHk9IjEyOCIgd2lkdGg9IjI1NiIgaGVpZ2h0PSIyNTYiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSJ3aGl0ZSIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPgo8cGF0aCBkPSJtMTIgMy0xLjkxMiA1LjgxM2EyIDIgMCAwIDEtMS4yOTUgMS4yOTVMMyAxMmw1LjgxMyAxLjkxMmEyIDIgMCAwIDEgMS4yOTUgMS4yOTVMMTIgMjFsMS45MTItNS44MTNhMiAyIDAgMCAxIDEuMjk1LTEuMjk1TDIxIDEybC01LjgxMy0xLjkxMmEyIDIgMCAwIDEtMS4yOTUtMS4yOTVaIi8+Cjwvc3ZnPgo8L3N2Zz4K",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Patient Registration",
+      "short_name": "Register",
+      "description": "Register new patients",
+      "url": "/patients"
+    },
+    {
+      "name": "Appointment Queue",
+      "short_name": "Queue",
+      "description": "View appointment queue",
+      "url": "/appointments/queue"
+    },
+    {
+      "name": "Clinical Module",
+      "short_name": "Clinical",
+      "description": "Access clinical workflows",
+      "url": "/clinical"
+    },
+    {
+      "name": "Service Management",
+      "short_name": "Services",
+      "description": "Manage system services",
+      "url": "/admin/services"
+    }
+  ],
+  "screenshots": [],
+  "related_applications": [],
+  "prefer_related_applications": false,
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "protocol_handlers": [
+    {
+      "protocol": "web+bristolpark",
+      "url": "/?protocol=%s"
+    }
+  ]
+}

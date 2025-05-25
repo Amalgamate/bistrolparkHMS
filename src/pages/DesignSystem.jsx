@@ -9,10 +9,11 @@ import {
   Loader, AlertTriangle, CheckCircle2,
   XCircle, Smile, Frown, Meh,
   Heart, ThumbsUp, Star, Phone,
-  Mail, MapPin
+  Mail, MapPin, Shield
 } from 'lucide-react';
 import { getPastelColors } from '../utils/colorUtils';
 import { useToast } from '../context/ToastContext';
+import PermissionDebug from '../components/debug/PermissionDebug';
 
 const DesignSystem = () => {
   // Get our predefined pastel colors
@@ -77,10 +78,23 @@ const DesignSystem = () => {
             <Smile className="w-4 h-4 mr-2" />
             Emojis
           </a>
+          <a href="#permissions" className="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center">
+            <Shield className="w-4 h-4 mr-2" />
+            Permission Debug
+          </a>
         </div>
       </div>
 
       <div className="space-y-12">
+
+        {/* Permission Debug Section */}
+        <section id="permissions" className="border rounded-lg p-6 bg-white shadow-sm">
+          <h2 className="text-2xl font-semibold text-[#2B3990] mb-6">Permission Debug</h2>
+          <p className="text-gray-600 mb-6">
+            Debug tool to verify current user permissions and role-based access control.
+          </p>
+          <PermissionDebug />
+        </section>
 
         {/* Typography Section */}
         <section id="typography" className="border rounded-lg p-6 bg-white shadow-sm">

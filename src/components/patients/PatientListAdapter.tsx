@@ -34,21 +34,31 @@ const PatientListAdapter: React.FC<PatientListAdapterProps> = ({
   onDelete
 }) => {
   // Convert simplified patients to the format expected by VirtualizedPatientList
-  const adaptedPatients = patients.map(patient => ({
-    id: parseInt(patient.id.replace(/\D/g, '')) || Math.floor(Math.random() * 10000), // Convert string ID to number or generate random ID
-    firstName: patient.name.split(' ')[0],
-    lastName: patient.name.split(' ').slice(1).join(' '),
-    gender: patient.gender,
-    dateOfBirth: `${new Date().getFullYear() - patient.age}-01-01`, // Approximate from age
-    phone: patient.phone,
-    email: patient.email,
-    bloodGroup: patient.bloodType,
-    lastVisit: patient.lastVisit,
-    status: patient.status || 'Active',
-    isAdmitted: patient.isAdmitted,
-    isCleared: patient.isCleared,
-    nationalId: patient.id // Use the original ID as nationalId for display
-  }));
+  const adaptedPatients = patients.map((patient, index) => {
+    // Ensure we have a valid numeric ID
+    const numericId = parseInt(patient.id) || index + 1;
+
+    // Split name properly
+    const nameParts = patient.name.split(' ').filter(part => part.trim());
+    const firstName = nameParts[0] || 'Unknown';
+    const lastName = nameParts.slice(1).join(' ') || '';
+
+    return {
+      id: numericId,
+      firstName: firstName,
+      lastName: lastName,
+      gender: patient.gender,
+      dateOfBirth: patient.dateOfBirth || `${new Date().getFullYear() - patient.age}-01-01`,
+      phone: patient.phone,
+      email: patient.email,
+      bloodGroup: patient.bloodType,
+      lastVisit: patient.lastVisit,
+      status: patient.status || 'Active',
+      isAdmitted: patient.isAdmitted || false,
+      isCleared: patient.isCleared || false,
+      nationalId: patient.idNumber || patient.id // Use ID number or fallback to patient ID
+    };
+  });
 
   // Calculate age from date of birth
   const calculateAge = (dateOfBirth: string) => {

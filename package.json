@@ -4,7 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host --open",
+    "dev:hmr": "vite --host --open --force",
+    "dev:debug": "vite --host --open --debug hmr",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -13,7 +15,10 @@
     "docker:stop": "docker-compose down",
     "docker:logs": "docker-compose logs -f",
     "test": "echo 'Tests will be added here'",
-    "deploy": "npm run build && npm run docker:prod"
+    "deploy": "npm run build && npm run docker:prod",
+    "start:all": "node scripts/unified-startup.js",
+    "start:full": "npm run start:all",
+    "dev:full": "npm run start:all"
   },
   "dependencies": {
     "@emoji-mart/data": "^1.2.1",

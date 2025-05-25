@@ -55,7 +55,10 @@ import {
   Package,
   ShieldCheck,
   Database,
-  MessageSquare
+  MessageSquare,
+  Code,
+  Lock,
+  Server
 } from 'lucide-react';
 import PermissionNavSection from './PermissionNavSection';
 import { ColoredIcon } from '../ui/colored-icon';
@@ -77,64 +80,16 @@ interface NavItemProps {
   iconColor?: ColorVariant;
 }
 
-const NavItem: React.FC<NavItemProps & { disabled?: boolean }> = ({
+const NavItem: React.FC<NavItemProps> = ({
   icon: Icon,
   text,
   isActive = false,
   onClick,
   to,
   collapsed = false,
-  disabled = false,
   iconColor
 }) => {
   const navigate = useNavigate();
-
-  // Define active modules - including Back Office modules
-  const isActiveModule =
-    text === "Patients" ||
-    text === "Patients Register" ||
-    text === "Admissions" ||
-    text === "Appointments" ||
-    text === "Clinical" ||
-    text === "Clinical/Nursing" ||
-    text === "Laboratory" ||
-    text === "Pharmacy" ||
-    text === "Radiology" ||
-    text === "Patient Queue" ||
-    text === "Appointment Management" ||
-    text === "Visit Records" ||
-    text === "Reports" ||
-    text === "Branch Settings" ||
-    text === "User Management" ||
-    text === "General Settings" ||
-    text === "Dashboard" ||
-    text === "Design System" ||
-    text === "Document Center" ||
-    text === "Procedures" ||
-    text === "Maternity" ||
-    text === "Physiotherapy" ||
-    text === "Mortuary" ||
-    text === "Emergency" ||
-    text === "Blood Bank" ||
-    text === "Ambulance" ||
-    text === "Emergency Services" ||
-    // Back Office Modules
-    text === "Back Office" ||
-    text === "Human Resources" ||
-    text === "Finance" ||
-    text === "Administration" ||
-    text === "Inventory" ||
-    text === "Procurement" ||
-    text === "Contracts" ||
-    text === "Compliance" ||
-    text === "Analytics" ||
-    text === "Audit Logs" ||
-    text === "Scheduling" ||
-    text === "Database" ||
-    text === "Approvals";
-
-  // Apply disabled styling if the module is not active
-  const isDisabled = disabled || (!isActiveModule && !["Dashboard"].includes(text));
 
   // Determine icon color based on module type
   const getIconColor = (): ColorVariant => {
@@ -172,34 +127,27 @@ const NavItem: React.FC<NavItemProps & { disabled?: boolean }> = ({
       href="#"
       onClick={(e) => {
         e.preventDefault();
-        if (isDisabled) return; // Prevent navigation for disabled items
         if (onClick) onClick();
         if (to) navigate(to);
       }}
       className={`flex ${collapsed ? 'justify-center' : 'items-center justify-start'} px-3 py-2 my-1 text-sm font-medium rounded-md group transition-all duration-150 ease-in-out relative ${
         isActive
           ? 'bg-[#F5B800] text-black font-semibold'
-          : isDisabled
-            ? 'text-gray-500 cursor-not-allowed opacity-70'
-            : 'text-gray-300 hover:text-white hover:bg-[#0000c7] hover:bg-opacity-50'
+          : 'text-gray-300 hover:text-white hover:bg-[#0000c7] hover:bg-opacity-50'
       }`}
       title={collapsed ? text : ''}
     >
-      {!collapsed && !isDisabled && (
+      {!collapsed && (
         <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-1 rounded-full bg-[#F5B800]"></div>
       )}
       <div className="ml-1 w-8 flex justify-center">
-        {isDisabled ? (
-          <Icon className="w-5 h-5 text-gray-500 opacity-70" />
-        ) : (
-          <ColoredIcon
-            icon={Icon}
-            color={getIconColor()}
-            size="xs"
-            variant={isActive ? "solid" : "outline"}
-            whiteBackground={true}
-          />
-        )}
+        <ColoredIcon
+          icon={Icon}
+          color={getIconColor()}
+          size="xs"
+          variant={isActive ? "solid" : "outline"}
+          whiteBackground={true}
+        />
       </div>
       {!collapsed && <span>{text}</span>}
     </a>
@@ -216,54 +164,16 @@ interface CollapsibleNavItemProps {
   iconColor?: ColorVariant;
 }
 
-const CollapsibleNavItem: React.FC<CollapsibleNavItemProps & { disabled?: boolean }> = ({
+const CollapsibleNavItem: React.FC<CollapsibleNavItemProps> = ({
   icon: Icon,
   text,
   children,
   isActive = false,
   defaultOpen = false,
   collapsed = false,
-  disabled = false,
   iconColor
 }) => {
   const [isOpen, setIsOpen] = useState(isActive || defaultOpen);
-
-  // Define active modules - including Back Office modules
-  const isActiveModule =
-    text === "Patients" ||
-    text === "Admissions" ||
-    text === "Appointments" ||
-    text === "Clinical" ||
-    text === "Clinical/Nursing" ||
-    text === "Laboratory" ||
-    text === "Pharmacy" ||
-    text === "Settings" ||
-    text === "Procedures" ||
-    text === "Maternity" ||
-    text === "Physiotherapy" ||
-    text === "Mortuary" ||
-    text === "Emergency" ||
-    text === "Blood Bank" ||
-    text === "Ambulance" ||
-    text === "Emergency Services" ||
-    // Back Office Modules
-    text === "Back Office" ||
-    text === "Human Resources" ||
-    text === "Finance" ||
-    text === "Administration" ||
-    text === "Inventory" ||
-    text === "Procurement" ||
-    text === "Contracts" ||
-    text === "Compliance" ||
-    text === "Reports" ||
-    text === "Analytics" ||
-    text === "Audit Logs" ||
-    text === "Scheduling" ||
-    text === "Database" ||
-    text === "Approvals";
-
-  // Apply disabled styling if the module is not active
-  const isDisabled = disabled || (!isActiveModule && !["Dashboard"].includes(text));
 
   // Determine icon color based on module type
   const getIconColor = (): ColorVariant => {
@@ -304,24 +214,18 @@ const CollapsibleNavItem: React.FC<CollapsibleNavItemProps & { disabled?: boolea
           className={`flex justify-center px-3 py-2 text-sm font-medium rounded-md transition-all duration-150 ease-in-out ${
             isActive
               ? 'bg-[#F5B800] text-black font-semibold'
-              : isDisabled
-                ? 'text-gray-500 cursor-pointer opacity-70'
-                : 'text-gray-300 hover:text-white hover:bg-[#0000c7] hover:bg-opacity-50'
+              : 'text-gray-300 hover:text-white hover:bg-[#0000c7] hover:bg-opacity-50'
           }`}
           title={text}
         >
           <div className="w-8 flex justify-center">
-            {isDisabled ? (
-              <Icon className="w-5 h-5 text-gray-500 opacity-70" />
-            ) : (
-              <ColoredIcon
-                icon={Icon}
-                color={getIconColor()}
-                size="xs"
-                variant={isActive ? "solid" : "outline"}
-                whiteBackground={true}
-              />
-            )}
+            <ColoredIcon
+              icon={Icon}
+              color={getIconColor()}
+              size="xs"
+              variant={isActive ? "solid" : "outline"}
+              whiteBackground={true}
+            />
           </div>
         </a>
         <div className="absolute left-full top-0 ml-2 hidden group-hover:block z-50 bg-[#0100f6] rounded-md shadow-lg py-2 w-48">
@@ -340,37 +244,30 @@ const CollapsibleNavItem: React.FC<CollapsibleNavItemProps & { disabled?: boolea
         href="#"
         onClick={(e) => {
           e.preventDefault();
-          // Allow toggling even for disabled items
           setIsOpen(!isOpen);
         }}
         className={`flex items-center justify-between px-3 py-2 text-sm font-medium rounded-md transition-all duration-150 ease-in-out ${
           isActive
             ? 'bg-[#F5B800] text-black font-semibold'
-            : isDisabled
-              ? 'text-gray-500 cursor-pointer opacity-70'
-              : 'text-gray-300 hover:text-white hover:bg-[#0000c7] hover:bg-opacity-50'
+            : 'text-gray-300 hover:text-white hover:bg-[#0000c7] hover:bg-opacity-50'
         }`}
       >
         <div className="flex items-center">
           <div className="ml-1 w-8 flex justify-center">
-            {isDisabled ? (
-              <Icon className="w-5 h-5 text-gray-500 opacity-70" />
-            ) : (
-              <ColoredIcon
-                icon={Icon}
-                color={getIconColor()}
-                size="xs"
-                variant={isActive ? "solid" : "outline"}
-                whiteBackground={true}
-              />
-            )}
+            <ColoredIcon
+              icon={Icon}
+              color={getIconColor()}
+              size="xs"
+              variant={isActive ? "solid" : "outline"}
+              whiteBackground={true}
+            />
           </div>
           {text}
         </div>
         {isOpen ? (
-          <ChevronDown className={`w-4 h-4 ${isDisabled ? 'text-gray-500' : ''}`} />
+          <ChevronDown className="w-4 h-4" />
         ) : (
-          <ChevronRight className={`w-4 h-4 ${isDisabled ? 'text-gray-500' : ''}`} />
+          <ChevronRight className="w-4 h-4" />
         )}
       </a>
       {isOpen && (
@@ -395,14 +292,13 @@ interface CollapsibleSectionProps {
   iconColor?: ColorVariant;
 }
 
-const CollapsibleSection: React.FC<CollapsibleSectionProps & { disabled?: boolean }> = ({
+const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   title,
   children,
   icon: Icon,
   defaultOpen = false,
   collapsed = false,
   abbreviation,
-  disabled = false,
   iconColor
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
@@ -417,30 +313,6 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps & { disabled?: boolea
       .map(word => word.charAt(0))
       .join('');
   }, [abbreviation, title]);
-
-  // Define active modules - including Back Office modules
-  const isActiveModule =
-    title === "Patients" ||
-    title === "Admissions" ||
-    title === "Appointments" ||
-    title === "Clinical" ||
-    title === "Pharmacy" ||
-    title === "Radiology" ||
-    title === "Settings" ||
-    title === "Hospital Modules" ||
-    title === "Back Office Modules" ||
-    title === "Procedures" ||
-    title === "Maternity" ||
-    title === "Physiotherapy" ||
-    title === "Mortuary" ||
-    title === "Emergency" ||
-    title === "Blood Bank" ||
-    title === "Ambulance" ||
-    title === "Emergency Services" ||
-    title === "Approvals";
-
-  // Apply disabled styling if the module is not active
-  const isDisabled = disabled || (!isActiveModule && !["Dashboard"].includes(title));
 
   // Determine icon color based on section type
   const getIconColor = (): ColorVariant => {
@@ -461,24 +333,16 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps & { disabled?: boolea
       <div className="mt-4 relative group">
         <div className="flex flex-col items-center">
           <div className="w-8 flex justify-center">
-            {isDisabled ? (
-              <div className="w-8 h-8 flex items-center justify-center rounded-md bg-gray-500 text-gray-300 opacity-70 cursor-pointer">
-                <Icon className="w-4 h-4" />
-              </div>
-            ) : (
-              <ColoredIcon
-                icon={Icon}
-                color={getIconColor()}
-                size="sm"
-                variant="solid"
-                className="rounded-md"
-                whiteBackground={true}
-              />
-            )}
+            <ColoredIcon
+              icon={Icon}
+              color={getIconColor()}
+              size="sm"
+              variant="solid"
+              className="rounded-md"
+              whiteBackground={true}
+            />
           </div>
-          <div className={`text-[10px] mt-1 font-semibold ${
-            isDisabled ? 'text-gray-500 opacity-70' : 'text-gray-300'
-          }`}>
+          <div className="text-[10px] mt-1 font-semibold text-gray-300">
             {abbr}
           </div>
         </div>
@@ -501,35 +365,26 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps & { disabled?: boolea
     <div className="mt-6">
       <button
         onClick={() => {
-          // Allow toggling even for disabled items
           setIsOpen(!isOpen);
         }}
-        className={`w-full flex items-center justify-between px-3 py-2 text-xs font-bold tracking-wider uppercase focus:outline-none transition-all duration-150 ${
-          isDisabled
-            ? 'text-gray-500 opacity-70 cursor-pointer'
-            : 'text-gray-300 hover:text-white'
-        }`}
+        className="w-full flex items-center justify-between px-3 py-2 text-xs font-bold tracking-wider uppercase focus:outline-none transition-all duration-150 text-gray-300 hover:text-white"
       >
         <div className="flex items-center">
           <div className="ml-1 w-8 flex justify-center">
-            {isDisabled ? (
-              <Icon className="w-4 h-4 text-gray-500 opacity-70" />
-            ) : (
-              <ColoredIcon
-                icon={Icon}
-                color={getIconColor()}
-                size="xs"
-                variant="solid"
-                whiteBackground={true}
-              />
-            )}
+            <ColoredIcon
+              icon={Icon}
+              color={getIconColor()}
+              size="xs"
+              variant="solid"
+              whiteBackground={true}
+            />
           </div>
           {title}
         </div>
         {isOpen ? (
-          <ChevronDown className={`w-4 h-4 ${isDisabled ? 'text-gray-500' : ''}`} />
+          <ChevronDown className="w-4 h-4" />
         ) : (
-          <ChevronRight className={`w-4 h-4 ${isDisabled ? 'text-gray-500' : ''}`} />
+          <ChevronRight className="w-4 h-4" />
         )}
       </button>
       {isOpen && (
@@ -635,8 +490,8 @@ export const UnifiedSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, clas
               <NavItem
                 icon={User}
                 text="Patients"
-                to="/patient-module"
-                isActive={currentPath.includes('/patients') || currentPath.includes('/patient-module')}
+                to="/patients"
+                isActive={currentPath.includes('/patients')}
                 collapsed={collapsed}
                 iconColor="green"
               />
@@ -653,6 +508,8 @@ export const UnifiedSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, clas
                 iconColor="amber"
               />
             </PermissionNavSection>
+
+
 
             {/* Appointments - Active (Fourth item) */}
             <PermissionNavSection requiredPermission="view_appointments">
@@ -679,34 +536,40 @@ export const UnifiedSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, clas
             </PermissionNavSection>
 
             {/* Pharmacy (Sixth item) */}
-            <NavItem
-              icon={Pill}
-              text="Pharmacy"
-              to="/pharmacy"
-              isActive={currentPath.includes('/pharmacy')}
-              collapsed={collapsed}
-              iconColor="orange"
-            />
+            <PermissionNavSection requiredPermission="view_waiting_patients_for_pharmacy">
+              <NavItem
+                icon={Pill}
+                text="Pharmacy"
+                to="/pharmacy"
+                isActive={currentPath.includes('/pharmacy')}
+                collapsed={collapsed}
+                iconColor="orange"
+              />
+            </PermissionNavSection>
 
             {/* Physiotherapy (Seventh item) */}
-            <NavItem
-              icon={Activity}
-              text="Physiotherapy"
-              to="/physiotherapy"
-              isActive={currentPath.includes('/physiotherapy')}
-              collapsed={collapsed}
-              iconColor="green"
-            />
+            <PermissionNavSection requiredPermission="view_physiotherapy_stock">
+              <NavItem
+                icon={Activity}
+                text="Physiotherapy"
+                to="/physiotherapy"
+                isActive={currentPath.includes('/physiotherapy')}
+                collapsed={collapsed}
+                iconColor="green"
+              />
+            </PermissionNavSection>
 
             {/* Maternity (Eighth item) */}
-            <NavItem
-              icon={Baby}
-              text="Maternity"
-              to="/maternity"
-              isActive={currentPath.includes('/maternity')}
-              collapsed={collapsed}
-              iconColor="pink"
-            />
+            <PermissionNavSection requiredPermission="maternity">
+              <NavItem
+                icon={Baby}
+                text="Maternity"
+                to="/maternity"
+                isActive={currentPath.includes('/maternity')}
+                collapsed={collapsed}
+                iconColor="pink"
+              />
+            </PermissionNavSection>
 
             {/* Radiology */}
             <PermissionNavSection requiredPermission="view_waiting_patients_for_radiology">
@@ -721,250 +584,357 @@ export const UnifiedSidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen, clas
             </PermissionNavSection>
 
             {/* Procedures */}
-            <NavItem
-              icon={Scissors}
-              text="Procedures"
-              to="/procedures"
-              isActive={currentPath.includes('/procedures')}
-              collapsed={collapsed}
-              iconColor="purple"
-            />
-
-
+            <PermissionNavSection requiredPermission="view_patients">
+              <NavItem
+                icon={Scissors}
+                text="Procedures"
+                to="/procedures"
+                isActive={currentPath.includes('/procedures')}
+                collapsed={collapsed}
+                iconColor="purple"
+              />
+            </PermissionNavSection>
 
             {/* Emergency Services Group */}
-            <CollapsibleNavItem
-              icon={Siren}
-              text="Emergency Services"
-              collapsed={collapsed}
-              isActive={
-                currentPath.includes('/emergency') ||
-                currentPath.includes('/blood-bank') ||
-                currentPath.includes('/ambulance')
-              }
-              iconColor="red"
-            >
-              <NavItem
-                icon={AlertTriangle}
-                text="Emergency"
-                to="/emergency"
-                isActive={currentPath.includes('/emergency')}
+            <PermissionNavSection requiredPermission="view_patients">
+              <CollapsibleNavItem
+                icon={Siren}
+                text="Emergency Services"
+                collapsed={collapsed}
+                isActive={
+                  currentPath.includes('/emergency') ||
+                  currentPath.includes('/blood-bank') ||
+                  currentPath.includes('/ambulance')
+                }
                 iconColor="red"
-              />
-              <NavItem
-                icon={Droplets}
-                text="Blood Bank"
-                to="/blood-bank"
-                isActive={currentPath.includes('/blood-bank')}
-                iconColor="red"
-              />
-              <NavItem
-                icon={Truck}
-                text="Ambulance"
-                to="/ambulance"
-                isActive={currentPath.includes('/ambulance')}
-                iconColor="red"
-              />
-            </CollapsibleNavItem>
+              >
+                <NavItem
+                  icon={AlertTriangle}
+                  text="Emergency"
+                  to="/emergency"
+                  isActive={currentPath.includes('/emergency')}
+                  iconColor="red"
+                />
+                <NavItem
+                  icon={Droplets}
+                  text="Blood Bank"
+                  to="/blood-bank"
+                  isActive={currentPath.includes('/blood-bank')}
+                  iconColor="red"
+                />
+                <NavItem
+                  icon={Truck}
+                  text="Ambulance"
+                  to="/ambulance"
+                  isActive={currentPath.includes('/ambulance')}
+                  iconColor="red"
+                />
+              </CollapsibleNavItem>
+            </PermissionNavSection>
 
             {/* Mortuary (Last item) */}
-            <NavItem
-              icon={Bed}
-              text="Mortuary"
-              to="/mortuary"
-              isActive={currentPath.includes('/mortuary')}
-              collapsed={collapsed}
-              iconColor="gray"
-            />
+            <PermissionNavSection requiredPermission="mortuary">
+              <NavItem
+                icon={Bed}
+                text="Mortuary"
+                to="/mortuary"
+                isActive={currentPath.includes('/mortuary')}
+                collapsed={collapsed}
+                iconColor="gray"
+              />
+            </PermissionNavSection>
           </CollapsibleSection>
 
           {/* Back Office Modules */}
-          <CollapsibleSection
-            title="Back Office Modules"
-            icon={Briefcase}
-            collapsed={collapsed}
-            abbreviation="BO"
-            defaultOpen={currentPath.includes('/back-office')}
-            iconColor="amber"
-          >
-            {/* Back Office Dashboard */}
-            <NavItem
-              icon={BarChart}
-              text="Dashboard"
-              to="/back-office"
-              isActive={currentPath === '/back-office'}
+          <PermissionNavSection requiredPermission="handle_payroll">
+            <CollapsibleSection
+              title="Back Office Modules"
+              icon={Briefcase}
               collapsed={collapsed}
-              iconColor="blue"
-            />
-
-            {/* Human Resources */}
-            <NavItem
-              icon={Users}
-              text="Human Resources"
-              to="/back-office/hr"
-              isActive={currentPath.includes('/back-office/hr')}
-              collapsed={collapsed}
-              iconColor="green"
-            />
-
-            {/* Finance */}
-            <NavItem
-              icon={DollarSign}
-              text="Finance"
-              to="/back-office/finance"
-              isActive={currentPath.includes('/back-office/finance')}
-              collapsed={collapsed}
+              abbreviation="BO"
+              defaultOpen={currentPath.includes('/back-office')}
               iconColor="amber"
-            />
+            >
+              {/* Back Office Dashboard */}
+              <NavItem
+                icon={BarChart}
+                text="Dashboard"
+                to="/back-office"
+                isActive={currentPath === '/back-office'}
+                collapsed={collapsed}
+                iconColor="blue"
+              />
 
-            {/* Administration */}
-            <NavItem
-              icon={Building2}
-              text="Administration"
-              to="/back-office/administration"
-              isActive={currentPath.includes('/back-office/administration')}
-              collapsed={collapsed}
-              iconColor="gray"
-            />
+              {/* Human Resources */}
+              <PermissionNavSection requiredPermission="handle_payroll">
+                <NavItem
+                  icon={Users}
+                  text="Human Resources"
+                  to="/back-office/hr"
+                  isActive={currentPath.includes('/back-office/hr')}
+                  collapsed={collapsed}
+                  iconColor="green"
+                />
+              </PermissionNavSection>
 
-            {/* Inventory */}
-            <NavItem
-              icon={Package}
-              text="Inventory"
-              to="/back-office/inventory"
-              isActive={currentPath.includes('/back-office/inventory')}
-              collapsed={collapsed}
-              iconColor="indigo"
-            />
+              {/* Finance */}
+              <PermissionNavSection requiredPermission="chart_of_accounts">
+                <NavItem
+                  icon={DollarSign}
+                  text="Finance"
+                  to="/back-office/finance"
+                  isActive={currentPath.includes('/back-office/finance')}
+                  collapsed={collapsed}
+                  iconColor="amber"
+                />
+              </PermissionNavSection>
 
-            {/* Procurement */}
-            <NavItem
-              icon={Truck}
-              text="Procurement"
-              to="/back-office/procurement"
-              isActive={currentPath.includes('/back-office/procurement')}
-              collapsed={collapsed}
-              iconColor="orange"
-            />
+              {/* Administration */}
+              <PermissionNavSection requiredPermission="manage_basic_settings">
+                <NavItem
+                  icon={Building2}
+                  text="Administration"
+                  to="/back-office/administration"
+                  isActive={currentPath.includes('/back-office/administration')}
+                  collapsed={collapsed}
+                  iconColor="gray"
+                />
+              </PermissionNavSection>
 
-            {/* Contracts */}
-            <NavItem
-              icon={FileText}
-              text="Contracts"
-              to="/back-office/contracts"
-              isActive={currentPath.includes('/back-office/contracts')}
-              collapsed={collapsed}
-              iconColor="blue"
-            />
+              {/* Inventory */}
+              <PermissionNavSection requiredPermission="stores">
+                <NavItem
+                  icon={Package}
+                  text="Inventory"
+                  to="/back-office/inventory"
+                  isActive={currentPath.includes('/back-office/inventory')}
+                  collapsed={collapsed}
+                  iconColor="indigo"
+                />
+              </PermissionNavSection>
 
-            {/* Compliance */}
-            <NavItem
-              icon={ShieldCheck}
-              text="Compliance"
-              to="/back-office/compliance"
-              isActive={currentPath.includes('/back-office/compliance')}
-              collapsed={collapsed}
-              iconColor="green"
-            />
+              {/* Procurement */}
+              <PermissionNavSection requiredPermission="create_and_view_purchase_orders">
+                <NavItem
+                  icon={Truck}
+                  text="Procurement"
+                  to="/back-office/procurement"
+                  isActive={currentPath.includes('/back-office/procurement')}
+                  collapsed={collapsed}
+                  iconColor="orange"
+                />
+              </PermissionNavSection>
 
-            {/* Reports */}
-            <NavItem
-              icon={Clipboard}
-              text="Reports"
-              to="/back-office/reports"
-              isActive={currentPath.includes('/back-office/reports')}
-              collapsed={collapsed}
-              iconColor="teal"
-            />
+              {/* Contracts */}
+              <PermissionNavSection requiredPermission="view_patients">
+                <NavItem
+                  icon={FileText}
+                  text="Contracts"
+                  to="/back-office/contracts"
+                  isActive={currentPath.includes('/back-office/contracts')}
+                  collapsed={collapsed}
+                  iconColor="blue"
+                />
+              </PermissionNavSection>
 
-            {/* Analytics */}
-            <NavItem
-              icon={LineChart}
-              text="Analytics"
-              to="/back-office/analytics"
-              isActive={currentPath.includes('/back-office/analytics')}
-              collapsed={collapsed}
-              iconColor="indigo"
-            />
+              {/* Compliance */}
+              <PermissionNavSection requiredPermission="view_patients">
+                <NavItem
+                  icon={ShieldCheck}
+                  text="Compliance"
+                  to="/back-office/compliance"
+                  isActive={currentPath.includes('/back-office/compliance')}
+                  collapsed={collapsed}
+                  iconColor="green"
+                />
+              </PermissionNavSection>
 
-            {/* Audit */}
-            <NavItem
-              icon={AlertTriangle}
-              text="Audit"
-              to="/back-office/audit"
-              isActive={currentPath.includes('/back-office/audit')}
+              {/* Reports */}
+              <PermissionNavSection requiredPermission="view_accounting_reports">
+                <NavItem
+                  icon={Clipboard}
+                  text="Reports"
+                  to="/back-office/reports"
+                  isActive={currentPath.includes('/back-office/reports')}
+                  collapsed={collapsed}
+                  iconColor="teal"
+                />
+              </PermissionNavSection>
+
+              {/* Analytics */}
+              <PermissionNavSection requiredPermission="view_management_reports">
+                <NavItem
+                  icon={LineChart}
+                  text="Analytics"
+                  to="/back-office/analytics"
+                  isActive={currentPath.includes('/back-office/analytics')}
+                  collapsed={collapsed}
+                  iconColor="indigo"
+                />
+              </PermissionNavSection>
+
+              {/* Audit */}
+              <PermissionNavSection requiredPermission="view_audit_logs">
+                <NavItem
+                  icon={AlertTriangle}
+                  text="Audit"
+                  to="/back-office/audit"
+                  isActive={currentPath.includes('/back-office/audit')}
+                  collapsed={collapsed}
+                  iconColor="red"
+                />
+              </PermissionNavSection>
+
+              {/* Approvals */}
+              <PermissionNavSection requiredPermission="view_patients">
+                <NavItem
+                  icon={CheckSquare}
+                  text="Approvals"
+                  to="/approvals"
+                  isActive={currentPath.includes('/approvals')}
+                  collapsed={collapsed}
+                  iconColor="green"
+                />
+              </PermissionNavSection>
+
+              {/* Scheduling */}
+              <PermissionNavSection requiredPermission="leave_management">
+                <NavItem
+                  icon={Calendar}
+                  text="Scheduling"
+                  to="/back-office/scheduling"
+                  isActive={currentPath.includes('/back-office/scheduling')}
+                  collapsed={collapsed}
+                  iconColor="pink"
+                />
+              </PermissionNavSection>
+
+              {/* Database */}
+              <PermissionNavSection requiredPermission="manage_database">
+                <NavItem
+                  icon={Database}
+                  text="Database"
+                  to="/back-office/database"
+                  isActive={currentPath.includes('/back-office/database')}
+                  collapsed={collapsed}
+                  iconColor="gray"
+                />
+              </PermissionNavSection>
+            </CollapsibleSection>
+          </PermissionNavSection>
+
+          {/* 3. Administration Modules */}
+          <PermissionNavSection requiredPermission="manage_basic_settings">
+            <CollapsibleSection
+              title="Administration"
+              icon={Shield}
               collapsed={collapsed}
+              abbreviation="ADM"
+              defaultOpen={currentPath.includes('/admin') || currentPath.includes('/users') || currentPath.includes('/settings')}
               iconColor="red"
-            />
-
-            {/* Approvals */}
-            <NavItem
-              icon={CheckSquare}
-              text="Approvals"
-              to="/approvals"
-              isActive={currentPath.includes('/approvals')}
-              collapsed={collapsed}
-              iconColor="green"
-            />
-
-            {/* Scheduling */}
-            <NavItem
-              icon={Calendar}
-              text="Scheduling"
-              to="/back-office/scheduling"
-              isActive={currentPath.includes('/back-office/scheduling')}
-              collapsed={collapsed}
-              iconColor="pink"
-            />
-
-            {/* Database */}
-            <NavItem
-              icon={Database}
-              text="Database"
-              to="/back-office/database"
-              isActive={currentPath.includes('/back-office/database')}
-              collapsed={collapsed}
-              iconColor="gray"
-            />
-          </CollapsibleSection>
-
-          {/* 3. Settings */}
-          <CollapsibleSection
-            title="Settings"
-            icon={Settings}
-            collapsed={collapsed}
-            abbreviation="SET"
-            defaultOpen={currentPath.includes('/settings') || currentPath.includes('/users')}
-            iconColor="gray"
-          >
-            {/* User Management - Active */}
-            <PermissionNavSection requiredPermission="register_user">
+            >
+            {/* User Management */}
+            <PermissionNavSection requiredPermission="manage_hospital_users">
               <NavItem
                 icon={UserCog}
                 text="User Management"
                 to="/users"
                 isActive={currentPath.includes('/users')}
+                collapsed={collapsed}
                 iconColor="blue"
               />
             </PermissionNavSection>
 
-            {/* General Settings - Active */}
-            <PermissionNavSection requiredPermission="upload_hospital_logo">
+            {/* Role & Permissions */}
+            <PermissionNavSection requiredPermission="manage_hospital_users">
               <NavItem
-                icon={Building2}
-                text="General Settings"
+                icon={Users}
+                text="Role & Permissions"
+                to="/admin/roles"
+                isActive={currentPath.includes('/admin/roles')}
+                collapsed={collapsed}
+                iconColor="purple"
+              />
+            </PermissionNavSection>
+
+            {/* System Settings */}
+            <PermissionNavSection requiredPermission="manage_basic_settings">
+              <NavItem
+                icon={Settings}
+                text="System Settings"
                 to="/settings"
                 isActive={currentPath.includes('/settings')}
+                collapsed={collapsed}
                 iconColor="gray"
               />
             </PermissionNavSection>
 
+            {/* Database Management */}
+            <PermissionNavSection requiredPermission="manage_database">
+              <NavItem
+                icon={Database}
+                text="Database Management"
+                to="/admin/database"
+                isActive={currentPath.includes('/admin/database')}
+                collapsed={collapsed}
+                iconColor="green"
+              />
+            </PermissionNavSection>
+
+            {/* Service Management */}
+            <PermissionNavSection requiredPermission="access_service_management">
+              <NavItem
+                icon={Server}
+                text="Service Management"
+                to="/admin/services"
+                isActive={currentPath.includes('/admin/services')}
+                collapsed={collapsed}
+                iconColor="blue"
+              />
+            </PermissionNavSection>
+
+            {/* Audit Logs */}
+            <PermissionNavSection requiredPermission="view_audit_logs">
+              <NavItem
+                icon={FileText}
+                text="Audit Logs"
+                to="/admin/audit"
+                isActive={currentPath.includes('/admin/audit')}
+                collapsed={collapsed}
+                iconColor="orange"
+              />
+            </PermissionNavSection>
+
+            {/* Security Settings */}
+            <PermissionNavSection requiredPermission="manage_security_settings">
+              <NavItem
+                icon={Lock}
+                text="Security Settings"
+                to="/admin/security"
+                isActive={currentPath.includes('/admin/security')}
+                collapsed={collapsed}
+                iconColor="red"
+              />
+            </PermissionNavSection>
+            </CollapsibleSection>
+          </PermissionNavSection>
+
+          {/* 4. Development Tools */}
+          <CollapsibleSection
+            title="Development"
+            icon={Code}
+            collapsed={collapsed}
+            abbreviation="DEV"
+            defaultOpen={currentPath.includes('/design-system')}
+            iconColor="pink"
+          >
             {/* Design System - For development only */}
             <NavItem
               icon={Palette}
               text="Design System"
               to="/design-system"
               isActive={currentPath.includes('/design-system')}
+              collapsed={collapsed}
               iconColor="pink"
             />
           </CollapsibleSection>

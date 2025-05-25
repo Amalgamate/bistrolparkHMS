@@ -1,167 +1,276 @@
-# Bristol Park Hospital Management System
+# 🏥 Bristol Park Hospital Management System (HMS)
 
-A modern hospital management system built with React, TypeScript, and Tailwind CSS. This system provides a comprehensive solution for managing patients, appointments, admissions, and other hospital operations.
+A comprehensive, modern hospital management system built with React, TypeScript, Node.js, and PostgreSQL. Designed specifically for Bristol Park Hospital's multi-branch operations with HIPAA compliance and advanced medical workflow management.
 
-## Features
+## 🌟 **Key Features**
 
-- **Patient Management**: Register, update, and manage patient information
-- **Appointment Scheduling**: Schedule and manage patient appointments
-- **Admission Management**: Manage patient admissions and room assignments
-- **Staff Management**: Manage doctors, nurses, and other hospital staff
-- **Billing and Payments**: Process payments and generate invoices
-- **Reporting**: Generate various reports for hospital operations
-- **Multi-Branch Support**: Support for multiple hospital branches
-- **Role-Based Access Control**: Different access levels for different user roles
+### **🏥 Hospital Modules**
+- **👥 Patient Management** - Complete patient registration, records, and history
+- **🏨 Admissions & Ward Management** - Bed allocation, patient admissions, transfers
+- **⚕️ Clinical Workflows** - Doctor consultations, medical procedures, treatment plans
+- **💊 Pharmacy Management** - Prescription management, inventory, dispensing
+- **🔬 Laboratory Services** - Lab tests, results management, reporting
+- **📡 Radiology Services** - Imaging requests, results, DICOM integration
+- **🚑 Emergency Services** - Emergency patient management, triage
+- **👶 Maternity Care** - Prenatal, delivery, postnatal care management
+- **🚑 Ambulance Services** - Ambulance dispatch, tracking, coordination
+- **🩸 Blood Bank** - Blood inventory, donation, transfusion management
+- **🏥 Mortuary Services** - Deceased patient management, documentation
+- **🏃 Physiotherapy** - Treatment plans, session management, progress tracking
+- **⚕️ Medical Procedures** - Procedure scheduling, documentation, billing
 
-## Getting Started
+### **💼 Back Office Operations**
+- **💰 Financial Management** - Billing, payments, insurance claims
+- **📊 Analytics & Reporting** - Comprehensive hospital analytics
+- **👨‍💼 Staff Management** - Employee records, scheduling, permissions
+- **🏢 Multi-Branch Support** - Fedha, Utawala, Tassia, Machakos, Kitengela
+- **🔐 Role-Based Access Control** - Granular permissions and security
 
-### Prerequisites
+### **🔗 External Integrations**
+- **🏥 SMART API** - Insurance verification and claims
+- **🏥 Slade360** - Healthcare provider integration
+- **🏛️ SHA (Social Health Authority)** - Government health insurance
+- **🔬 CityScan & ScanLab** - External laboratory integrations
 
-- Node.js (v16 or higher)
-- npm or yarn
-- Docker and Docker Compose (for containerized deployment)
+## 🚀 **Quick Start**
 
-### Installation
+### **Prerequisites**
+- Node.js 18+ and npm/yarn
+- PostgreSQL 14+
+- Docker & Docker Compose (optional)
 
-#### Option 1: Docker (Recommended)
+### **Installation**
 
-1. Clone the repository:
+1. **Clone the repository**
    ```bash
-   git clone https://github.com/Ricoamal/bristolparkhospital.git
-   cd bristolparkhospital
+   git clone https://github.com/your-org/bristol-park-hms.git
+   cd bristol-park-hms
    ```
 
-2. Start with Docker:
+2. **Install dependencies**
    ```bash
-   # Development mode with hot-reloading
-   docker-compose -f docker-compose.dev.yml up
-
-   # Production mode
-   docker-compose up
-
-   # Or use the deployment script
-   ./deploy.sh -e dev    # Development
-   ./deploy.sh -e prod   # Production
-   ```
-
-3. Access the application:
-   - Development: http://localhost:5173
-   - Production: http://localhost:80
-
-#### Option 2: Manual Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Ricoamal/bristolparkhospital.git
-   cd bristolparkhospital
-   ```
-
-2. Install dependencies:
-   ```bash
+   # Frontend dependencies
    npm install
-   # or
-   yarn install
+   
+   # Backend dependencies
+   cd api && npm install && cd ..
    ```
 
-3. Start the development server:
+3. **Environment setup**
    ```bash
-   npm run dev
-   # or
-   yarn dev
+   # Copy environment template
+   cp .env.example .env
+   
+   # Edit .env with your configuration
+   nano .env
    ```
 
-4. Open your browser and navigate to `http://localhost:5173` (or the port shown in your terminal)
+4. **Database setup**
+   ```bash
+   # Create PostgreSQL database
+   createdb bristol_park_hmis
+   
+   # Run migrations (contact admin for schema)
+   ```
 
-## Project Structure
+5. **Start development servers**
+   ```bash
+   # Start frontend (port 5173)
+   npm run dev
+   
+   # Start backend API (port 5174)
+   cd api && npm run dev
+   ```
+
+6. **Access the application**
+   - Frontend: http://localhost:5173
+   - API: http://localhost:5174
+
+## 🐳 **Docker Deployment**
+
+### **Development with Docker**
+```bash
+# Start all services
+docker-compose -f docker/docker-compose.dev.yml up
+
+# Access application
+# Frontend: http://localhost:5173
+# API: http://localhost:5174
+# Database: localhost:5432
+```
+
+### **Production Deployment**
+```bash
+# Build and start production services
+docker-compose -f docker/docker-compose.production.yml up -d
+
+# View logs
+docker-compose -f docker/docker-compose.production.yml logs -f
+```
+
+## 📁 **Project Structure**
 
 ```
-bristolparkhospital/
-├── public/             # Static assets
-├── src/
-│   ├── components/     # React components
-│   │   ├── common/     # Common UI components
-│   │   ├── dashboard/  # Dashboard components
-│   │   ├── patients/   # Patient-related components
-│   │   └── ...
-│   ├── context/        # React context providers
-│   ├── hooks/          # Custom React hooks
-│   ├── services/       # API services
-│   ├── utils/          # Utility functions
-│   ├── types/          # TypeScript type definitions
-│   ├── config/         # Configuration files
-│   ├── styles/         # Global styles
-│   ├── App.tsx         # Main App component
-│   └── main.tsx        # Entry point
-├── .gitignore          # Git ignore file
-├── index.html          # HTML template
-├── package.json        # Project dependencies
-├── tsconfig.json       # TypeScript configuration
-├── vite.config.ts      # Vite configuration
-└── README.md           # Project documentation
+bristol-park-hms/
+├── 📁 src/                          # Frontend React/TypeScript application
+│   ├── 📁 components/               # Reusable React components
+│   │   ├── 📁 admissions/          # Admissions module components
+│   │   ├── 📁 clinical/            # Clinical workflow components
+│   │   ├── 📁 pharmacy/            # Pharmacy management components
+│   │   ├── 📁 lab/                 # Laboratory components
+│   │   ├── 📁 radiology/           # Radiology services components
+│   │   ├── 📁 emergency/           # Emergency services components
+│   │   ├── 📁 maternity/           # Maternity care components
+│   │   ├── 📁 ambulance/           # Ambulance services components
+│   │   ├── 📁 blood-bank/          # Blood bank components
+│   │   ├── 📁 mortuary/            # Mortuary services components
+│   │   ├── 📁 physiotherapy/       # Physiotherapy components
+│   │   ├── 📁 procedures/          # Medical procedures components
+│   │   ├── 📁 patients/            # Patient management components
+│   │   ├── 📁 auth/                # Authentication components
+│   │   ├── 📁 layout/              # Layout and navigation
+│   │   ├── 📁 ui/                  # Reusable UI components
+│   │   └── 📁 dashboard/           # Dashboard components
+│   ├── 📁 pages/                   # Page-level components
+│   ├── 📁 context/                 # React Context providers
+│   ├── 📁 hooks/                   # Custom React hooks
+│   ├── 📁 services/                # API service functions
+│   ├── 📁 types/                   # TypeScript type definitions
+│   ├── 📁 utils/                   # Utility functions
+│   └── 📁 routes/                  # Application routing
+├── 📁 api/                         # Backend Node.js/Express API
+│   ├── 📁 src/                     # API source code
+│   │   ├── 📁 controllers/         # Business logic controllers
+│   │   ├── 📁 routes/              # API route definitions
+│   │   ├── 📁 middleware/          # Express middleware
+│   │   ├── 📁 validations/         # Input validation schemas
+│   │   └── 📁 utils/               # Backend utility functions
+│   └── package.json                # Backend dependencies
+├── 📁 docker/                      # Docker configuration files
+├── 📁 docs/                        # Project documentation
+├── 📁 public/                      # Static frontend assets
+└── 📁 smart-integrations/          # External API integrations
 ```
 
-## Backend Migration
+## ⚙️ **Configuration**
 
-Instead of integrating with the legacy Java backend, we are migrating data to a new modern backend stack. For detailed information on the migration strategy and implementation, please refer to the [Backend Migration Guide](./BACKEND_MIGRATION.md).
+### **Environment Variables**
+Key configuration options in `.env`:
 
-## Available Scripts
+```bash
+# API Configuration
+VITE_API_BASE_URL="http://localhost:5174/api"
 
-### Local Development
-- `npm run dev` - Start the development server
-- `npm run build` - Build the production-ready application
-- `npm run preview` - Preview the production build locally
-- `npm run lint` - Run ESLint to check for code quality issues
-- `npm run test` - Run tests
+# Database
+DB_HOST="localhost"
+DB_NAME="bristol_park_hmis"
+DB_USER="postgres"
+DB_PASSWORD="your_password"
 
-### Docker Commands
-- `docker-compose -f docker-compose.dev.yml up` - Start development environment
-- `docker-compose up` - Start production environment
-- `./deploy.sh -e dev` - Start development with deployment script
-- `./deploy.sh -e prod -b -d` - Build and start production in detached mode
-- `./health-check.sh` - Check the health of all services
+# Hospital Configuration
+HOSPITAL_NAME="Bristol Park Hospital"
+REACT_APP_DEFAULT_BRANCH="fedha"
 
-## Design System
+# External Integrations
+SMART_API_KEY="your_smart_api_key"
+SHA_API_KEY="your_sha_api_key"
 
-The application uses a custom design system based on Tailwind CSS. The main colors are:
-- Primary Blue: `#2B3990`
-- Accent Red: `#A61F1F`
-- Font Family: NEXA
+# Security
+JWT_SECRET="your_jwt_secret"
+HIPAA_COMPLIANCE="true"
+```
 
-A complete showcase of all UI components can be found in the Design System page within the application.
+### **Hospital Branches**
+The system supports multiple Bristol Park Hospital locations:
+- **Main Campus** (Hospital ID: 18)
+- **Fedha Branch** (Hospital ID: 19)
+- **Utawala Branch** (Hospital ID: 20)
+- **Tassia Branch** (Hospital ID: 21)
+- **Machakos Branch** (Hospital ID: 22)
+- **Kitengela Branch** (Hospital ID: 23)
 
-## Branch-Based Access
+## 🔐 **Security & Compliance**
 
-The system supports location-based login with access control for 5 branches:
-- Fedha
-- Utawala
-- Machakos
-- Tassia
-- Kitengela
+### **HIPAA Compliance**
+- ✅ Patient data encryption at rest and in transit
+- ✅ Audit logging for all patient data access
+- ✅ Role-based access control (RBAC)
+- ✅ Secure authentication with JWT tokens
+- ✅ Data anonymization for analytics
 
-## User Roles
+### **Security Features**
+- 🔒 Multi-factor authentication (MFA)
+- 🛡️ SQL injection prevention
+- 🔐 XSS protection
+- 🚫 CSRF protection
+- 📝 Comprehensive audit trails
+- 🔑 Encrypted sensitive data storage
 
-The system supports multiple user roles with different access levels:
-- Supa Admin
-- Admin
-- Doctor
-- Accountant
-- Front Office
-- Nurses
-- Pharmacy
-- Mortuary Attendant
+## 🧪 **Development**
 
-## Contributing
+### **Available Scripts**
+```bash
+# Frontend
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+npm run lint         # Run ESLint
+npm run type-check   # TypeScript type checking
+
+# Backend
+cd api
+npm run dev          # Start development API server
+npm run start        # Start production API server
+npm run test         # Run API tests
+```
+
+### **Code Quality**
+- **TypeScript** for type safety
+- **ESLint** for code linting
+- **Prettier** for code formatting
+- **Tailwind CSS** for styling
+- **React Hook Form** for form management
+- **Zod** for runtime validation
+
+## 📚 **Documentation**
+
+- [Development Guide](docs/DEVELOPMENT.md)
+- [API Documentation](docs/API_README.md)
+- [Docker Setup](docs/DOCKER_README.md)
+- [Production Deployment](docs/PRODUCTION_SETUP.md)
+- [Financial System](docs/FINANCIAL_SYSTEM_IMPLEMENTATION.md)
+- [Backend Migration](docs/BACKEND_MIGRATION.md)
+
+## 🤝 **Contributing**
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
-## License
+### **Development Guidelines**
+- Follow TypeScript best practices
+- Write comprehensive tests
+- Maintain HIPAA compliance
+- Document API changes
+- Follow existing code patterns
 
-This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
+## 📄 **License**
 
-## Contact
+This project is proprietary software developed for Bristol Park Hospital. All rights reserved.
 
-For any questions or support, please contact the development team at dev@bristolparkhospital.com.
+## 📞 **Support**
+
+For technical support or questions:
+- **Email**: support@bristolparkhospital.com
+- **System Admin**: admin@bristolparkhospital.com
+- **Emergency**: Contact hospital IT department
+
+## 🏥 **About Bristol Park Hospital**
+
+Bristol Park Hospital is a leading healthcare provider in Kenya, operating multiple branches across Nairobi and surrounding areas. This HMS system supports our commitment to providing excellent patient care through modern technology and efficient workflows.
+
+---
+
+**Built with ❤️ for Bristol Park Hospital**

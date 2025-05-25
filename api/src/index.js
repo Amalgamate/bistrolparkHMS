@@ -19,6 +19,10 @@ import medicationRoutes from './routes/medicationRoutes.js';
 import prescriptionRoutes from './routes/prescriptionRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import webhookRoutes from './routes/webhookRoutes.js';
+import financialRoutes from './routes/financialRoutes.js';
+import enhancedFinancialRoutes from './routes/enhancedFinancialRoutes.js';
+import admissionsRoutes from './routes/admissions.js';
+import serviceRoutes from './routes/serviceRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -74,6 +78,10 @@ app.use('/api/medications', medicationRoutes);
 app.use('/api/prescriptions', prescriptionRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/webhooks', webhookRoutes);
+app.use('/api/financial', financialRoutes);
+app.use('/api/financial', enhancedFinancialRoutes);
+app.use('/api/admissions', admissionsRoutes);
+app.use('/api/services', serviceRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

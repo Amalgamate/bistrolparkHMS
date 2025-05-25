@@ -7,14 +7,14 @@ import {
   CardTitle
 } from '../ui/card';
 import { Button } from '../ui/button';
-import { Input } from '../ui/input';
+import { EnhancedInput } from '../ui/enhanced-input';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue
-} from '../ui/select';
+  EnhancedSelect,
+  EnhancedSelectContent,
+  EnhancedSelectItem,
+  EnhancedSelectTrigger,
+  EnhancedSelectValue
+} from '../ui/enhanced-select';
 import {
   Form,
   FormControl,
@@ -24,12 +24,6 @@ import {
   FormMessage
 } from '../ui/form';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from '../ui/tabs';
-import {
   User,
   Calendar,
   Phone,
@@ -37,8 +31,6 @@ import {
   MapPin,
   Shield,
   UserPlus,
-  Search,
-  AlertTriangle,
   CheckCircle2,
   Ticket
 } from 'lucide-react';
@@ -99,8 +91,6 @@ type PatientFormData = z.infer<typeof patientSchema>;
 const PatientRegistration: React.FC = () => {
   const { registerPatient } = useClinical();
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState('new');
-  const [searchQuery, setSearchQuery] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
   const [tokenNumber, setTokenNumber] = useState<number | null>(null);
 
@@ -220,12 +210,6 @@ const PatientRegistration: React.FC = () => {
     }
   };
 
-  // Handle search
-  const handleSearch = () => {
-    // In a real app, this would search the patient database
-    showToast('info', `Searching for "${searchQuery}"`);
-  };
-
   // Reset success state
   const handleReset = () => {
     setRegistrationSuccess(false);
@@ -239,19 +223,12 @@ const PatientRegistration: React.FC = () => {
           <div className="flex justify-between items-center">
             <div>
               <CardTitle className="text-xl">Patient Registration</CardTitle>
-              <CardDescription>Register new patients or search existing records</CardDescription>
+              <CardDescription>Register new patients and add them to the consultation queue</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="new">New Patient</TabsTrigger>
-              <TabsTrigger value="existing">Existing Patient</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="new">
-              {registrationSuccess ? (
+          {registrationSuccess ? (
                 <div className="text-center py-8">
                   <div className="flex items-center justify-center w-20 h-20 rounded-full bg-green-100 text-green-800 mx-auto mb-4">
                     <CheckCircle2 className="h-10 w-10" />
@@ -283,10 +260,10 @@ const PatientRegistration: React.FC = () => {
               ) : (
                 <Form {...form}>
                   <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       {/* File Numbers */}
-                      <div className="space-y-4">
-                        <h3 className="text-sm font-medium border-b pb-2">File Numbers</h3>
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold border-b pb-3 text-gray-800">File Numbers</h3>
 
                         <FormField
                           control={form.control}
@@ -296,12 +273,13 @@ const PatientRegistration: React.FC = () => {
                               <FormLabel>Patient ID</FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Input
+                                  <EnhancedInput
                                     {...field}
                                     disabled
-                                    className="pl-10 bg-gray-50"
+                                    className="pl-12 bg-gray-50"
+                                    size="xl"
                                   />
-                                  <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                  <User className="absolute left-4 top-4 h-6 w-6 text-gray-400" />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -317,7 +295,7 @@ const PatientRegistration: React.FC = () => {
                               <FormItem>
                                 <FormLabel>Out-Patient File No.</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <EnhancedInput {...field} size="lg" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -331,7 +309,7 @@ const PatientRegistration: React.FC = () => {
                               <FormItem>
                                 <FormLabel>Old Reference No.</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <EnhancedInput {...field} size="lg" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -346,7 +324,7 @@ const PatientRegistration: React.FC = () => {
                             <FormItem>
                               <FormLabel>In-Patient File No.</FormLabel>
                               <FormControl>
-                                <Input {...field} />
+                                <EnhancedInput {...field} size="lg" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -355,8 +333,8 @@ const PatientRegistration: React.FC = () => {
                       </div>
 
                       {/* Personal Information */}
-                      <div className="space-y-4">
-                        <h3 className="text-sm font-medium border-b pb-2">Personal Information</h3>
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold border-b pb-3 text-gray-800">Personal Information</h3>
 
                         <div className="grid grid-cols-3 gap-4">
                           <FormField
@@ -366,7 +344,7 @@ const PatientRegistration: React.FC = () => {
                               <FormItem>
                                 <FormLabel>First Name</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <EnhancedInput {...field} size="lg" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -380,7 +358,7 @@ const PatientRegistration: React.FC = () => {
                               <FormItem>
                                 <FormLabel>Middle Name</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <EnhancedInput {...field} size="lg" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -394,7 +372,7 @@ const PatientRegistration: React.FC = () => {
                               <FormItem>
                                 <FormLabel>Last Name</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <EnhancedInput {...field} size="lg" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -409,21 +387,21 @@ const PatientRegistration: React.FC = () => {
                             render={({ field }) => (
                               <FormItem>
                                 <FormLabel>Gender</FormLabel>
-                                <Select
+                                <EnhancedSelect
                                   onValueChange={field.onChange}
                                   defaultValue={field.value}
                                 >
                                   <FormControl>
-                                    <SelectTrigger>
-                                      <SelectValue placeholder="Select gender" />
-                                    </SelectTrigger>
+                                    <EnhancedSelectTrigger size="lg">
+                                      <EnhancedSelectValue placeholder="Select gender" />
+                                    </EnhancedSelectTrigger>
                                   </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="male">Male</SelectItem>
-                                    <SelectItem value="female">Female</SelectItem>
-                                    <SelectItem value="other">Other</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                  <EnhancedSelectContent>
+                                    <EnhancedSelectItem value="male">Male</EnhancedSelectItem>
+                                    <EnhancedSelectItem value="female">Female</EnhancedSelectItem>
+                                    <EnhancedSelectItem value="other">Other</EnhancedSelectItem>
+                                  </EnhancedSelectContent>
+                                </EnhancedSelect>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -437,12 +415,13 @@ const PatientRegistration: React.FC = () => {
                                 <FormLabel>Date of Birth</FormLabel>
                                 <FormControl>
                                   <div className="relative">
-                                    <Input
+                                    <EnhancedInput
                                       {...field}
                                       type="date"
-                                      className="pl-10"
+                                      className="pl-12"
+                                      size="lg"
                                     />
-                                    <Calendar className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                    <Calendar className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
                                   </div>
                                 </FormControl>
                                 <FormMessage />
@@ -457,23 +436,23 @@ const PatientRegistration: React.FC = () => {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Marital Status</FormLabel>
-                              <Select
+                              <EnhancedSelect
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
                                 <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select marital status" />
-                                  </SelectTrigger>
+                                  <EnhancedSelectTrigger size="lg">
+                                    <EnhancedSelectValue placeholder="Select marital status" />
+                                  </EnhancedSelectTrigger>
                                 </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="single">Single</SelectItem>
-                                  <SelectItem value="married">Married</SelectItem>
-                                  <SelectItem value="divorced">Divorced</SelectItem>
-                                  <SelectItem value="widowed">Widowed</SelectItem>
-                                  <SelectItem value="other">Other</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                <EnhancedSelectContent>
+                                  <EnhancedSelectItem value="single">Single</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="married">Married</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="divorced">Divorced</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="widowed">Widowed</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="other">Other</EnhancedSelectItem>
+                                </EnhancedSelectContent>
+                              </EnhancedSelect>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -481,8 +460,8 @@ const PatientRegistration: React.FC = () => {
                       </div>
 
                       {/* Contact Information */}
-                      <div className="space-y-4">
-                        <h3 className="text-sm font-medium border-b pb-2">Contact Information</h3>
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold border-b pb-3 text-gray-800">Contact Information</h3>
 
                         <FormField
                           control={form.control}
@@ -492,11 +471,12 @@ const PatientRegistration: React.FC = () => {
                               <FormLabel>Phone Number</FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Input
+                                  <EnhancedInput
                                     {...field}
-                                    className="pl-10"
+                                    className="pl-12"
+                                    size="lg"
                                   />
-                                  <Phone className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                  <Phone className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -512,12 +492,13 @@ const PatientRegistration: React.FC = () => {
                               <FormLabel>Email (Optional)</FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Input
+                                  <EnhancedInput
                                     {...field}
                                     type="email"
-                                    className="pl-10"
+                                    className="pl-12"
+                                    size="lg"
                                   />
-                                  <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                  <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -533,11 +514,12 @@ const PatientRegistration: React.FC = () => {
                               <FormLabel>Address</FormLabel>
                               <FormControl>
                                 <div className="relative">
-                                  <Input
+                                  <EnhancedInput
                                     {...field}
-                                    className="pl-10"
+                                    className="pl-12"
+                                    size="lg"
                                   />
-                                  <MapPin className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
+                                  <MapPin className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
                                 </div>
                               </FormControl>
                               <FormMessage />
@@ -552,7 +534,7 @@ const PatientRegistration: React.FC = () => {
                             <FormItem>
                               <FormLabel>Residence/Estate</FormLabel>
                               <FormControl>
-                                <Input {...field} />
+                                <EnhancedInput {...field} size="lg" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -561,8 +543,8 @@ const PatientRegistration: React.FC = () => {
                       </div>
 
                       {/* Identification & Payment */}
-                      <div className="space-y-4">
-                        <h3 className="text-sm font-medium border-b pb-2">Identification & Payment</h3>
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold border-b pb-3 text-gray-800">Identification & Payment</h3>
 
                         <FormField
                           control={form.control}
@@ -571,7 +553,7 @@ const PatientRegistration: React.FC = () => {
                             <FormItem>
                               <FormLabel>ID/Passport Number</FormLabel>
                               <FormControl>
-                                <Input {...field} />
+                                <EnhancedInput {...field} size="lg" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -584,24 +566,24 @@ const PatientRegistration: React.FC = () => {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Payment Type</FormLabel>
-                              <Select
+                              <EnhancedSelect
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
                                 <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select payment type" />
-                                  </SelectTrigger>
+                                  <EnhancedSelectTrigger size="lg">
+                                    <EnhancedSelectValue placeholder="Select payment type" />
+                                  </EnhancedSelectTrigger>
                                 </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="cash">Cash</SelectItem>
-                                  <SelectItem value="insurance">Insurance</SelectItem>
-                                  <SelectItem value="mpesa">M-Pesa</SelectItem>
-                                  <SelectItem value="card">Card</SelectItem>
-                                  <SelectItem value="credit">Credit</SelectItem>
-                                  <SelectItem value="other">Other</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                <EnhancedSelectContent>
+                                  <EnhancedSelectItem value="cash">Cash</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="insurance">Insurance</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="mpesa">M-Pesa</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="card">Card</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="credit">Credit</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="other">Other</EnhancedSelectItem>
+                                </EnhancedSelectContent>
+                              </EnhancedSelect>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -636,23 +618,23 @@ const PatientRegistration: React.FC = () => {
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel>Insurance Provider</FormLabel>
-                                  <Select
+                                  <EnhancedSelect
                                     onValueChange={field.onChange}
                                     defaultValue={field.value}
                                   >
                                     <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select provider" />
-                                      </SelectTrigger>
+                                      <EnhancedSelectTrigger size="lg">
+                                        <EnhancedSelectValue placeholder="Select provider" />
+                                      </EnhancedSelectTrigger>
                                     </FormControl>
-                                    <SelectContent>
-                                      <SelectItem value="SHA">SHA</SelectItem>
-                                      <SelectItem value="Jubilee">Jubilee</SelectItem>
-                                      <SelectItem value="AAR">AAR</SelectItem>
-                                      <SelectItem value="Britam">Britam</SelectItem>
-                                      <SelectItem value="Madison">Madison</SelectItem>
-                                    </SelectContent>
-                                  </Select>
+                                    <EnhancedSelectContent>
+                                      <EnhancedSelectItem value="SHA">SHA</EnhancedSelectItem>
+                                      <EnhancedSelectItem value="Jubilee">Jubilee</EnhancedSelectItem>
+                                      <EnhancedSelectItem value="AAR">AAR</EnhancedSelectItem>
+                                      <EnhancedSelectItem value="Britam">Britam</EnhancedSelectItem>
+                                      <EnhancedSelectItem value="Madison">Madison</EnhancedSelectItem>
+                                    </EnhancedSelectContent>
+                                  </EnhancedSelect>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -665,7 +647,7 @@ const PatientRegistration: React.FC = () => {
                                 <FormItem>
                                   <FormLabel>Policy Number</FormLabel>
                                   <FormControl>
-                                    <Input {...field} />
+                                    <EnhancedInput {...field} size="lg" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -679,7 +661,7 @@ const PatientRegistration: React.FC = () => {
                                 <FormItem>
                                   <FormLabel>SHA Number</FormLabel>
                                   <FormControl>
-                                    <Input {...field} />
+                                    <EnhancedInput {...field} size="lg" />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -690,8 +672,8 @@ const PatientRegistration: React.FC = () => {
                       </div>
 
                       {/* Next of Kin */}
-                      <div className="space-y-4">
-                        <h3 className="text-sm font-medium border-b pb-2">Next of Kin</h3>
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold border-b pb-3 text-gray-800">Next of Kin</h3>
 
                         <FormField
                           control={form.control}
@@ -700,7 +682,7 @@ const PatientRegistration: React.FC = () => {
                             <FormItem>
                               <FormLabel>Full Name</FormLabel>
                               <FormControl>
-                                <Input {...field} />
+                                <EnhancedInput {...field} size="lg" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -715,7 +697,7 @@ const PatientRegistration: React.FC = () => {
                               <FormItem>
                                 <FormLabel>Relationship</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <EnhancedInput {...field} size="lg" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -729,7 +711,7 @@ const PatientRegistration: React.FC = () => {
                               <FormItem>
                                 <FormLabel>Phone Number</FormLabel>
                                 <FormControl>
-                                  <Input {...field} />
+                                  <EnhancedInput {...field} size="lg" />
                                 </FormControl>
                                 <FormMessage />
                               </FormItem>
@@ -744,7 +726,7 @@ const PatientRegistration: React.FC = () => {
                             <FormItem>
                               <FormLabel>Address</FormLabel>
                               <FormControl>
-                                <Input {...field} />
+                                <EnhancedInput {...field} size="lg" />
                               </FormControl>
                               <FormMessage />
                             </FormItem>
@@ -753,8 +735,8 @@ const PatientRegistration: React.FC = () => {
                       </div>
 
                       {/* Clinical Information */}
-                      <div className="space-y-4">
-                        <h3 className="text-sm font-medium border-b pb-2">Clinical Information</h3>
+                      <div className="space-y-6">
+                        <h3 className="text-lg font-semibold border-b pb-3 text-gray-800">Clinical Information</h3>
 
                         <FormField
                           control={form.control}
@@ -762,21 +744,21 @@ const PatientRegistration: React.FC = () => {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Priority</FormLabel>
-                              <Select
+                              <EnhancedSelect
                                 onValueChange={field.onChange}
                                 defaultValue={field.value}
                               >
                                 <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select priority" />
-                                  </SelectTrigger>
+                                  <EnhancedSelectTrigger size="lg">
+                                    <EnhancedSelectValue placeholder="Select priority" />
+                                  </EnhancedSelectTrigger>
                                 </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="normal">Normal</SelectItem>
-                                  <SelectItem value="urgent">Urgent</SelectItem>
-                                  <SelectItem value="emergency">Emergency</SelectItem>
-                                </SelectContent>
-                              </Select>
+                                <EnhancedSelectContent>
+                                  <EnhancedSelectItem value="normal">Normal</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="urgent">Urgent</EnhancedSelectItem>
+                                  <EnhancedSelectItem value="emergency">Emergency</EnhancedSelectItem>
+                                </EnhancedSelectContent>
+                              </EnhancedSelect>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -793,38 +775,6 @@ const PatientRegistration: React.FC = () => {
                   </form>
                 </Form>
               )}
-            </TabsContent>
-
-            <TabsContent value="existing">
-              <div className="space-y-6">
-                <div className="flex gap-2">
-                  <div className="relative flex-grow">
-                    <Input
-                      placeholder="Search by patient ID, name, or phone number"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                    <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
-                  </div>
-                  <Button onClick={handleSearch}>Search</Button>
-                </div>
-
-                <div className="text-center py-8">
-                  <AlertTriangle className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                  <h3 className="text-lg font-medium text-gray-700 mb-2">No Patients Found</h3>
-                  <p className="text-gray-500 mb-4">Try searching with a different term or register a new patient.</p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setActiveTab('new')}
-                  >
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Register New Patient
-                  </Button>
-                </div>
-              </div>
-            </TabsContent>
-          </Tabs>
         </CardContent>
       </Card>
     </div>

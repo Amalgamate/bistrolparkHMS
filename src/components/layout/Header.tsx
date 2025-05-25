@@ -11,6 +11,8 @@ import { useNavigate } from 'react-router-dom';
 import LoginAs from '../auth/LoginAs';
 import { refreshCache } from '../../utils/cacheUtils';
 import ModuleQuickActionsButton from './ModuleQuickActionsButton';
+import { PageTransitionLoader } from '../ui/PageTransitionLoader';
+import { usePageTransition } from '../../context/PageTransitionContext';
 
 interface HeaderProps {
   onMenuButtonClick: () => void;
@@ -23,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { isLoading, progress } = usePageTransition();
 
   // Close the user menu when clicking outside
   useEffect(() => {
@@ -38,7 +41,11 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
     };
   }, []);
   return (
-    <header className="sticky top-0 z-20 flex items-center justify-between h-16 px-4 bg-white border-b border-gray-200 sm:px-6">
+    <header className="sticky top-0 z-20 bg-white border-b border-gray-200 relative">
+      {/* Page Transition Loading Bar */}
+      <PageTransitionLoader isLoading={isLoading} progress={progress} />
+
+      <div className="flex items-center justify-between h-16 px-4 sm:px-6">
       <div className="flex items-center">
         <button
           type="button"
@@ -215,6 +222,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuButtonClick, onMessageButt
             )}
           </div>
         </div>
+      </div>
       </div>
     </header>
   );

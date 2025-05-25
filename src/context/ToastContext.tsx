@@ -15,6 +15,12 @@ interface ToastContextType {
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
 
 export const ToastProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Safety check for React context
+  if (typeof React === 'undefined' || !React.useState) {
+    console.error('React is not properly loaded in ToastProvider');
+    return <>{children}</>;
+  }
+
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const showToast = (type: ToastType, message: string, title?: string) => {

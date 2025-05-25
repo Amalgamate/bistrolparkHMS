@@ -136,8 +136,26 @@ class ApiClient {
   }
 
   // Patients API
-  public async getPatients(): Promise<AxiosResponse<any>> {
-    return this.get('/patients');
+  public async getPatients(params: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    sortBy?: string;
+    sortOrder?: string;
+  } = {}): Promise<AxiosResponse<any>> {
+    const queryParams = new URLSearchParams();
+
+    // Add pagination parameters
+    if (params.page) queryParams.append('page', params.page.toString());
+    if (params.limit) queryParams.append('limit', params.limit.toString());
+    if (params.search) queryParams.append('search', params.search);
+    if (params.sortBy) queryParams.append('sortBy', params.sortBy);
+    if (params.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+    const queryString = queryParams.toString();
+    const url = queryString ? `/patients?${queryString}` : '/patients';
+
+    return this.get(url);
   }
 
   public async getPatientById(id: string | number): Promise<AxiosResponse<any>> {
@@ -204,6 +222,39 @@ class ApiClient {
 
   public async deletePrescription(id: string | number): Promise<AxiosResponse<any>> {
     return this.delete(`/prescriptions/${id}`);
+  }
+
+  // Financial API
+  public async getPatientInvoices(patientId: string | number, params?: any): Promise<AxiosResponse<any>> {
+    return this.get(`/financial/patients/${patientId}/invoices`, params);
+  }
+
+  public async getPatientPayments(patientId: string | number, params?: any): Promise<AxiosResponse<any>> {
+    return this.get(`/financial/patients/${patientId}/payments`, params);
+  }
+
+  public async getPatientBillingSummary(patientId: string | number): Promise<AxiosResponse<any>> {
+    return this.get(`/financial/patients/${patientId}/billing-summary`);
+  }
+
+  public async getPatientInsuranceClaims(patientId: string | number, params?: any): Promise<AxiosResponse<any>> {
+    return this.get(`/financial/patients/${patientId}/insurance-claims`, params);
+  }
+
+  public async createInvoice(invoiceData: any): Promise<AxiosResponse<any>> {
+    return this.post('/financial/invoices', invoiceData);
+  }
+
+  public async createPayment(paymentData: any): Promise<AxiosResponse<any>> {
+    return this.post('/financial/payments', paymentData);
+  }
+
+  public async createInsuranceClaim(claimData: any): Promise<AxiosResponse<any>> {
+    return this.post('/financial/insurance-claims', claimData);
+  }
+
+  public async initiateMpesaPayment(paymentData: any): Promise<AxiosResponse<any>> {
+    return this.post('/financial/payments/mpesa/initiate', paymentData);
   }
 }
 

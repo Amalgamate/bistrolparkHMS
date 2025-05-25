@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Registration → Clinical → Discharge Workflow</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0100f6 0%, #0080ff 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .diagram-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            border-left: 4px solid #0100f6;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .info-card h3 {
+            color: #0100f6;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .info-card li {
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+            color: #495057;
+        }
+        
+        .info-card li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #0100f6;
+            font-weight: bold;
+        }
+        
+        .status-implemented:before { content: "✅"; color: #28a745; }
+        .status-partial:before { content: "🔄"; color: #ffc107; }
+        .status-pending:before { content: "❌"; color: #dc3545; }
+        
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        
+        .mermaid {
+            text-align: center;
+        }
+        
+        .print-btn {
+            background: #28a745;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+        
+        .print-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        @media print {
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; }
+            .back-btn, .print-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👤 Patient Registration → Clinical → Discharge</h1>
+            <p>Complete Patient Journey Workflow</p>
+        </div>
+        
+        <div class="content">
+            <a href="index.html" class="back-btn">← Back to Overview</a>
+            <button onclick="window.print()" class="print-btn">🖨️ Print Diagram</button>
+            
+            <div class="diagram-container">
+                <div class="mermaid">
+                    flowchart TD
+                        A[Patient Arrives] --> B{New Patient?}
+                        B -->|Yes| C[Patient Registration Form]
+                        B -->|No| D[Search Existing Patient]
+                        
+                        C --> E[Generate MRN & Patient ID]
+                        D --> F[Update Patient Info if needed]
+                        
+                        E --> G[Add to Clinical Queue]
+                        F --> G
+                        
+                        G --> H[Token Number Generated]
+                        H --> I[Waiting for Vitals]
+                        
+                        I --> J[Vitals Capture]
+                        J --> K[Waiting for Doctor]
+                        
+                        K --> L[Doctor Consultation]
+                        L --> M{Needs Lab Tests?}
+                        L --> N{Needs Medication?}
+                        
+                        M -->|Yes| O[Lab Orders Created]
+                        N -->|Yes| P[Prescription Created]
+                        
+                        O --> Q[Lab Queue]
+                        P --> R[Pharmacy Queue]
+                        
+                        Q --> S[Lab Results]
+                        R --> T[Medication Dispensed]
+                        
+                        S --> U[Results to Doctor]
+                        T --> V[Patient Notified]
+                        
+                        U --> W[Final Diagnosis]
+                        V --> W
+                        
+                        W --> X{Discharge Ready?}
+                        X -->|Yes| Y[Generate Bill]
+                        X -->|No| Z[Continue Treatment]
+                        
+                        Y --> AA[Payment Processing]
+                        AA --> BB[Discharge Summary]
+                        BB --> CC[Patient Discharged]
+                        
+                        Z --> L
+                        
+                        classDef implemented fill:#d4edda,stroke:#28a745,stroke-width:2px
+                        classDef partial fill:#fff3cd,stroke:#ffc107,stroke-width:2px
+                        classDef pending fill:#f8d7da,stroke:#dc3545,stroke-width:2px
+                        
+                        class A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W implemented
+                        class X,Y,AA partial
+                        class BB,CC pending
+                </div>
+            </div>
+            
+            <div class="info-grid">
+                <div class="info-card">
+                    <h3>✅ Fully Implemented Components</h3>
+                    <ul>
+                        <li class="status-implemented">Patient Registration Forms (Multiple variants)</li>
+                        <li class="status-implemented">MRN Generation (BP + Random Number)</li>
+                        <li class="status-implemented">Clinical Queue with Token System</li>
+                        <li class="status-implemented">Vitals Capture Interface</li>
+                        <li class="status-implemented">Doctor Consultation Module</li>
+                        <li class="status-implemented">Lab Order Management</li>
+                        <li class="status-implemented">Prescription Creation</li>
+                        <li class="status-implemented">Pharmacy Queue System</li>
+                        <li class="status-implemented">Lab Results Management</li>
+                        <li class="status-implemented">Real-time Notifications</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🔄 Partially Implemented</h3>
+                    <ul>
+                        <li class="status-partial">Discharge Decision Logic</li>
+                        <li class="status-partial">Bill Generation (Basic Structure)</li>
+                        <li class="status-partial">Payment Processing (Framework)</li>
+                        <li class="status-partial">Insurance Integration (SHA Verification)</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>❌ Pending Development</h3>
+                    <ul>
+                        <li class="status-pending">Automated Discharge Summary</li>
+                        <li class="status-pending">Complete Discharge Process</li>
+                        <li class="status-pending">Advanced Billing Rules</li>
+                        <li class="status-pending">Payment Gateway Integration</li>
+                        <li class="status-pending">Document Generation (PDF)</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🔗 Key Integration Points</h3>
+                    <ul>
+                        <li>Patient Context → Clinical Context ✅</li>
+                        <li>Clinical Context → Lab Context ✅</li>
+                        <li>Clinical Context → Pharmacy Context ✅</li>
+                        <li>Pharmacy Context → Billing 🔄</li>
+                        <li>Lab Context → Billing 🔄</li>
+                        <li>Billing → Payment Processing ❌</li>
+                        <li>Payment → Discharge ❌</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>📊 Current Database Tables</h3>
+                    <ul>
+                        <li>patients (UUID, MRN, demographics)</li>
+                        <li>appointments (scheduling)</li>
+                        <li>medications (pharmacy inventory)</li>
+                        <li>prescriptions (doctor orders)</li>
+                        <li>users (authentication)</li>
+                        <li>external_messages (notifications)</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>🎯 Next Development Priorities</h3>
+                    <ul>
+                        <li>Complete billing module integration</li>
+                        <li>Implement M-Pesa payment gateway</li>
+                        <li>Build automated discharge workflow</li>
+                        <li>Create PDF document generation</li>
+                        <li>Add comprehensive reporting</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true
+            }
+        });
+    </script>
+</body>
+</html>

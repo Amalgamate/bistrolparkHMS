@@ -53,6 +53,12 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  // Safety check for React context
+  if (typeof React === 'undefined' || !React.useState) {
+    console.error('React is not properly loaded in AuthProvider');
+    return <>{children}</>;
+  }
+
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -217,8 +223,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     if (!user) return false;
 
     // For API users, we'll grant permissions based on role
-    // Admin users have all permissions
-    if (user.role === 'admin') return true;
+    // Super Admin users have all permissions
+    if (user.role === 'super-admin') return true;
+
+    // Admin users have all permissions except super admin exclusive ones
+    if (user.role === 'admin') {
+      const superAdminExclusivePermissions = [
+        'manage_service_control', 'access_system_administration', 'manage_all_users',
+        'control_server_services', 'access_service_management', 'manage_system_settings',
+        'view_audit_logs', 'manage_security_settings', 'manage_database'
+      ];
+
+      // If it's a super admin exclusive permission, deny access
+      if (superAdminExclusivePermissions.includes(permission)) {
+        return false;
+      }
+
+      return true;
+    }
 
     // Doctor users have clinical permissions
     if (user.role === 'doctor') {

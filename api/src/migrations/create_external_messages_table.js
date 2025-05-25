@@ -1,4 +1,5 @@
 import db from '../utils/db.js';
+import { fileURLToPath } from 'url';
 
 /**
  * Create external_messages table for storing messages from external sources like tawk.to
