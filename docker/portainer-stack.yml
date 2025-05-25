@@ -33,7 +33,7 @@ services:
   api:
     image: bristol-park-hms-api:latest
     build:
-      context: https://github.com/Amalgamate/bistrolparkHMS.git#main:api
+      context: https://github.com/Amalgamate/bistrolparkHMS.git#master:api
       dockerfile: docker/api/Dockerfile.simple
     ports:
       - "${API_PORT:-3001}:3001"
