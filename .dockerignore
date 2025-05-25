@@ -29,12 +29,12 @@ build
 *.sln
 *.sw?
 
-# Docker files
-Dockerfile
-Dockerfile.dev
-docker-compose.yml
-docker-compose.dev.yml
-.dockerignore
+# Docker files (keep docker/ directory for builds)
+# Dockerfile - commented out as it's needed for Docker builds
+# Dockerfile.dev - commented out as it's needed for Docker builds
+# docker-compose.yml - commented out as it's needed for Docker builds
+# docker-compose.dev.yml - commented out as it's needed for Docker builds
+# .dockerignore - commented out as it's needed for Docker builds
 
 # Logs
 logs
