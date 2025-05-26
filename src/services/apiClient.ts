@@ -1,18 +1,19 @@
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios';
 
 // Define API response type
 export interface ApiResponse<T = any> {
-  success: boolean;
-  data?: T;
-  message?: string;
-  errors?: Array<{
-    param: string;
-    msg: string;
-  }>;
+    success: boolean;
+    data?: T;
+    message?: string;
+    errors?: Array<{
+        param: string;
+        msg: string;
+    }>;
 }
 
 // Create API client class
 class ApiClient {
+
   private client: AxiosInstance;
   private baseURL: string;
 
@@ -173,6 +174,16 @@ class ApiClient {
   public async deletePatient(id: string | number): Promise<AxiosResponse<any>> {
     return this.delete(`/patients/${id}`);
   }
+  
+  // Fetch all insurance providers
+  public async getInsurances({search}: { search: any; }) {
+      return this.get(`/insurances/${search}`);
+  }
+
+  // Fetch all company details
+  public async getCompanies({search}: { search: string }) {
+      return this.get(`/companies/${search}`);
+  }
 
   // Appointments API
   public async getAppointments(): Promise<AxiosResponse<any>> {
@@ -256,6 +267,7 @@ class ApiClient {
   public async initiateMpesaPayment(paymentData: any): Promise<AxiosResponse<any>> {
     return this.post('/financial/payments/mpesa/initiate', paymentData);
   }
+
 }
 
 // Create and export a singleton instance

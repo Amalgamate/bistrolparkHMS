@@ -32,9 +32,12 @@ const PatientForm = ({ onClose, onSave }) => {
     emergency_contact_name: '',
     emergency_contact_relationship: '',
     emergency_contact_phone: '',
-    insurance_provider: '',
-    insurance_number: '',
-    sha_number: ''
+    payment_type: '',
+    insurance_account: '',
+    insurance_company: '',
+    staff_no: '',
+    membership_no: '',
+    principal_name: '',
   });
 
   const [loading, setLoading] = useState(false);
@@ -91,9 +94,12 @@ const PatientForm = ({ onClose, onSave }) => {
         emergency_contact_name: patient.emergencyContact?.name || patient.emergency_contact_name || '',
         emergency_contact_relationship: patient.emergencyContact?.relationship || patient.emergency_contact_relationship || '',
         emergency_contact_phone: patient.emergencyContact?.phone || patient.emergency_contact_phone || '',
-        insurance_provider: patient.insurance?.provider || patient.insurance_provider || '',
-        insurance_number: patient.insurance?.policyNumber || patient.insurance_number || '',
-        sha_number: patient.insurance?.shaNumber || patient.sha_number || ''
+        payment_type: patient.insurance?.type || patient.payment_type || '',
+        insurance_account: patient.insurance?.account || patient.insurance_account || '',
+        insurance_company: patient.insurance?.company || patient.insurance_company || '',
+        staff_no: patient.insurance?.staffNo || patient.staff_no || '',
+        membership_no: patient.insurance?.membershipNo || patient.membership_no || '',
+        principal_name: patient.insurance?.principalName || patient.principal_name || '',
       });
     } catch (err) {
       console.error('Error fetching patient:', err);
@@ -232,10 +238,12 @@ const PatientForm = ({ onClose, onSave }) => {
           phone: formData.emergency_contact_phone || ''
         },
         insurance: {
-          provider: formData.insurance_provider || '',
-          policyNumber: formData.insurance_number || '',
-          holderName: `${formData.first_name} ${formData.last_name}`,
-          shaNumber: formData.sha_number || ''
+            type: formData.payment_type || '',
+            account: formData.insurance_account || '',
+            company: formData.insurance_company || '',
+            staffNo: formData.staff_no || '',
+            membershipNo: formData.membership_no || '',
+            principalName: formData.principal_name || '',
         },
         status: 'Active'
       };
@@ -690,52 +698,118 @@ const PatientForm = ({ onClose, onSave }) => {
 
         {/* Insurance Information Section */}
         <div className="mb-6">
-          <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Insurance Information</h2>
+          <h2 className="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Payment Information</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="insurance_provider">
-                Insurance Provider
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="payment_type">
+                Payment Type
+              </label>
+              <select
+                  className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="payment_type"
+                  name="payment_type"
+                  value={formData.payment_type}
+                  onChange={handleChange}
+              >
+                <option value="">Select Payment Type</option>
+                <option value="Cash">Cash</option>
+                <option value="Corporate">Corporate</option>
+                <option value="Foreigner">Foreigner</option>
+              </select>
+            </div>
+
+
+
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="insurance_account">
+                Insurance Account
               </label>
               <input
                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="insurance_provider"
-                name="insurance_provider"
+                id="insurance_account"
+                name="insurance_account"
                 type="text"
-                value={formData.insurance_provider || ''}
+                value={formData.insurance_account || ''}
                 onChange={handleChange}
                 placeholder="e.g., NHIF, AAR, Jubilee"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="insurance_number">
-                Insurance Number
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="insurance_provider">
+                Company (Scheme)
               </label>
               <input
-                className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="insurance_number"
-                name="insurance_number"
-                type="text"
-                value={formData.insurance_number || ''}
-                onChange={handleChange}
-                placeholder="Insurance ID number"
+                  className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="insurance_provider"
+                  name="insurance_provider"
+                  type="text"
+                  value={formData.insurance_company || ''}
+                  onChange={handleChange}
+                  // placeholder="e.g., NHIF, AAR, Jubilee"
               />
             </div>
 
             <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sha_number">
-                SHA Number
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="staff_no">
+                Staff No
+              </label>
+              <input
+                  className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="staff_no"
+                  name="staff_no"
+                  type="text"
+                  value={formData.staff_no || ''}
+                  onChange={handleChange}
+                  // placeholder="e.g., NHIF, AAR, Jubilee"
+              />
+            </div>
+
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="membership_no">
+                Membership Number
               </label>
               <input
                 className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="sha_number"
-                name="sha_number"
+                id="membership_no"
+                name="membership_no"
                 type="text"
-                value={formData.sha_number || ''}
+                value={formData.membership_no || ''}
                 onChange={handleChange}
-                placeholder="Social Health Authority number"
+                placeholder="Insurance Membership number"
               />
             </div>
+
+            <div>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="principal_name">
+                Principal Member Name
+              </label>
+              <input
+                  className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="principal_name"
+                  name="principal_name"
+                  type="text"
+                  value={formData.principal_name || ''}
+                  onChange={handleChange}
+                  // placeholder="e.g., NHIF, AAR, Jubilee"
+              />
+            </div>
+
+            {/*<div>*/}
+            {/*  <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="sha_number">*/}
+            {/*    SHA Number*/}
+            {/*  </label>*/}
+            {/*  <input*/}
+            {/*    className="shadow appearance-none border border-gray-300 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"*/}
+            {/*    id="sha_number"*/}
+            {/*    name="sha_number"*/}
+            {/*    type="text"*/}
+            {/*    value={formData.sha_number || ''}*/}
+            {/*    onChange={handleChange}*/}
+            {/*    placeholder="Social Health Authority number"*/}
+            {/*  />*/}
+            {/*</div>*/}
           </div>
         </div>
 
