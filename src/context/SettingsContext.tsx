@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 
 // Define branch type with location data
 export interface BranchLocation {
@@ -145,6 +145,12 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 
 // Provider component
 export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Safety check for React context
+  if (typeof React === 'undefined' || !React.useState) {
+    console.error('React is not properly loaded');
+    return <>{children}</>;
+  }
+
   const [branches, setBranches] = useState<Branch[]>(() => {
     try {
       const storedBranches = localStorage.getItem('branches');

@@ -1,0 +1,144 @@
+version: '3.8'
+
+# Bristol Park HMS - Portainer Stack Configuration
+# HIPAA-Compliant Hospital Management System
+# Deploy this stack through Portainer for production use
+
+services:
+  # Frontend Service - React Application
+  frontend:
+    image: bristol-park-hms-frontend:latest
+    build:
+      context: https://github.com/Amalgamate/bistrolparkHMS.git#master
+      dockerfile: docker/Dockerfile.simple
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    depends_on:
+      - api
+    networks:
+      - bristol-park-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bristol-frontend.rule=Host(`${DOMAIN:-localhost}`)"
+
+  # Backend API Service - Node.js Express
+  api:
+    image: bristol-park-hms-api:latest
+    build:
+      context: https://github.com/Amalgamate/bistrolparkHMS.git#master
+      dockerfile: docker/api/Dockerfile.simple
+    ports:
+      - "${API_PORT:-3001}:3001"
+    depends_on:
+      - db
+    networks:
+      - bristol-park-network
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_SSL=${DB_SSL:-false}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-24h}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    volumes:
+      - api_logs:/app/logs
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bristol-api.rule=Host(`${DOMAIN:-localhost}`) && PathPrefix(`/api`)"
+
+  # PostgreSQL Database - Patient Data Storage
+  db:
+    image: postgres:15-alpine
+    ports:
+      - "${DB_EXTERNAL_PORT:-5433}:5432"
+    networks:
+      - bristol-park-network
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_INITDB_ARGS="--encoding=UTF8 --locale=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - postgres_backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    labels:
+      - "backup.enable=true"
+      - "backup.schedule=0 2 * * *"  # Daily at 2 AM
+
+  # Redis Cache (Optional) - Session & Performance
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    networks:
+      - bristol-park-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backup Service - HIPAA Compliance
+  backup:
+    image: postgres:15-alpine
+    networks:
+      - bristol-park-network
+    restart: "no"
+    environment:
+      - PGPASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_backups:/backups
+    command: |
+      sh -c "
+      while true; do
+        pg_dump -h db -U ${DB_USER} -d ${DB_NAME} > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql
+        find /backups -name '*.sql' -mtime +7 -delete
+        sleep 86400
+      done"
+    depends_on:
+      - db
+
+networks:
+  bristol-park-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_data:
+    driver: local
+  postgres_backups:
+    driver: local
+  redis_data:
+    driver: local
+  api_logs:
+    driver: local

@@ -7,22 +7,11 @@ import {
   TableHeader,
   TableRow
 } from '../ui/table';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '../ui/card';
+
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from '../ui/tabs';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +20,6 @@ import {
 } from '../ui/dropdown-menu';
 import {
   Search,
-  Filter,
   MoreHorizontal,
   Activity,
   Stethoscope,
@@ -172,73 +160,58 @@ const ConsultationQueue: React.FC<ConsultationQueueProps> = ({
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle className="text-xl">Consultation Queue</CardTitle>
-              <CardDescription>Manage patient queue and workflow</CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <div className="relative w-64">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
-                <Input
-                  type="search"
-                  placeholder="Search patients..."
-                  className="pl-9"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
-                    <Filter className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onChangeView('all')}>
-                    All Patients
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onChangeView('registered')}>
-                    Registered Only
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onChangeView('waiting_vitals')}>
-                    Waiting for Vitals
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onChangeView('vitals_taken')}>
-                    Ready for Doctor
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => onChangeView('with_doctor')}>
-                    With Doctor
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+      {/* Header with Search and Queue Filter */}
+      <div className="flex justify-between items-center">
+        <div>
+          <h2 className="text-xl font-semibold text-gray-900">Consultation Queue</h2>
+          <p className="text-sm text-gray-600">Manage patient queue and workflow</p>
+        </div>
+        <div className="flex gap-4 items-center">
+          <div className="relative w-64">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+            <Input
+              type="search"
+              placeholder="Search patients..."
+              className="pl-9"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="table" className="w-full">
-            <TabsList className="mb-4">
-              <TabsTrigger value="table">Table View</TabsTrigger>
-              <TabsTrigger value="cards">Card View</TabsTrigger>
-              <TabsTrigger value="tokens">Token Display</TabsTrigger>
-            </TabsList>
 
-            <TabsContent value="table">
-              <div className="rounded-md border overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[80px]">Token</TableHead>
-                      <TableHead>Patient</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Priority</TableHead>
-                      <TableHead>Wait Time</TableHead>
-                      <TableHead>Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
+          <div className="flex items-center gap-2">
+            <label htmlFor="queue-filter" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+              Select Queue:
+            </label>
+            <select
+              id="queue-filter"
+              value={view}
+              onChange={(e) => onChangeView(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-w-[160px]"
+            >
+              <option value="all">All Patients</option>
+              <option value="registered">Registered Only</option>
+              <option value="waiting_vitals">Waiting for Vitals</option>
+              <option value="vitals_taken">Ready for Doctor</option>
+              <option value="with_doctor">With Doctor</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Direct Table - No Card Wrapper */}
+      <div className="rounded-md border overflow-hidden bg-white">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[80px]">Token</TableHead>
+              <TableHead>Patient</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Wait Time</TableHead>
+              <TableHead>Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
                     {sortedQueue.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={6} className="text-center py-8 text-gray-500">
@@ -365,187 +338,9 @@ const ConsultationQueue: React.FC<ConsultationQueueProps> = ({
                         </TableRow>
                       ))
                     )}
-                  </TableBody>
-                </Table>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="cards">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sortedQueue.length === 0 ? (
-                  <div className="col-span-3 text-center py-8 text-gray-500">
-                    No patients in queue
-                  </div>
-                ) : (
-                  sortedQueue.map((entry) => (
-                    <Card key={entry.id} className={`
-                      overflow-hidden border-l-4
-                      ${entry.priority === 'emergency' ? 'border-l-red-500' :
-                        entry.priority === 'urgent' ? 'border-l-amber-500' :
-                        'border-l-blue-500'}
-                    `}>
-                      <CardHeader className="pb-2 flex flex-row items-start justify-between">
-                        <div>
-                          <div className="flex items-center">
-                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 mr-2">
-                              {entry.tokenNumber}
-                            </div>
-                            <CardTitle className="text-lg">{entry.patientName}</CardTitle>
-                          </div>
-                          <CardDescription>{entry.patientId}</CardDescription>
-                        </div>
-                        <Badge variant={getStatusBadgeVariant(entry.status)}>
-                          {formatStatus(entry.status)}
-                        </Badge>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-2">
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Registered:</span>
-                            <span>{format(new Date(entry.registeredAt), 'h:mm a')}</span>
-                          </div>
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-500">Wait Time:</span>
-                            <span>{formatDistanceToNow(new Date(entry.registeredAt), { addSuffix: false })}</span>
-                          </div>
-                          {entry.estimatedWaitTime !== undefined && (
-                            <div className="flex justify-between text-sm">
-                              <span className="text-gray-500">Est. Wait:</span>
-                              <span>{entry.estimatedWaitTime} minutes</span>
-                            </div>
-                          )}
-
-                          <div className="flex justify-between pt-2">
-                            <Badge variant={getPriorityBadgeVariant(entry.priority)}>
-                              {entry.priority.charAt(0).toUpperCase() + entry.priority.slice(1)}
-                            </Badge>
-
-                            <div className="flex gap-1">
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => handleNotifyPatient(entry.id, entry.patientName)}
-                              >
-                                <Bell className="h-4 w-4" />
-                              </Button>
-
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon">
-                                    <MoreHorizontal className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  {entry.status === 'registered' && (
-                                    <DropdownMenuItem onClick={() => handleStatusChange(entry.id, 'waiting_vitals')}>
-                                      Send to Vitals
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {entry.status === 'waiting_vitals' && (
-                                    <DropdownMenuItem onClick={() => onSelectForVitals(entry.id)}>
-                                      <Activity className="h-4 w-4 mr-2" />
-                                      Capture Vitals
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {entry.status === 'vitals_taken' && (
-                                    <DropdownMenuItem onClick={() => onSelectForConsultation(entry.id)}>
-                                      <Stethoscope className="h-4 w-4 mr-2" />
-                                      Start Consultation
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {entry.priority !== 'emergency' && (
-                                    <DropdownMenuItem onClick={() => handlePriorityChange(entry.id, 'emergency')}>
-                                      <AlertTriangle className="h-4 w-4 mr-2 text-red-500" />
-                                      Mark as Emergency
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  <DropdownMenuItem onClick={() => handleStatusChange(entry.id, 'cancelled')}>
-                                    <XCircle className="h-4 w-4 mr-2 text-red-500" />
-                                    Cancel Visit
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="tokens">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <TokenBoard
-                  title="Now Serving"
-                  status={['with_doctor']}
-                  maxTokens={3}
-                  showActions={false}
-                  destination="Doctor's Office"
-                />
-
-                <TokenBoard
-                  title="Up Next"
-                  status={['vitals_taken']}
-                  maxTokens={5}
-                  showActions={true}
-                  destination="Consultation"
-                />
-
-                <TokenBoard
-                  title="Waiting for Vitals"
-                  status={['waiting_vitals', 'registered']}
-                  maxTokens={6}
-                  showActions={true}
-                  destination="Vitals Station"
-                />
-
-                <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-                  <div className="px-4 py-3 bg-gray-50 border-b border-gray-200">
-                    <h2 className="text-lg font-medium text-gray-800">Emergency Patients</h2>
-                  </div>
-
-                  <div className="p-4 space-y-3">
-                    {sortedQueue
-                      .filter(entry => entry.priority === 'emergency')
-                      .map(entry => (
-                        <TokenDisplay
-                          key={entry.id}
-                          tokenNumber={entry.tokenNumber}
-                          patientName={entry.patientName}
-                          patientId={entry.patientId}
-                          status={entry.status}
-                          priority={entry.priority}
-                          estimatedWaitTime={entry.estimatedWaitTime}
-                          queueId={entry.id}
-                          onCall={() => handleNotifyPatient(entry.id, entry.patientName)}
-                          showActions={true}
-                          destination="Emergency Care"
-                        />
-                      ))}
-
-                    {sortedQueue.filter(entry => entry.priority === 'emergency').length === 0 && (
-                      <div className="text-center py-8">
-                        <p className="text-gray-500">No emergency patients</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-6 text-center text-gray-500 text-sm">
-                <p>Last updated: {format(new Date(), 'h:mm:ss a')}</p>
-                <p className="mt-1">Please listen for your token number to be called</p>
-              </div>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 };

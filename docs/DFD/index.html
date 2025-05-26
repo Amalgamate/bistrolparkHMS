@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bristol Park Hospital - Process Flow Diagrams</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0100f6 0%, #0080ff 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .diagram-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .diagram-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .diagram-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #0100f6;
+        }
+        
+        .diagram-card h3 {
+            color: #0100f6;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .diagram-card .icon {
+            width: 40px;
+            height: 40px;
+            background: #0100f6;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .diagram-card p {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .diagram-card .features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+        
+        .diagram-card .features li {
+            color: #495057;
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .diagram-card .features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .btn {
+            background: #0100f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #0080ff;
+            transform: translateY(-2px);
+        }
+        
+        .overview {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-left: 5px solid #0100f6;
+        }
+        
+        .overview h2 {
+            color: #0100f6;
+            margin-bottom: 15px;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            text-align: center;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .status-implemented {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-item h4 {
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Bristol Park Hospital</h1>
+            <p>Process Flow Diagrams & Data Flow Documentation</p>
+        </div>
+        
+        <div class="content">
+            <div class="overview">
+                <h2>System Overview</h2>
+                <p>Comprehensive workflow diagrams for the Bristol Park Hospital Management Information System. These diagrams illustrate the complete patient journey from registration to discharge, including all integrated modules and processes.</p>
+                
+                <div class="status-grid">
+                    <div class="status-item status-implemented">
+                        <h4>✅ Fully Implemented</h4>
+                        <p>Patient Registration, Clinical Queue, Doctor Consultation</p>
+                    </div>
+                    <div class="status-item status-partial">
+                        <h4>🔄 Partially Implemented</h4>
+                        <p>Financial Workflow, Insurance Integration</p>
+                    </div>
+                    <div class="status-item status-pending">
+                        <h4>❌ Pending Development</h4>
+                        <p>Discharge Process, Payment Integration</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="diagram-grid">
+                <div class="diagram-card" onclick="window.open('patient-registration-workflow.html', '_blank')">
+                    <h3>
+                        <div class="icon">👤</div>
+                        Patient Registration → Clinical → Discharge
+                    </h3>
+                    <p>Complete patient journey from initial registration through clinical care to final discharge.</p>
+                    <ul class="features">
+                        <li>Patient registration with MRN generation</li>
+                        <li>Clinical queue management with tokens</li>
+                        <li>Vitals capture and doctor consultation</li>
+                        <li>Lab orders and pharmacy prescriptions</li>
+                        <li>Billing and discharge process</li>
+                    </ul>
+                    <a href="patient-registration-workflow.html" class="btn">View Diagram</a>
+                </div>
+                
+                <div class="diagram-card" onclick="window.open('doctor-workflow.html', '_blank')">
+                    <h3>
+                        <div class="icon">👨‍⚕️</div>
+                        Doctor Workflow
+                    </h3>
+                    <p>Doctor's complete workflow from appointment to diagnosis and prescription.</p>
+                    <ul class="features">
+                        <li>Queue and appointment management</li>
+                        <li>Patient history review</li>
+                        <li>Clinical examination and assessment</li>
+                        <li>Lab test ordering</li>
+                        <li>Diagnosis and prescription creation</li>
+                    </ul>
+                    <a href="doctor-workflow.html" class="btn">View Diagram</a>
+                </div>
+                
+                <div class="diagram-card" onclick="window.open('pharmacy-workflow.html', '_blank')">
+                    <h3>
+                        <div class="icon">💊</div>
+                        Pharmacy Workflow
+                    </h3>
+                    <p>Prescription processing from receipt to medication dispensing.</p>
+                    <ul class="features">
+                        <li>Prescription verification</li>
+                        <li>Medication availability checking</li>
+                        <li>Stock management</li>
+                        <li>Patient counseling</li>
+                        <li>Dispensing and documentation</li>
+                    </ul>
+                    <a href="pharmacy-workflow.html" class="btn">View Diagram</a>
+                </div>
+                
+                <div class="diagram-card" onclick="window.open('lab-workflow.html', '_blank')">
+                    <h3>
+                        <div class="icon">🔬</div>
+                        Laboratory Workflow
+                    </h3>
+                    <p>Lab test processing from order to results delivery.</p>
+                    <ul class="features">
+                        <li>Lab order verification</li>
+                        <li>Sample collection and processing</li>
+                        <li>Test execution and quality control</li>
+                        <li>Results review and approval</li>
+                        <li>Report generation and delivery</li>
+                    </ul>
+                    <a href="lab-workflow.html" class="btn">View Diagram</a>
+                </div>
+                
+                <div class="diagram-card" onclick="window.open('financial-workflow.html', '_blank')">
+                    <h3>
+                        <div class="icon">💰</div>
+                        Financial Workflow
+                    </h3>
+                    <p>Billing and payment processing from service completion to transaction closure.</p>
+                    <ul class="features">
+                        <li>Service charge calculation</li>
+                        <li>Insurance verification and claims</li>
+                        <li>Invoice generation</li>
+                        <li>Multiple payment methods</li>
+                        <li>Receipt generation and records</li>
+                    </ul>
+                    <a href="financial-workflow.html" class="btn">View Diagram</a>
+                </div>
+                
+                <div class="diagram-card" onclick="window.open('integration-overview.html', '_blank')">
+                    <h3>
+                        <div class="icon">🔗</div>
+                        System Integration Overview
+                    </h3>
+                    <p>High-level view of how all modules integrate and communicate.</p>
+                    <ul class="features">
+                        <li>Module interconnections</li>
+                        <li>Data flow between systems</li>
+                        <li>Integration points</li>
+                        <li>API endpoints</li>
+                        <li>Database relationships</li>
+                    </ul>
+                    <a href="integration-overview.html" class="btn">View Diagram</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

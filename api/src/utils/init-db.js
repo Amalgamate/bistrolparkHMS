@@ -1,7 +1,7 @@
 import db from './db.js';
 import { createDatabase } from './create-db.js';
 import bcrypt from 'bcrypt';
-import { createExternalMessagesTable } from '../migrations/create_external_messages_table.js';
+// import { createExternalMessagesTable } from '../migrations/create_external_messages_table.js';
 
 const { pool } = db;
 
@@ -283,50 +283,26 @@ const seedDatabase = async () => {
     const columnNames = userColumns.rows.map(row => row.column_name);
     console.log('User table columns:', columnNames);
 
-    // Check if admin user exists
-    const adminExists = await pool.query(
+    // Check if bristoladmin user exists
+    const bristolAdminExists = await pool.query(
       'SELECT * FROM users WHERE username = $1',
-      ['admin']
+      ['bristoladmin']
     );
 
-    if (adminExists.rows.length === 0 && columnNames.includes('password')) {
-      // Hash password (password is 'admin123')
+    if (bristolAdminExists.rows.length === 0 && columnNames.includes('password')) {
+      // Hash password (password is 'Bristol2024!')
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash('admin123', salt);
+      const hashedPassword = await bcrypt.hash('Bristol2024!', salt);
 
-      // Create admin user
+      // Create bristoladmin user
       await pool.query(
         `INSERT INTO users (username, password, email, first_name, last_name, role)
          VALUES ($1, $2, $3, $4, $5, $6)`,
-        ['admin', hashedPassword, 'admin@bristolpark.com', 'Admin', 'User', 'admin']
+        ['bristoladmin', hashedPassword, 'bristoladmin@bristolpark.com', 'Bristol', 'Administrator', 'admin']
       );
-      console.log('Admin user created');
-
-      // Create doctor user
-      await pool.query(
-        `INSERT INTO users (username, password, email, first_name, last_name, role)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        ['doctor', hashedPassword, 'doctor@bristolpark.com', 'John', 'Smith', 'doctor']
-      );
-      console.log('Doctor user created');
-
-      // Create nurse user
-      await pool.query(
-        `INSERT INTO users (username, password, email, first_name, last_name, role)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        ['nurse', hashedPassword, 'nurse@bristolpark.com', 'Jane', 'Doe', 'nurse']
-      );
-      console.log('Nurse user created');
-
-      // Create pharmacist user
-      await pool.query(
-        `INSERT INTO users (username, password, email, first_name, last_name, role)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        ['pharmacist', hashedPassword, 'pharmacist@bristolpark.com', 'Robert', 'Johnson', 'pharmacist']
-      );
-      console.log('Pharmacist user created');
+      console.log('Bristol admin user created');
     } else {
-      console.log('Users already exist or password column is missing');
+      console.log('Bristol admin user already exists or password column is missing');
     }
 
     // Check the structure of the medications table
@@ -430,7 +406,7 @@ const initializeDatabase = async () => {
     await seedDatabase();
 
     // Create external messages table for tawk.to integration
-    await createExternalMessagesTable();
+    // await createExternalMessagesTable();
 
     console.log('Database initialization completed');
   } catch (error) {

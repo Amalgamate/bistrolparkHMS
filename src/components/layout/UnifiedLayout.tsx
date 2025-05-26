@@ -5,6 +5,7 @@ import { MessageCenter } from './MessageCenter';
 import { Pin, PinOff } from 'lucide-react';
 import { ModuleQuickActionsProvider } from '../../context/ModuleQuickActionsContext';
 import moduleQuickActions from '../../config/moduleQuickActions';
+import { PageTransition } from '../ui/PageTransition';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -108,7 +109,13 @@ export const UnifiedLayout: React.FC<LayoutProps> = ({ children }) => {
             sidebarOpen={sidebarOpen}
           />
           <main className="relative flex-1 overflow-y-auto focus:outline-none p-4 md:p-6">
-            {children}
+            <PageTransition
+              transitionDuration={400}
+              easing="cubic-bezier(0.25, 0.46, 0.45, 0.94)"
+              className="min-h-full"
+            >
+              {children}
+            </PageTransition>
           </main>
         </div>
 

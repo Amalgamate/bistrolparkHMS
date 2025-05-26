@@ -21,7 +21,7 @@ import {
 import CompactModuleHeader from '../../components/layout/CompactModuleHeader';
 import { useClinical, PatientStatus } from '../../context/ClinicalContext';
 import { PharmacyProvider } from '../../context/PharmacyContext';
-import PatientRegistration from '../../components/clinical/PatientRegistration';
+import MultiStepPatientRegistration from '../../components/clinical/MultiStepPatientRegistration';
 import ConsultationQueue from '../../components/clinical/ConsultationQueue';
 import VitalsCapture from '../../components/clinical/VitalsCapture';
 import DoctorConsultation from '../../components/clinical/DoctorConsultation';
@@ -64,172 +64,74 @@ const ClinicalModule: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-2 py-2 max-w-7xl">
-      <CompactModuleHeader
-        title="Clinical Menu"
-        actions={
-          <div className="flex items-center gap-2">
-            <ModuleSelector currentModule="clinical" />
+    <div className="container mx-auto px-4 py-4 max-w-full">
+      {/* Top Navigation Tabs */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+        <div className="border-b border-gray-200">
+          <nav className="flex space-x-8 px-6" aria-label="Clinical Navigation">
+            <button
+              className={`py-4 px-6 border-b-2 font-medium text-base transition-colors ${
+                activeTab === 'registration'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+              onClick={() => {
+                setActiveTab('registration');
+                setSelectedPatientId(null);
+              }}
+            >
+              <div className="flex items-center">
+                <UserPlus className="h-5 w-5 mr-3" />
+                <span>Register Patients</span>
+              </div>
+            </button>
 
-            <Button size="sm" onClick={() => {
-              setActiveTab('registration');
-              setSelectedPatientId(null);
-            }}>
-              <UserPlus className="h-3 w-3 mr-1.5" />
-              New Patient
-            </Button>
-          </div>
-        }
-      />
+            <button
+              className={`py-4 px-6 border-b-2 font-medium text-base transition-colors ${
+                activeTab === 'queue'
+                  ? 'border-green-500 text-green-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+              onClick={() => {
+                setActiveTab('queue');
+                setSelectedView('all');
+                setSelectedPatientId(null);
+              }}
+            >
+              <div className="flex items-center">
+                <Users className="h-5 w-5 mr-3" />
+                <span>Queue Management</span>
+                <span className="ml-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">
+                  {registeredCount + waitingVitalsCount + vitalsTakenCount}
+                </span>
+              </div>
+            </button>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {/* Left sidebar with module navigation */}
-        <div className="md:col-span-1">
-          <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-            <div className="p-2">
-              <h2 className="text-sm font-semibold mb-2 text-gray-700 px-2">Clinical Menu</h2>
-              <nav className="space-y-0.5">
-                <button
-                  className={`w-full flex items-center px-2 py-1.5 text-xs rounded-md ${
-                    activeTab === 'registration'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={() => {
-                    setActiveTab('registration');
-                    setSelectedPatientId(null);
-                  }}
-                >
-                  <UserPlus className="h-3 w-3 mr-2" />
-                  <span>Patient Registration</span>
-                </button>
-
-                <button
-                  className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded-md ${
-                    activeTab === 'queue'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={() => {
-                    setActiveTab('queue');
-                    setSelectedView('all');
-                    setSelectedPatientId(null);
-                  }}
-                >
-                  <div className="flex items-center">
-                    <Users className="h-3 w-3 mr-2" />
-                    <span>Consultation Queue</span>
-                  </div>
-                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs">
-                    {registeredCount + waitingVitalsCount + vitalsTakenCount}
-                  </span>
-                </button>
-
-                <button
-                  className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded-md ${
-                    activeTab === 'vitals'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={() => {
-                    setActiveTab('vitals');
-                    setSelectedView('waiting');
-                    setSelectedPatientId(null);
-                  }}
-                >
-                  <div className="flex items-center">
-                    <Activity className="h-3 w-3 mr-2" />
-                    <span>Vitals Capture</span>
-                  </div>
-                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs">
-                    {waitingVitalsCount}
-                  </span>
-                </button>
-
-                <button
-                  className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded-md ${
-                    activeTab === 'consultation'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={() => {
-                    setActiveTab('consultation');
-                    setSelectedView('waiting');
-                    setSelectedPatientId(null);
-                  }}
-                >
-                  <div className="flex items-center">
-                    <Stethoscope className="h-3 w-3 mr-2" />
-                    <span>Doctor Consultation</span>
-                  </div>
-                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs">
-                    {vitalsTakenCount + withDoctorCount + labCompletedCount}
-                  </span>
-                </button>
-
-                <button
-                  className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded-md ${
-                    activeTab === 'lab'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={() => {
-                    setActiveTab('lab');
-                    setSelectedPatientId(null);
-                  }}
-                >
-                  <div className="flex items-center">
-                    <FlaskConical className="h-3 w-3 mr-2" />
-                    <span>Laboratory</span>
-                  </div>
-                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs">
-                    {labOrderedCount}
-                  </span>
-                </button>
-
-                <button
-                  className={`w-full flex items-center justify-between px-2 py-1.5 text-xs rounded-md ${
-                    activeTab === 'pharmacy'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={() => {
-                    setActiveTab('pharmacy');
-                    setSelectedPatientId(null);
-                  }}
-                >
-                  <div className="flex items-center">
-                    <Pill className="h-3 w-3 mr-2" />
-                    <span>Pharmacy</span>
-                  </div>
-                  <span className="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded-full text-xs">
-                    {pharmacyCount}
-                  </span>
-                </button>
-
-                <button
-                  className={`w-full flex items-center px-2 py-1.5 text-xs rounded-md ${
-                    activeTab === 'settings'
-                      ? 'bg-blue-50 text-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
-                  }`}
-                  onClick={() => {
-                    setActiveTab('settings');
-                    setSelectedPatientId(null);
-                  }}
-                >
-                  <Settings className="h-3 w-3 mr-2" />
-                  <span>Clinical Settings</span>
-                </button>
-              </nav>
-            </div>
-          </div>
+            <button
+              className={`py-4 px-6 border-b-2 font-medium text-base transition-colors ${
+                activeTab === 'settings'
+                  ? 'border-gray-500 text-gray-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              }`}
+              onClick={() => {
+                setActiveTab('settings');
+                setSelectedPatientId(null);
+              }}
+            >
+              <div className="flex items-center">
+                <Settings className="h-5 w-5 mr-3" />
+                <span>Settings</span>
+              </div>
+            </button>
+          </nav>
         </div>
+      </div>
 
-        {/* Main content area */}
-        <div className="md:col-span-3">
+      {/* Main Content Area - Full Width */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6">
           {activeTab === 'registration' && (
-            <PatientRegistration />
+            <MultiStepPatientRegistration />
           )}
 
           {activeTab === 'queue' && (
@@ -241,39 +143,27 @@ const ClinicalModule: React.FC = () => {
             />
           )}
 
-          {activeTab === 'vitals' && (
-            <VitalsCapture
-              patientId={selectedPatientId}
-              view={selectedView}
-              onChangeView={setSelectedView}
-              onSelectPatient={(patientId) => setSelectedPatientId(patientId)}
-            />
-          )}
-
-          {activeTab === 'consultation' && (
-            <DoctorConsultation
-              patientId={selectedPatientId}
-              view={selectedView}
-              onChangeView={setSelectedView}
-              onSelectPatient={(patientId) => setSelectedPatientId(patientId)}
-            />
-          )}
-
-          {activeTab === 'lab' && (
-            <LabQueue />
-          )}
-
-          {activeTab === 'pharmacy' && (
-            <PharmacyProvider>
-              <PharmacyQueue />
-            </PharmacyProvider>
-          )}
-
           {activeTab === 'settings' && (
-            <div className="bg-white rounded-lg shadow-sm p-4">
-              <h2 className="text-lg font-semibold mb-2">Clinical Settings</h2>
-              <p className="text-sm text-gray-500">Configure clinical workflow, templates, and preferences.</p>
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Clinical Settings</h2>
+                <p className="text-gray-600">Configure clinical workflow, templates, and preferences.</p>
+              </div>
               {/* Settings content would go here */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-2">Workflow Settings</h3>
+                  <p className="text-sm text-gray-600">Configure patient flow and queue management</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-2">Templates</h3>
+                  <p className="text-sm text-gray-600">Manage clinical forms and templates</p>
+                </div>
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h3 className="font-medium text-gray-900 mb-2">Preferences</h3>
+                  <p className="text-sm text-gray-600">Set default values and preferences</p>
+                </div>
+              </div>
             </div>
           )}
         </div>

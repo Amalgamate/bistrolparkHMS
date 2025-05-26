@@ -23,22 +23,26 @@ export const DB_USERS = {
   }
 };
 
-// Sample patient data for testing
+// Sample patient data for testing - DO NOT USE IN PRODUCTION
+// All patient data should come from the database API
 export const TEST_PATIENT = {
-  firstName: 'John',
-  lastName: 'Doe',
+  firstName: 'Test',
+  lastName: 'Patient',
   gender: 'male',
   dateOfBirth: '1990-01-01',
-  phone: '0712345678',
-  email: 'john.doe@example.com',
-  idNumber: 'ID123456',
-  address: '123 Test Street',
-  city: 'Nairobi',
-  insuranceProvider: 'SHA',
-  insuranceNumber: 'SHA123456',
-  emergencyContact: 'Jane Doe',
-  emergencyPhone: '0787654321'
+  phone: '0700000000',
+  email: 'test@example.com',
+  idNumber: 'TEST123456',
+  address: 'Test Address',
+  city: 'Test City',
+  insuranceProvider: 'TEST',
+  insuranceNumber: 'TEST123456',
+  emergencyContact: 'Test Contact',
+  emergencyPhone: '0700000001'
 };
+
+// Warning: This is for testing only
+console.warn('TEST_PATIENT is for testing only. Use real patient data from API in production.');
 
 // Sample vitals data for testing
 export const TEST_VITALS = {

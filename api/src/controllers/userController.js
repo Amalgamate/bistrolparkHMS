@@ -6,19 +6,57 @@ import dotenv from 'dotenv';
 // Configure dotenv
 dotenv.config();
 
-// Get all users
+// Get all users with enhanced role information
 const getAllUsers = async (req, res) => {
   try {
     // Don't return password
     const result = await db.query(`
       SELECT id, username, email, first_name, last_name, role, created_at, updated_at
       FROM users
-      ORDER BY last_name, first_name
+      ORDER BY
+        CASE
+          WHEN role = 'super-admin' THEN 1
+          WHEN role = 'bristol-admin' THEN 2
+          WHEN role = 'admin' THEN 3
+          ELSE 4
+        END,
+        last_name, first_name
     `);
-    res.status(200).json(result.rows);
+
+    // Add role display names and permissions
+    const usersWithRoleInfo = result.rows.map(user => ({
+      ...user,
+      roleDisplayName: getRoleDisplayName(user.role),
+      canControlServices: user.role === 'super-admin',
+      canManageUsers: ['super-admin', 'bristol-admin'].includes(user.role)
+    }));
+
+    res.status(200).json({
+      success: true,
+      users: usersWithRoleInfo,
+      total: usersWithRoleInfo.length
+    });
   } catch (error) {
     console.error('Error fetching users:', error);
-    res.status(500).json({ message: 'Error fetching users', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching users',
+      error: error.message
+    });
+  }
+};
+
+// Helper function to get role display name
+const getRoleDisplayName = (role) => {
+  switch (role) {
+    case 'super-admin':
+      return 'Super Administrator';
+    case 'bristol-admin':
+      return 'Bristol Administrator';
+    case 'admin':
+      return 'Administrator';
+    default:
+      return 'User';
   }
 };
 
@@ -65,7 +103,7 @@ const getUsersByRole = async (req, res) => {
   }
 };
 
-// Register new user
+// Register new user with enhanced role validation
 const registerUser = async (req, res) => {
   const {
     username,
@@ -76,6 +114,42 @@ const registerUser = async (req, res) => {
     role
   } = req.body;
 
+  // Validate required fields
+  if (!username || !password || !email || !first_name || !last_name || !role) {
+    return res.status(400).json({
+      success: false,
+      message: 'All fields are required',
+      required: ['username', 'password', 'email', 'first_name', 'last_name', 'role']
+    });
+  }
+
+  // Validate role
+  const validRoles = ['super-admin', 'bristol-admin', 'admin', 'user'];
+  if (!validRoles.includes(role)) {
+    return res.status(400).json({
+      success: false,
+      message: 'Invalid role specified',
+      validRoles: validRoles
+    });
+  }
+
+  // Check if current user can create users with this role
+  const currentUserRole = req.user?.role;
+  if (role === 'super-admin' && currentUserRole !== 'super-admin') {
+    return res.status(403).json({
+      success: false,
+      message: 'Only Super Admins can create other Super Admin accounts'
+    });
+  }
+
+  // Validate password strength
+  if (password.length < 8) {
+    return res.status(400).json({
+      success: false,
+      message: 'Password must be at least 8 characters long'
+    });
+  }
+
   try {
     // Check if username or email already exists
     const existingUser = await db.query(
@@ -84,11 +158,17 @@ const registerUser = async (req, res) => {
     );
 
     if (existingUser.rows.length > 0) {
-      return res.status(400).json({ message: 'Username or email already exists' });
+      const existing = existingUser.rows[0];
+      const conflict = existing.username === username ? 'username' : 'email';
+      return res.status(400).json({
+        success: false,
+        message: `${conflict.charAt(0).toUpperCase() + conflict.slice(1)} already exists`,
+        conflict: conflict
+      });
     }
 
     // Hash password
-    const salt = await bcrypt.genSalt(10);
+    const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create user
@@ -101,10 +181,28 @@ const registerUser = async (req, res) => {
       [username, hashedPassword, email, first_name, last_name, role]
     );
 
-    res.status(201).json(result.rows[0]);
+    const newUser = result.rows[0];
+
+    // Add role information
+    const userWithRoleInfo = {
+      ...newUser,
+      roleDisplayName: getRoleDisplayName(newUser.role),
+      canControlServices: newUser.role === 'super-admin',
+      canManageUsers: ['super-admin', 'bristol-admin'].includes(newUser.role)
+    };
+
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      user: userWithRoleInfo
+    });
   } catch (error) {
     console.error('Error registering user:', error);
-    res.status(500).json({ message: 'Error registering user', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Error registering user',
+      error: error.message
+    });
   }
 };
 
@@ -148,8 +246,9 @@ const loginUser = async (req, res) => {
       (err, token) => {
         if (err) throw err;
 
-        // Return user info and token
+        // Return user info and token with enhanced role information
         res.status(200).json({
+          success: true,
           token,
           user: {
             id: user.id,
@@ -158,6 +257,9 @@ const loginUser = async (req, res) => {
             first_name: user.first_name,
             last_name: user.last_name,
             role: user.role,
+            roleDisplayName: getRoleDisplayName(user.role),
+            canControlServices: user.role === 'super-admin',
+            canManageUsers: ['super-admin', 'bristol-admin'].includes(user.role),
             department: user.department
           }
         });
